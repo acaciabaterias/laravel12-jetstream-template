@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/Users/luizeof/Library/Application Support/Herd/bin/php83",
+            "args": [
+                "/Users/luizeof/Github/Laravel12JetstreamStarter/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
