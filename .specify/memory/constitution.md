@@ -1,13 +1,13 @@
 <!--
 Sync Impact Report
-- Version change: 1.3.1 → 1.4.0
+- Version change: 1.4.0 → 1.5.0
 - Modified principles:
-  - I. Laravel 12 First → I. Laravel 12 First
-  - II. Reactive UI via Livewire 4 + Filament → II. Reactive UI via Livewire 4 + Filament
-  - III. Test-First Delivery (NON-NEGOTIABLE) → III. Test-First Delivery (NON-NEGOTIABLE)
-  - IV. PostgreSQL Data Integrity → IV. PostgreSQL Data Integrity
-  - V. Boost-Guided, Minimal Changes → V. Boost-Guided, Minimal Changes
-  - VI. Production-Ready Integrations → VI. Production-Ready Integrations
+  - I. Laravel 12 First → I. Business Domain Specialization
+  - II. Reactive UI via Livewire 4 + Filament → II. Mobile-First Field Operations
+  - III. Test-First Delivery (NON-NEGOTIABLE) → III. Automated Financial Microservices
+  - IV. PostgreSQL Data Integrity → IV. Comprehensive Inventory & Reverse Logistics
+  - V. Boost-Guided, Minimal Changes → V. Proactive Quality & Customer Service
+  - VI. Production-Ready Integrations → VI. Integrated Fiscal Compliance
 - Added sections:
   - None
 - Removed sections:
@@ -20,58 +20,39 @@ Sync Impact Report
   - None
 -->
 
-# Laravel12JetstreamStarter Constitution
+# BateriaExpert ERP Constitution
 
 ## Core Principles
 
-### I. Laravel 12 First
-All backend implementation MUST follow Laravel 12 conventions and native framework patterns.
-Routing, middleware, exceptions, and console configuration MUST use `bootstrap/app.php` and
-`routes/console.php` as applicable. Features MUST prefer Eloquent relationships, Form Requests,
-policies, named routes, and framework commands over custom infrastructure.
+### I. Business Domain Specialization
+The ERP MUST be a specialist system for automotive battery resale management, deeply understanding and implementing specific business rules such as scrap weight control and reverse logistics. The system MUST replace generic solutions by embedding a validated 27-year workflow.
 
-Rationale: Reduces accidental complexity and keeps the codebase aligned with maintainable Laravel
-standards.
+Rationale: Ensures the software directly addresses the unique needs of the automotive battery resale market, reducing manual effort and complexity.
 
-### II. Reactive UI via Livewire 4 + Filament
-Interactive UI MUST be built with Blade + Alpine + Livewire 4. The design system MUST follow the
-Jetstream base template and its established UI patterns. Livewire components MUST follow
-server-driven state, validation, authorization, and lifecycle hook conventions. Administrative and
-data-heavy UIs MUST use Filament Forms and Filament Tables before custom alternatives are
-introduced. Styling MUST use Tailwind CSS v4 utilities and existing project design tokens.
+### II. Mobile-First Field Operations
+Deliverers MUST interact with the system via a mobile-centric interface, enabling real-time access to routes, on-site adjustments of scrap weight, and direct recording of payment receipts. This MUST ensure seamless integration between field and in-store operations.
 
-Rationale: Enforces a single, consistent UI architecture and prevents fragmented frontend patterns.
+Rationale: Enhances operational efficiency, improves data accuracy by capturing information at the source, and bridges the gap between external and internal workflows.
 
-### III. Test-First Delivery (NON-NEGOTIABLE)
-Every behavioral change MUST be covered by automated tests. Work MUST follow a red-green-refactor
-cycle: write or update a failing test first, implement, then pass. Feature-level behavior MUST be
-validated in PHPUnit Feature tests; unit tests MUST be used for isolated domain logic.
+### III. Automated Financial Microservices
+Financial processes MUST leverage microservices for automated bank reconciliation via API, streamlined boleto issuance, and automatic payment baixa, thereby minimizing manual data entry and ensuring financial accuracy.
 
-Rationale: Prevents regressions and keeps delivery confidence high while evolving the system.
+Rationale: Automates critical financial tasks, reduces human error, and provides real-time financial visibility and control.
 
-### IV. PostgreSQL Data Integrity
-Persistent data MUST target PostgreSQL. Schema changes MUST be shipped through Laravel migrations,
-with explicit constraints, indexes, and foreign keys where applicable. Data access MUST prefer
-Eloquent/query builder and MUST avoid bypassing model integrity rules.
+### IV. Comprehensive Inventory & Reverse Logistics
+The system MUST provide robust inventory and reverse logistics management, including automatic stock entry via XML import from suppliers, precise "Scrap Account" management for clients and suppliers, and proactive monitoring of battery "Shelf Life" to prevent charge loss.
 
-Rationale: Protects data correctness and performance while keeping migrations auditable.
+Rationale: Optimizes inventory levels, ensures compliance with reverse logistics requirements, and minimizes financial losses due to product degradation.
 
-### V. Boost-Guided, Minimal Changes
-For Laravel ecosystem decisions, implementation MUST consult Laravel Boost documentation search
-before coding. Any question about framework or system behavior MUST use Laravel Boost as the
-primary source of truth, treating it as the internal MCP for resolving doubts about the system and
-framework. Changes MUST be minimal, scoped, and compatible with existing structure; dependency or
-major architectural changes REQUIRE explicit approval.
+### V. Proactive Quality & Customer Service
+The system MUST manage product guarantees with full traceability to original sales and clients, facilitate battery loans, and automate customer notifications via WhatsApp for status updates. It MUST also generate detailed quality reports by brand, model, and time-to-claim to dynamically establish product return indices.
 
-Rationale: Ensures version-correct implementation choices and reduces risk from broad refactors.
+Rationale: Improves customer satisfaction, enhances after-sales support, and provides critical data for product quality control and supplier negotiation.
 
-### VI. Production-Ready Integrations
-Background processing MUST use Laravel queues with Horizon for monitoring and operations. Outbound
-HTTP calls MUST use Laravel's native HTTP client. Feature flags, integrations, and environment-
-specific customization MUST be configured via environment variables and surfaced through config
-files, never hard-coded or stored directly in source control.
+### VI. Integrated Fiscal Compliance
+The system MUST communicate with dedicated microservices for the issuance of Fiscal Coupons (PDV) and NF-e. Users MUST be able to consult, print, correct, cancel, and generate accounting reports for these documents directly through the ERP interface.
 
-Rationale: Standardizes integrations for reliability, visibility, and secure configuration.
+Rationale: Ensures full compliance with fiscal regulations, simplifies tax reporting, and provides users with direct control over their fiscal documentation.
 
 ## Technology Stack Constraints
 
@@ -88,6 +69,7 @@ The canonical application stack is:
 - Laravel Horizon
 - Laravel HTTP Client
 - Laravel Pennant
+- Dedicated microservices for financial and fiscal automation.
 
 Any proposal that introduces an additional framework for a capability already covered by this stack
 MUST include written justification and explicit approval before implementation.
@@ -127,4 +109,4 @@ Compliance Review Expectations:
 - Every task list MUST include explicit testing tasks.
 - Every pull request review MUST verify constitutional compliance prior to approval.
 
-**Version**: 1.4.0 | **Ratified**: 2026-02-19 | **Last Amended**: 2026-02-19
+**Version**: 1.5.0 | **Ratified**: 2026-02-19 | **Last Amended**: 2026-04-11
