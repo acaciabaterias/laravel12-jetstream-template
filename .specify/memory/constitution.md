@@ -54,6 +54,28 @@ The system MUST communicate with dedicated microservices for the issuance of Fis
 
 Rationale: Ensures full compliance with fiscal regulations, simplifies tax reporting, and provides users with direct control over their fiscal documentation.
 
+## Princípios de Arquitetura
+
+### Multi-Tenancy (Filial)
+- Todo registro no banco de dados DEVE conter `filial_id` como chave estrangeira
+- Isolamento de dados entre filiais é obrigatório
+- Usuários só podem acessar dados da(s) sua(s) filial(is)
+
+### RBAC (Perfis)
+- O sistema deve implementar controle de acesso baseado em papéis (Roles)
+- Perfis mínimos: Dono, Gestor, Vendedor, Técnico, Estoquista
+- Auditoria de acesso (IP, dispositivo, timestamp) é obrigatória
+
+### Ordem de Implementação
+Os módulos DEVEM ser implementados na seguinte ordem:
+1. Filial/Tenant
+2. Cadastros Estruturais
+3. Usuários e Perfis
+4. Estoque
+5. Vendas e Assistência
+6. Empréstimo de Ativos
+7. Conciliação Bancária
+
 ## Technology Stack Constraints
 
 The canonical application stack is:
@@ -110,3 +132,18 @@ Compliance Review Expectations:
 - Every pull request review MUST verify constitutional compliance prior to approval.
 
 **Version**: 1.5.0 | **Ratified**: 2026-02-19 | **Last Amended**: 2026-04-11
+
+# Constituição do Projeto: ERP Baterias
+
+## Princípios de Arquitetura
+1. **Multi-tenancy Absoluto:** Todo e qualquer dado deve ser filtrado por `branch_id` (Filial). O isolamento de dados é a prioridade número 1.
+2. **Precedência Hierárquica:** O desenvolvimento deve seguir a ordem de Níveis (1 a 4). Nenhuma funcionalidade de nível superior pode ser implementada sem que a sua dependência no nível inferior esteja estável.
+3. **RBAC (Role-Based Access Control):** O acesso a funcionalidades e dados é estritamente controlado por perfis de utilizador.
+
+## Padrão de Documentação (SDD)
+Todas as especificações devem seguir obrigatoriamente a estrutura:
+- **Contexto e Dependências:** O que é e o que precisa de existir antes.
+- **User Scenarios (Given-When-Then):** Comportamento esperado.
+- **Edge Cases:** Tratamento de erros e exceções.
+- **Functional Requirements (FR):** Regras técnicas numeradas.
+- **Success Criteria (SC):** Como medir se a funcionalidade funciona.

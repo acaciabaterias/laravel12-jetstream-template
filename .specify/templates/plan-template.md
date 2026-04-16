@@ -27,6 +27,20 @@
 **Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
+## ERP Modernization Context
+
+**Modules**:
+- Structural Registrations
+- Sales and "Vales"
+- Logistics (Delivery App)
+- Inventory and Reverse Logistics
+- Intelligent Financial Module
+- Guarantees and Feedback
+- Fiscal Module
+
+**Constitution Check**:
+- Ensure alignment with ERP principles, including reverse logistics and financial automation.
+
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*

@@ -249,3 +249,17 @@ With multiple developers:
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+
+## ERP-Specific Tasks
+
+- **Structural Registrations**:
+  - [P1] Create client registration form.
+  - [P1] Implement supplier XML import.
+
+- **Sales and "Vales"**:
+  - [P1] Develop "Vale" creation workflow.
+  - [P2] Add scrap weight adjustment logic.
+
+- **Logistics**:
+  - [P1] Build mobile route tracking interface.
+  - [P2] Integrate real-time scrap adjustments.

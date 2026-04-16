@@ -113,3 +113,13 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+
+### ERP-Specific User Stories
+
+- **Structural Registrations**: Manage clients, suppliers, and products.
+- **Sales and "Vales"**: Create and manage open orders.
+- **Logistics**: Real-time route tracking and scrap adjustments.
+- **Inventory**: XML imports and shelf-life monitoring.
+- **Financial**: Automated reconciliation and profit margins.
+- **Guarantees**: Warranty tracking and customer notifications.
+- **Fiscal**: Issuance and management of fiscal documents.
