@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
             ->site('Promovaweb')
             ->title(
                 default: 'Laravel 12 Jetstream Livewire Starter Kit',
-                modify: fn(string $title) => $title . ' | Promovaweb'
+                modify: fn (string $title) => $title.' | Promovaweb'
             )
             ->description(default: 'We are a development agency ...')
             ->twitterSite('@promovaweb');

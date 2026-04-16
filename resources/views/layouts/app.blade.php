@@ -1,3 +1,8 @@
+@php
+    $filial = auth()->user()?->filial;
+    $whiteLabel = $filial?->whiteLabelConfig;
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -16,9 +21,30 @@
 
         <!-- Styles -->
         @livewireStyles
+
+        <title>{{ $whiteLabel?->titulo_login ?? config('app.name') }} - {{ $filial?->nome ?? 'BateriaExpert' }}</title>
+        
+        <link rel="icon" href="{{ $whiteLabel?->favicon_url ?? asset('favicon.ico') }}">
+        
+        @if($whiteLabel)
+        <style>
+            :root {
+                --primary-color: {{ $whiteLabel->cor_primaria }};
+                --secondary-color: {{ $whiteLabel->cor_secundaria }};
+                --background-color: {{ $whiteLabel->cor_fundo }};
+            }
+            {!! $whiteLabel->custom_css !!}
+        </style>
+        @endif
     </head>
     <body class="font-sans antialiased">
         <x-banner />
+
+        @if($whiteLabel?->logo_url)
+            <div class="bg-white p-4 flex justify-center">
+                <img src="{{ $whiteLabel->logo_url }}" alt="Logo" class="h-12">
+            </div>
+        @endif
 
         <div class="min-h-screen bg-gray-100">
             @livewire('navigation-menu')
@@ -41,5 +67,15 @@
         @stack('modals')
 
         @livewireScripts
+
+        @if($whiteLabel?->custom_js)
+            <script>{!! $whiteLabel->custom_js !!}</script>
+        @endif
+        
+        @if($whiteLabel?->mostrar_marca_plataforma ?? true)
+            <footer class="text-center text-xs text-gray-500 p-4">
+                Powered by <a href="https://bateriaexpert.com">BateriaExpert</a>
+            </footer>
+        @endif
     </body>
 </html>

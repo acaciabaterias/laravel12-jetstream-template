@@ -67,4 +67,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function filial()
+    {
+        return $this->belongsTo(Filial::class);
+    }
 }

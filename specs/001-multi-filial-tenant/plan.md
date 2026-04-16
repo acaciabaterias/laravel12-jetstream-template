@@ -8,5 +8,7 @@
 **Storage**: PostgreSQL 15+
 
 ## Project Structure
-- **Global Scope**: `MultiTenantScope` aplicado em traits (ex: `HasFilial`).
-- **Middleware**: `SetFilialContext` para injetar o contexto da filial base no request/session.
+- **Global Scope**: `MultiTenantScope` aplicado via trait `HasFilial`.
+- **Tenant Resolution**: Middleware `TenantResolver` associado ao alias `tenant` nas rotas.
+- **SaaS Core**: Relacionamentos entre `Filial`, `PlanoAssinatura`, `Assinatura` e `Fatura`.
+- **UI Customization**: `WhiteLabelConfig` gerenciando branding dinâmico no `app.blade.php`.

@@ -12,17 +12,18 @@ Implementação do suporte base para múltiplas filiais (Tenants), garantindo is
 
 ## Functional Requirements
 - **FR01 - Isolamento de Dados**: Todas as queries e operações DEVEM ser filtradas por `filial_id` através de Global Scopes.
-- **FR02 - Tabela Base**: Criar a tabela `filiais` com campos essenciais.
-- **FR03 - Seletor de Filial**: Implementar um dropdown no Dashboard permitindo a troca de contexto (apenas para usuários com acesso a mais de uma filial).
-- **FR04 - Sessão**: O sistema deve manter o `filial_id` ativo salvo na sessão.
+- **FR02 - Suporte SaaS**: Tabela `filiais` deve suportar planos, limites (usuários, estoque) e status de assinatura (trial, active, expired).
+- **FR03 - White Label**: Suporte a branding customizado (logo, cores, favicon, CSS/JS) via `WhiteLabelConfig`.
+- **FR04 - Resolution por Domínio**: Middleware `TenantResolver` deve identificar o tenant via subdomínio ou domínio personalizado.
+- **FR05 - Seletor de Filial**: Dropdown no Dashboard permitindo a troca de contexto entre filiais do mesmo grupo.
 
-## User Stories
+## User Scenarios
 1. **Given** um usuário logado associado a várias filiais, **When** ele clica no seletor do dashboard, **Then** ele pode alternar a visualização dos dados para outra filial específica.
-2. **Given** uma tentativa de acesso a um dado de outra filial (ex: `/api/clientes/2`), **When** a filial do registro for diferente da filial atual do usuário, **Then** o sistema retorna `403 Forbidden` ou exibe como não encontrado.
-
-## Edge Cases
-- O que acontece se a filial atual de um usuário for desativada? O sistema deve redirecioná-lo para a principal conta disponível ou realizar logout.
+2. **Given** um acesso via subdomínio (ex: `joao.erp.com`), **When** o sistema resolve o tenant, **Then** a interface reflete as cores e logo configurados no White Label.
+3. **Given** uma assinatura expirada, **When** o usuário tenta acessar o dashboard, **Then** o sistema bloqueia o acesso com erro 402.
 
 ## Success Criteria
-- **SC01**: Nenhum dado cruzado entre filiais em listagens do banco.
-- **SC02**: Global scope obriga presença de `filial_id` na criação de novos registros das entidades.
+- **SC01**: Isolamento total de dados entre tenants.
+- **SC02**: Resolução correta de tenant via subdomínio/domínio.
+- **SC03**: Aplicação dinâmica de estilos White Label baseada no tenant resolvido.
+- **SC04**: Bloqueio automático de funcionalidades por limite de plano.
