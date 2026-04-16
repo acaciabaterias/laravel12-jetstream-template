@@ -117,6 +117,8 @@ Inteligência geográfica para o App do Entregador e Módulo 006. Converte ender
 | `VALE_FATURADO` | Módulo 005 / 009 | MS-001, MS-003 | Venda faturada — emitir NF-e e notificar cliente |
 | `NF_AUTORIZADA` | MS-001 | Módulo 009 | NF-e autorizada com chave e DANFE |
 | `NF_EM_CONTINGENCIA` | MS-001 | Módulo 009, MS-003 | SEFAZ offline — nota na fila |
+| `NF_CONTINGENCIA_CRITICA` | MS-001 | Módulo 009, MS-003 | Contingência atingiu 10 falhas/24h — intervenção humana necessária |
+| `NF_INUTILIZAR` | Módulo 009 | MS-001 | Solicita inutilização de faixa de numeração NF |
 | `COBRANCA_CRIAR_BOLETO` | Módulo 009 | MS-002 | Solicitar geração de boleto |
 | `COBRANCA_PAGA` | MS-002 | Módulo 008, MS-003 | Pagamento confirmado → baixar fatura |
 | `TRANSACOES_CAPTURADAS` | MS-004 | Módulo 008 | Extrato bancário para conciliação |

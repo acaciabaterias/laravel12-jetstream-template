@@ -6,6 +6,31 @@
 
 ---
 
+## Constitution Check
+
+> Requisito da constitution v1.5.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
+
+| Functional Requirement | Princípio da Constitution | Status | Notas |
+|---|---|---|---|
+| FR-005-01: Geocodificação de Endereços | **II. Mobile-First Field Operations** — "enabling real-time access to routes" | ✅ Alinhado | Geocodificações precisas são pré-requisito para rotas funcionais no App do Entregador |
+| FR-005-02: Otimização de Rota (TSP) | **II. Mobile-First Field Operations** — "real-time access to routes, on-site adjustments" + **I. Business Domain Specialization** — otimização de logística de revenda de baterias | ✅ Alinhado | Rotas otimizadas reduzem custo operacional específico do domínio |
+| FR-005-03: Cálculo de ETA Dinâmico | **II. Mobile-First Field Operations** — "real-time access" e "seamless integration between field and in-store operations" | ✅ Alinhado | ETAs em tempo real conectam campo (entregador) à loja (gestor) |
+| FR-005-04: Rastreamento de Localização | **II. Mobile-First Field Operations** — "direct recording of payment receipts" e rastreamento de campo | ✅ Alinhado | |
+| FR-005-05: Ajuste Manual de Coordenadas | **II. Mobile-First Field Operations** — "on-site adjustments" pelo entregador | ✅ Alinhado | Entregador corrige pin diretamente no App (mobile-first) |
+| FR-005-06: Gerenciamento de Cache | **I. Business Domain Specialization** — otimização operacional + redução de custos de API | ✅ Alinhado | Cache de 30 dias reduz custo de Google Maps para operação de revenda |
+
+**Princípios sem conflito identificado:** III, IV, V, VI — não impactados diretamente por este MS.
+
+**Multi-Tenancy (Architecture Principle):**
+> A entidade `Rota` contém `filial_id` (visível em spec Key Entities), garantindo isolamento por filial conforme exigido. Cada filial gerencia suas próprias rotas de entrega independentemente. ✅ Alinhado.
+
+**Stack Tecnológica (Quality Gate — Technology Stack Constraints):**
+- Node.js 20+ (Fastify): ✅ Serviço autônomo. Justificativa: SDK oficial Google Maps em Node.js, alta performance para processamento de coordenadas em memória
+- PostgreSQL 15+ com PostGIS: ✅ PostgreSQL é stack canônico; extensão PostGIS é adição específica e necessária para queries geoespaciais (GIST index, ST_DWithin)
+- Redis: ✅ Stack canônico
+
+---
+
 ## Stack Tecnológica
 
 | Camada | Tecnologia | Justificativa |

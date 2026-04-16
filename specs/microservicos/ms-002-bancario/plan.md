@@ -6,6 +6,29 @@
 
 ---
 
+## Constitution Check
+
+> Requisito da constitution v1.5.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
+
+| Functional Requirement | Princípio da Constitution | Status | Notas |
+|---|---|---|---|
+| FR-002-01: Geração de Boleto Registrado | **III. Automated Financial Microservices** — "streamlined boleto issuance" | ✅ Alinhado | Este MS é a implementação direta do requisito de emissão automatizada de boletos |
+| FR-002-02: Geração de Cobrança PIX | **III. Automated Financial Microservices** — "automated bank reconciliation via API" | ✅ Alinhado | PIX integrado ao fluxo de reconciliação |
+| FR-002-03: Consulta de Status de Pagamento | **III. Automated Financial Microservices** — "automatic payment baixa" | ✅ Alinhado | Consulta de status viabiliza a baixa automática no Módulo 008 |
+| FR-002-04: Cancelamento/Baixa de Cobrança | **III. Automated Financial Microservices** — "minimizing manual data entry" | ✅ Alinhado | |
+| FR-002-05: Geração de CNAB Remessa | **III. Automated Financial Microservices** — "ensuring financial accuracy" | ✅ Alinhado | |
+| FR-002-06: Processamento de CNAB Retorno | **III. Automated Financial Microservices** — "automatic payment baixa, minimizing manual data entry" | ✅ Alinhado | Elimina o upload manual de retorno bancário |
+| FR-002-07: Idempotência de Cobranças | **III. Automated Financial Microservices** — "ensuring financial accuracy" | ✅ Alinhado | Previne cobranças duplicadas acidentais |
+
+**Princípios sem conflito identificado:** I, II, IV, V, VI — não impactados diretamente por este MS.
+
+**Stack Tecnológica (Quality Gate — Technology Stack Constraints):**
+- Node.js 20+ (Fastify): ✅ Serviço autônomo — não conflita com Laravel 12 do ERP (justificativa: ecossistema bancário e I/O intensivo)
+- PostgreSQL: ✅ Stack canônico
+- Redis (BullMQ): ✅ Stack canônico (equivalente ao Laravel Horizon no contexto do MS)
+
+---
+
 ## Stack Tecnológica
 
 | Camada | Tecnologia | Justificativa |
@@ -57,11 +80,14 @@ interface BancoAdapter {
 ```
 
 **Bancos suportados na v1:**
-- Bradesco (API Bradesco Developer)
-- Itaú (API Itaú e-Commerce)
-- Sicoob (API Sicoob PIX + CNAB)
-- Banco do Brasil (API BB Developers)
-- Caixa Econômica Federal (API CEF + CNAB 240)
+
+| Banco | Adapter API | Suporta Webhook Push? | Estratégia de Atualização |
+|---|---|---|---|
+| Bradesco | API Bradesco Developer | Não | Polling agendado via BullMQ (T017) |
+| Itaú | API Itaú e-Commerce | Sim | Webhook (passivo) |
+| Sicoob | API Sicoob PIX + CNAB | Sim | Webhook (passivo) |
+| Banco do Brasil | API BB Developers | Sim | Webhook (passivo) |
+| Caixa Econômica | API CEF + CNAB 240 | Não | Polling via arquivo Retorno |
 
 ---
 

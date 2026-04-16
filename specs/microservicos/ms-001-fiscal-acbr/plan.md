@@ -6,6 +6,30 @@
 
 ---
 
+## Constitution Check
+
+> Requisito da constitution v1.5.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
+
+| Functional Requirement | Princípio da Constitution | Status | Notas |
+|---|---|---|---|
+| FR-001-01: Emissão de NF-e | **VI. Integrated Fiscal Compliance** — "The system MUST communicate with dedicated microservices for issuance of NF-e" | ✅ Alinhado | Este MS é exatamente o microserviço dedicado mandatado pelo Princípio VI |
+| FR-001-02: Emissão de NFC-e (PDV) | **VI. Integrated Fiscal Compliance** — "Fiscal Coupons (PDV)" | ✅ Alinhado | NFC-e cobre o Cupom Fiscal do PDV |
+| FR-001-03: Modo Contingência Automático | **VI. Integrated Fiscal Compliance** — operação ininterrupta | ✅ Alinhado | Garante que o balconista (Princípio I — domínio de revenda) nunca trave por SEFAZ fora do ar |
+| FR-001-04: Cancelamento de NF-e | **VI. Integrated Fiscal Compliance** — "Users MUST be able to consult, cancel documents directly through ERP" | ✅ Alinhado | |
+| FR-001-05: Carta de Correção (CC-e) | **VI. Integrated Fiscal Compliance** — "correct… fiscal documents directly through ERP" | ✅ Alinhado | |
+| FR-001-06: Monitoramento de Certificado | **VI. Integrated Fiscal Compliance** — ensures continued fiscal compliance | ✅ Alinhado | Prevenção de interrupção operacional no domínio de revenda (Princípio I) |
+| FR-001-07: Inutilização de Numeração | **VI. Integrated Fiscal Compliance** — conformidade fiscal plena | ✅ Alinhado | |
+
+**Princípios sem conflito identificado:** I, II, III, IV, V — não impactados por este MS.
+
+**Stack Tecnológica (Quality Gate — Technology Stack Constraints):**
+- Node.js 20+ (Fastify): ✅ Não conflita com o stack Laravel 12 do ERP principal (MS é serviço separado com justificativa de performance I/O)
+- ACBr Docker: ✅ Mandatado implicitamente como "dedicated microservices for fiscal automation"
+- PostgreSQL: ✅ Stack canônico
+- Redis: ✅ Stack canônico (Laravel Horizon equivalente no contexto do MS)
+
+---
+
 ## Stack Tecnológica
 
 | Camada | Tecnologia | Justificativa |
@@ -144,7 +168,7 @@ const RETRY_DELAYS_MS = [
 
 const contingenciaQueue = new Queue('contingencia-nfe', {
   defaultJobOptions: {
-    attempts: 5,
+    attempts: 10,
     backoff: {
       type: 'custom',
       delay: (attemptsMade) => RETRY_DELAYS_MS[attemptsMade] ?? 21_600_000,

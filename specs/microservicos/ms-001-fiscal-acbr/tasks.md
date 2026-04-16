@@ -48,7 +48,8 @@
 - [ ] T024: Implementar `ValeFaturadoConsumer.ts` — escuta `VALE_FATURADO`, chama `EmissaoService`
 - [ ] T025: Implementar `NfCancelarConsumer.ts` — escuta `NF_CANCELAR`, chama cancelamento via ACBr
 - [ ] T026: Implementar `NfCceConsumer.ts` — escuta `NF_CCE_SOLICITAR`
-- [ ] T027: Implementar publicador de eventos de saída (`NF_AUTORIZADA`, `NF_ERRO`, `NF_EM_CONTINGENCIA`, `NF_CANCELADA`)
+- [ ] T044: Implementar `NfInutilizarConsumer.ts` — escuta `NF_INUTILIZAR`, chama `AcbrService.inutilizar()` e publica resultado
+- [ ] T027: Implementar publicador de eventos de saída (`NF_AUTORIZADA`, `NF_ERRO`, `NF_EM_CONTINGENCIA`, `NF_CANCELADA`, `NF_CONTINGENCIA_CRITICA`)
 
 ---
 
@@ -69,6 +70,7 @@
 - [ ] T035: Teste de integração `POST /api/v1/nfe/emitir` contra ACBr em modo homologação SEFAZ
 - [ ] T036: Teste de idempotência — enviar mesmo `correlation_id` duas vezes, verificar que apenas 1 emissão ocorre
 - [ ] T037: Teste E2E da fila de contingência: simular SEFAZ fora do ar → notas enfileiradas → SEFAZ volta → notas transmitidas
+- [ ] T037A: Teste de carga (performance) usando k6/Artillery, validando latência de autorização em < 3s (p95) e salvamento em contingência em < 1s
 
 ---
 
@@ -80,3 +82,4 @@
 - [ ] T041: Configurar Prometheus metrics endpoint + Grafana dashboard template para monitoramento
 - [ ] T042: Documentar processo de rotação de certificado A1 (sem downtime)
 - [ ] T043: Criar runbook de troubleshooting para os cenários de contingência
+- [ ] T045: Executar linting e formatação em todos os arquivos TypeScript modificados (ESLint + Prettier) antes de cada merge

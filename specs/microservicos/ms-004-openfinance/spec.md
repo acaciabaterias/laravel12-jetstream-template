@@ -66,10 +66,10 @@ O Open Finance Brasil (anteriormente Open Banking) obriga os bancos participante
 - Útil para reconciliação manual acionada pelo usuário no Módulo 008
 
 ### FR-004-07: Suporte a Múltiplos Providers
-- **Pluggy**: Agregador que suporta +200 bancos brasileiros (OAuth simplificado)
-- **Belvo**: Alternativa ao Pluggy, cobertura similar
-- **API Direta (Open Finance Brasil)**: Para bancos que expõem API Open Finance nativa (Itaú, Bradesco, BB, etc.)
-- O MS DEVE abstrair a diferença entre providers via padrão de Adapter
+- **Pluggy** *(v1)*: Agregador que suporta +200 bancos brasileiros (OAuth simplificado) — escopo do primeiro release
+- **Belvo** *(v1)*: Alternativa ao Pluggy para bancos não cobertos — escopo do primeiro release
+- **API Direta Open Finance Brasil** *[FUTURO v2]*: Adapter nativo para bancos que expõem API Open Finance Brasil (Itaú, Bradesco, BB, etc.) diretamente, sem intermediário. Requer certificado digital próprio, registro no Diretório BACEN e fluxo OAuth mais complexo. Será implementado apenas após Pluggy/Belvo estarem estáveis em produção.
+- O MS DEVE abstrair a diferença entre providers via padrão de Adapter para que v2 seja adicionável sem alterar o contrato de API
 
 ---
 

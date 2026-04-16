@@ -89,3 +89,4 @@
 - [ ] T045: Configurar métricas Prometheus: cache hit/miss, uso Google Maps API, latência de otimização
 - [ ] T046: Criar Grafana dashboard para monitoramento de rotas (entregadores ativos, média de paradas, ETA accuracy)
 - [ ] T047: Documentar limites da Google Maps API e processo de aumento de cota
+- [ ] T048: Executar linting e formatação em todos os arquivos TypeScript modificados (ESLint + Prettier) antes de cada merge

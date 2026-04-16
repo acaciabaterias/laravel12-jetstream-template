@@ -42,8 +42,9 @@ Uma loja de baterias que faz entregas precisa organizar a ordem das paradas do e
 
 ### FR-005-02: Otimização de Rota (TSP)
 - Dado uma lista de endereços de entrega (N paradas) e um ponto de partida (filial), o MS DEVE calcular a ordem ótima das paradas
-- Para N ≤ 10 paradas: algoritmo exato (nearest neighbor + 2-opt improvement)
-- Para N > 10 paradas: algoritmo aproximado heurístico (Google Maps Routes API ou OR-Tools)
+- Para N ≤ 15 paradas: algoritmo local (nearest neighbor + 2-opt improvement) — execução em memória, sem chamadas externas
+- Para N > 15 paradas: algoritmo heurístico via Google Maps Routes API com waypoints optimization (ou OR-Tools como fallback)
+- Para N > 50 paradas: clustering K-means geográfico antes da otimização, gerando múltiplas sub-rotas
 - O MS DEVE retornar a lista de paradas na ordem otimizada com ETAs estimados para cada parada
 - O ETA DEVE considerar tráfego em tempo real (quando disponível pelo provider)
 
@@ -175,4 +176,4 @@ Uma loja de baterias que faz entregas precisa organizar a ordem das paradas do e
 - **SC-005-03**: ETA recalculado e publicado em < 3 segundos após receber `LOCALIZACAO_ATUALIZADA`
 - **SC-005-04**: 100% das falhas da Google Maps API resultam em fallback para OpenStreetMap sem erro para o usuário
 - **SC-005-05**: Zero bloqueios de entrega por endereço não encontrado (sempre há fallback ou ajuste manual)
-- **SC-005-06**: App do Entregador funciona offline com dados cacheados por até 8 horas
+- **SC-005-06**: Payload de rota retornado pelo endpoint `POST /api/v1/rotas/otimizar` é auto-contido (coordenadas, ETAs, ordem e metadados de parada incluídos), sem necessidade de lookups adicionais, permitindo que o App armazene e sirva os dados offline sem dependência de chamadas subsequentes ao MS-005

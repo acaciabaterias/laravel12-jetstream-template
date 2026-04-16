@@ -132,6 +132,7 @@ Este MS **não reescreve** a lógica do ACBr. Ele recebe JSON do ERP, transforma
 | `NF_EM_CONTINGENCIA` | Módulo 009 | Nota aguardando transmissão (SEFAZ offline) |
 | `NF_CANCELADA` | Módulo 009, 005 | Cancelamento confirmado |
 | `NF_ERRO` | Módulo 009 | Nota rejeitada com código e descrição do erro |
+| `NF_CONTINGENCIA_CRITICA` | Módulo 009, MS-003 | Contingência atingiu limite máximo (10 falhas / 24h) — requer intervenção humana |
 | `CERTIFICADO_EXPIRANDO` | Sistema de Alertas | Certificado com menos de 30 dias de validade |
 | `CERTIFICADO_EXPIRADO` | Módulo 009, Alertas | Certificado inválido ou expirado |
 
@@ -155,18 +156,19 @@ Este MS **não reescreve** a lógica do ACBr. Ele recebe JSON do ERP, transforma
 
 ## Edge Cases
 
-- **SEFAZ fora do ar**: Ativar modo contingência → armazenar na `ContingenciaQueue` → retransmitir automaticamente com exponential backoff (1min, 5min, 30min, 2h, 6h). Após 10 falhas em 24h, publicar alerta crítico.
+- **SEFAZ fora do ar**: Ativar modo contingência → armazenar na `ContingenciaQueue` → retransmitir automaticamente com exponential backoff (1min, 5min, 30min, 2h, 6h). Após 10 falhas em 24h, publicar `NF_CONTINGENCIA_CRITICA` e alerta crítico.
 - **Certificado A1 expirado**: Rejeitar emissões com erro `CERT_EXPIRED`, publicar `CERTIFICADO_EXPIRADO` e notificar administrador via webhook imediato.
 - **CC-e enviada após prazo legal**: Rejeitar com erro `CCE_PRAZO_EXPIRADO` e retornar mensagem explicativa ao ERP.
 - **Numeração de NF-e divergente**: Se o contador de numeração no ACBr desincronizar com o banco, o MS deve detectar e alertar antes de emitir (prevenindo duplicidades).
 - **Rejeição da SEFAZ (código 4xx)**: Rejeições por dados inválidos (ex: CNPJ incorreto, CFOP inválido) NÃO devem ir para contingência — devem retornar `NF_ERRO` imediatamente ao ERP com o código e descrição da rejeição SEFAZ.
+- **Payload inválido antes de enviar ao ACBr**: O MS DEVE validar o payload JSON de entrada contra o XSD NF-e 4.00 oficial localmente antes de acionar o ACBr. Erros de schema devem retornar `NF_ERRO` imediato (sem chamar o ACBr e sem ir para contingência). Esta validação prévia é a principal alavanca para manter a taxa de rejeição < 1% (SC-001-05).
 - **Nota emitida em duplicidade (idempotência)**: Toda requisição de emissão DEVE incluir um `correlation_id` (UUID do Vale). Se o ID já foi processado com sucesso, retornar a resposta cacheada sem reemitir.
 
 ---
 
 ## Success Criteria
 
-- **SC-001-01**: NF-e autorizada em < 3 segundos com SEFAZ disponível (95° percentil)
+- **SC-001-01**: NF-e autorizada em < 3 segundos **com SEFAZ disponível e respondendo dentro do timeout configurado** (95° percentil) — em contingência, o critério é: nota salva na fila em < 1 segundo
 - **SC-001-02**: 100% das notas em contingência são transmitidas automaticamente quando a SEFAZ restabelece conexão
 - **SC-001-03**: Zero duplicidade de emissão — idempotência garantida por `correlation_id` único por Vale
 - **SC-001-04**: Alertas de certificado expirado chegam ao ERP com ≥ 30 dias de antecedência

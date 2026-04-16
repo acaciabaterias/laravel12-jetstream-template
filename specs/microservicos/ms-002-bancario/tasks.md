@@ -65,6 +65,7 @@
 - [ ] T031: Teste de integração `BradescoAdapter` em ambiente de homologação
 - [ ] T032: Teste E2E — boleto criado → webhook de pagamento recebido → evento `COBRANCA_PAGA` publicado
 - [ ] T033: Teste de carga — 100 boletos gerados em paralelo sem falhas de idempotência
+- [ ] T033A: Teste de performance validando latência em < 3s (p95) para boletos e < 1s para PIX (simulando APIs externas)
 
 ---
 
@@ -75,3 +76,4 @@
 - [ ] T036: Configurar secrets de credenciais bancárias via Docker Secrets ou Vault
 - [ ] T037: Criar dashboard Grafana para métricas de cobranças (geradas, pagas, falhas por banco)
 - [ ] T038: Documentar processo de onboarding de novos bancos (criação de adapter + configuração de webhook)
+- [ ] T039: Executar linting e formatação em todos os arquivos TypeScript modificados (ESLint + Prettier) antes de cada merge

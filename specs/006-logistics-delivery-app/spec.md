@@ -45,3 +45,4 @@ Permite que entregadores acessem rotas de entrega pelo celular, editem pedidos e
 - **SC-LOG-01**: A aplicação suporta até 1 shift inteiro (+- 8 horas corridas) em operação assíncrona blindada sem deslogar usuários em cachê.
 - **SC-LOG-02**: O despachante de frota local tem visibilidade de posições GPS refrescadas num delay `< 10 segundos`.
 - **SC-LOG-03**: Índice de confiabilidade da sincronicidade dos registros atinge 100% de estabilidade pós re-handshake online da frota na fábrica.
+- **SC-LOG-04**: O App do Entregador cacheia localmente os dados de rota (paradas, coordenadas e ETAs) recebidos do MS-005 ao início do turno e permanece operacional por até 8 horas sem conexão ativa, sincronizando status das paradas automaticamente ao reconectar.

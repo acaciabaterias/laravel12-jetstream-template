@@ -30,7 +30,7 @@
 ## Phase 3: Fluxo OAuth e Consentimentos
 
 - [ ] T013: Implementar `GET /api/v1/oauth/authorize/{banco}` — gera URL de autorização e armazena `state` no Redis
-- [ ] T014: Implementar `GET /api/v1/oauth/callback` — troca authorization code por tokens, persiste criptografado
+- [ ] T014: Implementar `GET /api/v1/oauth/callback` — troca authorization code por tokens, persiste criptografado + publicar evento `CONSENTIMENTO_ATIVO` no broker com `consentimento_id` após persistência bem-sucedida
 - [ ] T015: Implementar refresh automático de token (verificado antes de cada captura, margem de 10 minutos)
 - [ ] T016: Implementar `ConsentimentoService.listar_ativos()` e `marcar_expirado()`
 - [ ] T017: Implementar job de verificação de consentimentos a vencer (cron diário → publica `CONSENTIMENTO_EXPIRANDO` para quem vence em 7 dias)
@@ -39,7 +39,7 @@
 
 ## Phase 4: Captura de Extratos
 
-- [ ] T018: Implementar `CapturaService.capturar(consentimento)` — orquestra busca, normalização, deduplicação e publicação
+- [ ] T018: Implementar `CapturaService.capturar(consentimento)` — orquestra busca, normalização, deduplicação e publica evento `TRANSACOES_CAPTURADAS` (sucesso) ou `CAPTURA_ERRO` (falha após retries máximos)
 - [ ] T019: Implementar deduplicação por `deduplicacao_hash` com janela de 30 dias
 - [ ] T020: Implementar retry com `tenacity` (3 tentativas, backoff exponencial 30s/2min/10min)
 - [ ] T021: Implementar registro em `ExtratoCapturaLog` ao final de cada captura (success/error/partial)
@@ -73,6 +73,7 @@
 - [ ] T034: Teste de integração `PluggyAdapter` em ambiente sandbox Pluggy
 - [ ] T035: Teste E2E OAuth → Captura → Publicação: `CONSENTIMENTO_ATIVO` → cron dispara → `TRANSACOES_CAPTURADAS` publicado
 - [ ] T036: Teste de falha de provider: Pluggy retorna 503 → retry executado → `CAPTURA_ERRO` publicado após 3 falhas
+- [ ] T036A: Teste E2E cronometrado garantindo que o job cron de capturas consiga processar o batch de consentimentos dentro da janela alvo de < 2 min
 
 ---
 
@@ -83,3 +84,4 @@
 - [ ] T039: Configurar Prometheus metrics (transações capturadas/h, taxa de deduplicação, latência por provider)
 - [ ] T040: Documentar processo de onboarding de novo banco (criação de BancoProvider + adapter)
 - [ ] T041: Criar runbook para renovação manual de consentimento expirado
+- [ ] T042: Executar linting e formatação em todos os arquivos Python modificados (Black + isort + Ruff) antes de cada merge

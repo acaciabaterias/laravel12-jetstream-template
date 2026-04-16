@@ -68,6 +68,7 @@
 - [ ] T032: Implementar `GET /api/v1/notificacao/historico/{cliente_id}` consultando `notificacao_log`
 - [ ] T033: Implementar `POST /api/v1/blacklist` e `DELETE /api/v1/blacklist/{numero}`
 - [ ] T034: Implementar `GET /api/v1/templates` listando templates ativos
+- [ ] T034A: Implementar `POST /api/v1/templates` e `PUT /api/v1/templates/{id}` para CRUD de templates via API
 - [ ] T035: Implementar `POST /api/v1/notificacao/enviar` para disparo manual (publica evento no Redis)
 - [ ] T036: Implementar `GET /api/v1/health` verificando n8n e Evolution API
 
@@ -92,3 +93,5 @@
 - [ ] T046: Criar `docs/adicionar-workflow.md` com guia para adicionar novos eventos/workflows
 - [ ] T047: Configurar backup automático do banco n8n e volume de workflows (crontab ou script)
 - [ ] T048: Configurar monitoramento: alerta no Slack/WhatsApp próprio se Evolution API desconectar
+- [ ] T048A: Configurar Grafana Dashboard calculando Taxa de Entrega (Mensagens Enviadas vs Confirmadas ≥ 95%)
+- [ ] T049: Executar linting e formatação em todos os arquivos TypeScript da API proxy (ESLint + Prettier) e validar JSON dos workflows exportados antes de cada merge

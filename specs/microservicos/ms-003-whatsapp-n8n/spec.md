@@ -39,7 +39,7 @@ O MS-003 é o hub central de **comunicação automatizada com clientes** via Wha
 - O MS DEVE receber eventos do ERP e disparar mensagens WhatsApp via Evolution API
 - Mensagens DEVEM ser enviadas com templates pré-definidos (com variáveis substituídas)
 - O MS DEVE suportar: texto, texto + imagem, texto + PDF (DANFE, boleto)
-- Horário de envio DEVE respeitar a janela comercial (8h–20h). Mensagens fora do horário são agendadas
+- Horário de envio DEVE respeitar a janela comercial (8h–20h). Mensagens fora do horário (incluindo domingos e feriados nacionais/estaduais) são tratadas como dia não-útil e agendadas para o próximo dia útil às 8h
 
 ### FR-003-02: Notificação de Venda/Boleto
 - Ao evento `VALE_FATURADO`: enviar confirmação de compra e linha digitável do boleto (se boleto)

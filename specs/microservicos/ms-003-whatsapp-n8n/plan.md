@@ -6,6 +6,30 @@
 
 ---
 
+## Constitution Check
+
+> Requisito da constitution v1.5.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
+
+| Functional Requirement | Princípio da Constitution | Status | Notas |
+|---|---|---|---|
+| FR-003-01: Envio de Mensagens WhatsApp | **V. Proactive Quality & Customer Service** — "automate customer notifications via WhatsApp for status updates" | ✅ Alinhado | Este MS é a implementação exata do requisito de notificação automatizada via WhatsApp |
+| FR-003-02: Notificação de Venda/Boleto | **V. Proactive Quality & Customer Service** + **I. Business Domain Specialization** — notificação específica do domínio de revenda de baterias | ✅ Alinhado | |
+| FR-003-03: Alertas de Garantia | **V. Proactive Quality & Customer Service** — "manage product guarantees… automate customer notifications" | ✅ Alinhado | Complementa o Módulo 007 (Garantias) |
+| FR-003-04: Notificações de Entrega | **II. Mobile-First Field Operations** — "seamless integration between field and in-store operations" | ✅ Alinhado | Notificação ao cliente fecha o ciclo da operação de campo |
+| FR-003-05: Alertas Internos para Equipe | **VI. Integrated Fiscal Compliance** (alertas de certificado/contingência) + **I. Business Domain Specialization** | ✅ Alinhado | |
+| FR-003-06: Respostas Automáticas (Chatbot) | **V. Proactive Quality & Customer Service** — "improve customer satisfaction, enhance after-sales support" | ✅ Alinhado | |
+| FR-003-07: Blacklist e Opt-out | **V. Proactive Quality & Customer Service** — respeito ao cliente e LGPD | ✅ Alinhado | |
+
+**Princípios sem conflito identificado:** III, IV — não impactados diretamente por este MS.
+
+**Stack Tecnológica (Quality Gate — Technology Stack Constraints):**
+- n8n (self-hosted, >= 1.40.0): ✅ Serviço autônomo. Justificativa explícita: workflows de notificação mudam frequentemente por decisão de negócio; n8n permite alteração sem deploy de código, reduzindo cycle time de dias para minutos. Aprovado como exceção arquitetural ao stack canônico.
+- Evolution API v2: ✅ Wrapper para WhatsApp Business — necessário pois não há solução no stack canônico Laravel 12 para transporte WhatsApp
+- PostgreSQL: ✅ Stack canônico
+- Redis: ✅ Stack canônico
+
+---
+
 ## Stack Tecnológica
 
 | Camada | Tecnologia | Justificativa |
@@ -110,6 +134,7 @@ services:
 | `wf-os-concluida` | Redis: `OS_CONCLUIDA` | Produto pronto → notifica cliente |
 | `wf-alerta-interno-cert` | Redis: `CERTIFICADO_EXPIRANDO` | WhatsApp para grupo de TI |
 | `wf-alerta-contingencia` | Redis: `NF_CONTINGENCIA_CRITICA` | WhatsApp urgente para fiscal |
+| `wf-processar-fila` | Schedule (Cron, 15 min) | Lê tabela `FilaNotificacao` para horários vencidos e envia |
 | `wf-processar-resposta` | Webhook: Evolution API | Interpreta respostas do cliente (SIM/NÃO/PARAR) |
 | `wf-opt-out` | Nó filho de `wf-processar-resposta` | Adiciona à blacklist + publica `CLIENTE_OPT_OUT` |
 
