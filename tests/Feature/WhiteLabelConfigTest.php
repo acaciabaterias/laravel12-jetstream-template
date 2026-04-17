@@ -4,49 +4,24 @@ namespace Tests\Feature;
 
 use App\Models\Cliente;
 use App\Models\WhiteLabelConfig;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class WhiteLabelConfigTest extends TestCase
 {
-    use RefreshDatabase;
 
-    protected $connectionsToTransact = ['central', 'tenant'];
-
-    protected function afterRefreshingDatabase()
-    {
-        $this->artisan('migrate', [
-            '--database' => 'central',
-            '--path' => 'database/migrations/central',
-            '--force' => true,
-        ]);
-    }
-
+    /**
+     * Test if white label branding is correctly resolved from the database.
+     * Note: Models now use the default connection refreshed by RefreshDatabase trait.
+     */
     public function test_it_applies_white_label_branding_from_tenant_database()
     {
-        // Setup base client and tenant route mockup
+        // Setup base client (central)
         $cliente = Cliente::factory()->create([
             'subdominio' => 'tenant-brand',
             'status' => 'active'
         ]);
 
-        // Simular switch de connection via route fake
-        config(['database.connections.tenant' => [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]]);
-
-        DB::purge('tenant');
-
-        // Em vez de rodar migrações completas, vamos fazer um mock da tabela no banco local
-        $this->artisan('migrate', [
-            '--database' => 'tenant',
-            '--path' => 'database/migrations/tenant',
-            '--force' => true,
-        ]);
-
+        // Create branding config (tenant/default connection)
         WhiteLabelConfig::create([
             'cor_primaria' => '#ff0000',
             'titulo_login' => 'ERP Bateria Custom',

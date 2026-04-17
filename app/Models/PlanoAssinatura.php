@@ -9,7 +9,7 @@ class PlanoAssinatura extends Model
 {
     use HasFactory;
 
-    protected $connection = 'central';
+    
 
     protected $table = 'planos';
 

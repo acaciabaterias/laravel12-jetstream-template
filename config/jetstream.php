@@ -57,13 +57,13 @@ return [
     |
     */
 
-    'features' => [
-        // Features::termsAndPrivacyPolicy(),
-        // Features::profilePhotos(),
-        // Features::api(),
-        Features::teams(['invitations' => true]),
-        Features::accountDeletion(),
-    ],
+    'features' => array_filter([
+        env('TERMS_AND_PRIVACY_POLICY', false) ? Features::termsAndPrivacyPolicy() : null,
+        env('PROFILE_PHOTOS', false) ? Features::profilePhotos() : null,
+        env('API_TOKENS', false) ? Features::api() : null,
+        env('TEAMS', false) ? Features::teams(['invitations' => true]) : null,
+        env('ACCOUNT_DELETION', false) ? Features::accountDeletion() : null,
+    ]),
 
     /*
     |--------------------------------------------------------------------------

@@ -10,7 +10,6 @@ class Cliente extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $connection = 'central';
 
     protected $table = 'clientes';
 

@@ -70,16 +70,16 @@ class CreateTenantCommand extends Command
             $projectData = $response->json();
             
             // 2. Salvar metadados no cliente
-            $cliente->supabase_host = "db." . $projectData['id'] . ".supabase.co";
+            $cliente->supabase_db_host = "db." . $projectData['id'] . ".supabase.co";
             // Nota: Numa aplicação real, criptografar e proteger bem esta senha
-            $cliente->supabase_password = encrypt($dbPass); 
+            $cliente->supabase_db_password = $dbPass; 
             $cliente->save();
 
-            $this->info("Projeto Supabase criado com sucesso! Host: {$cliente->supabase_host}");
+            $this->info("Projeto Supabase criado com sucesso! Host: {$cliente->supabase_db_host}");
             
             $dbName = 'postgres';
             $dbUser = 'postgres';
-            $dbHost = $cliente->supabase_host;
+            $dbHost = $cliente->supabase_db_host;
             $dbPassToUse = $dbPass;
 
         } else {
@@ -91,7 +91,7 @@ class CreateTenantCommand extends Command
                 touch($dbPath);
             }
             
-            $cliente->supabase_host = $dbPath; // Para testes, vamos usar o host como o path
+            $cliente->supabase_db_host = $dbPath; // Para testes, vamos usar o host como o path
             $cliente->save();
             
             $dbName = 'sqlite';
@@ -108,7 +108,7 @@ class CreateTenantCommand extends Command
         if ($env === 'testing' || !($token && $orgId)) {
              Config::set('database.connections.tenant', [
                 'driver' => 'sqlite',
-                'database' => $cliente->supabase_host,
+                'database' => $cliente->supabase_db_host,
                 'prefix' => '',
                 'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
             ]);
@@ -129,20 +129,16 @@ class CreateTenantCommand extends Command
 
         DB::purge('tenant');
 
-        if (app()->environment() !== 'testing') {
-            try {
-                Artisan::call('migrate', [
-                    '--database' => 'tenant',
-                    '--path' => 'database/migrations/tenant',
-                    '--force' => true,
-                ]);
-                $this->info(Artisan::output());
-            } catch (\Exception $e) {
-                $this->error("Erro ao executar migrações: " . $e->getMessage());
-                return Command::FAILURE;
-            }
-        } else {
-            $this->info("Ambiente de testes detectado, pulando migrações reais do banco");
+        try {
+            Artisan::call('migrate', [
+                '--database' => 'tenant',
+                '--path' => 'database/migrations',
+                '--force' => true,
+            ]);
+            $this->info(Artisan::output());
+        } catch (\Exception $e) {
+            $this->error("Erro ao executar migrações: " . $e->getMessage());
+            return Command::FAILURE;
         }
 
         $this->info("Tenant provisionado com sucesso!");

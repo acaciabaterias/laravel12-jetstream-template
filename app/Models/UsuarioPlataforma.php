@@ -9,7 +9,7 @@ class UsuarioPlataforma extends Authenticatable
 {
     use Notifiable;
 
-    protected $connection = 'central';
+    
 
     protected $table = 'usuarios_plataforma';
 

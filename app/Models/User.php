@@ -32,6 +32,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'filial_id',
+        'papel',
+        'ativo',
     ];
 
     /**
@@ -55,7 +58,6 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-    protected $connection = 'tenant';
 
     /**
      * Get the attributes that should be cast.
@@ -67,6 +69,26 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'ativo' => 'boolean',
         ];
+    }
+
+    public function filial()
+    {
+        return $this->belongsTo(Filial::class);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->papel === 'super_admin';
+    }
+
+    public function hasRole(string|array $papel): bool
+    {
+        if (is_array($papel)) {
+            return in_array($this->papel, $papel);
+        }
+
+        return $this->papel === $papel;
     }
 }

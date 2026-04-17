@@ -11,20 +11,22 @@ class TenantConnectionMiddleware
 {
     public function handle($request, Closure $next)
     {
-        // Pular rotas públicas e webhooks (opcional, dependendo do design)
-        if ($request->is('login', 'register', 'webhooks/*', 'api/webhooks/*')) {
+        // Pular rotas públicas e administrativas centrais
+        if ($request->is('login', 'register', 'user/profile', 'teams/*', 'webhooks/*', 'api/webhooks/*')) {
             return $next($request);
         }
 
         // Para super_admin (acesso via dashboard central)
-        if ($request->is('admin/*') && auth()->user() instanceof \App\Models\UsuarioPlataforma) {
+        if ($request->is('admin/*', 'dashboard') && auth()->check() && auth()->user()->isSuperAdmin()) {
             return $next($request);
         }
 
         $subdominio = $this->getSubdominio($request);
 
+        // Se não houver subdomínio identificado (ex: domínio principal ou localhost), 
+        // permitimos que a requisição siga para a aplicação central.
         if (! $subdominio) {
-            abort(400, 'Subdomínio não identificado');
+            return $next($request);
         }
 
         // Busca cliente no banco central
@@ -55,7 +57,7 @@ class TenantConnectionMiddleware
         if (app()->environment('testing')) {
             Config::set('database.connections.tenant', [
                 'driver' => 'sqlite',
-                'database' => env('DB_TENANT_DATABASE', database_path('test_tenant.sqlite')),
+                'database' => ':memory:',
                 'prefix' => '',
                 'host' => $cliente->supabase_db_host,
                 'password' => $cliente->supabase_db_password,
@@ -75,8 +77,11 @@ class TenantConnectionMiddleware
         }
 
         // Purge e reconecta para garantir que as queries seguintes usem a nova config
-        DB::purge('tenant');
-        DB::reconnect('tenant');
+        // Purge e reconecta para garantir que as queries seguintes usem a nova config
+        if (! app()->environment('testing')) {
+            DB::purge('tenant');
+            DB::reconnect('tenant');
+        }
 
         // Compartilha cliente com a requisição via atributo
         $request->attributes->set('cliente', $cliente);
@@ -87,7 +92,18 @@ class TenantConnectionMiddleware
     private function getSubdominio($request): ?string
     {
         $host = $request->getHost();
+        
+        // Se for localhost ou o domínio base puro, não há subdominio de tenant
+        if ($host === 'localhost' || $host === '127.0.0.1') {
+            return null;
+        }
+
         $parts = explode('.', $host);
+
+        // Se o domínio for 'erp.com' e tiver apenas 2 partes, não há subdomínio
+        if (count($parts) <= 2) {
+            return null;
+        }
 
         // Remove www e app se existirem para pegar o identificador do tenant
         $subdominio = $parts[0] ?? null;

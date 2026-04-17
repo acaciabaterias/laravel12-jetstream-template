@@ -9,8 +9,6 @@ class WhiteLabelConfig extends Model
 {
     use HasFactory;
 
-    protected $connection = 'tenant';
-
     protected $fillable = [
         'logo_url', 'favicon_url', 'cor_primaria',
         'cor_secundaria', 'cor_fundo', 'titulo_login', 'custom_css',

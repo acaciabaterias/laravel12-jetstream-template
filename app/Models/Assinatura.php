@@ -9,7 +9,7 @@ class Assinatura extends Model
 {
     use HasFactory;
 
-    protected $connection = 'central';
+    
 
     protected $fillable = [
         'cliente_id', 'plano_id', 'status', 'data_inicio',

@@ -143,17 +143,17 @@ return [
     |
     */
 
-    'features' => [
+    'features' => array_filter([
         Features::registration(),
         Features::resetPasswords(),
-        // Features::emailVerification(),
+        env('EMAIL_VERIFICATION', false) ? Features::emailVerification() : null,
         Features::updateProfileInformation(),
         Features::updatePasswords(),
-        Features::twoFactorAuthentication([
+        env('TWO_FACTOR_AUTH', false) ? Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => true,
             // 'window' => 0,
-        ]),
-    ],
+        ]) : null,
+    ]),
 
 ];

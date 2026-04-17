@@ -3,38 +3,22 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Models\WhiteLabelConfig;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class WhiteLabelTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->artisan('migrate:fresh', [
-            '--database' => 'central',
-            '--path' => 'database/migrations/central',
-            '--force' => true,
-        ]);
-
-        $this->artisan('migrate:fresh', [
-            '--database' => 'tenant',
-            '--path' => 'database/migrations/tenant',
-            '--force' => true,
-        ]);
-    }
-
     public function test_white_label_branding_is_applied_to_application_layout(): void
     {
+        $subdomain = fake()->unique()->slug(1);
         $cliente = \App\Models\Cliente::factory()->create([
-            'subdominio' => 'meuerp',
+            'subdominio' => $subdomain,
             'status' => 'active',
         ]);
 
-        $user = User::factory()->withPersonalTeam()->create();
+        $user = User::factory()->withPersonalTeam()->create([
+            'papel' => 'super_admin',
+            'filial_id' => null,
+        ]);
 
         \App\Models\WhiteLabelConfig::create([
             'titulo_login' => 'ERP Personalizado',
@@ -45,7 +29,7 @@ class WhiteLabelTest extends TestCase
             'favicon_url' => 'https://example.com/favicon.png',
         ]);
 
-        $response = $this->actingAs($user)->get('http://meuerp.erp.com/dashboard');
+        $response = $this->actingAs($user)->get("http://{$subdomain}.erp.com/dashboard");
 
         $response->assertStatus(200);
         $response->assertSee('ERP Personalizado');

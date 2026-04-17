@@ -3,29 +3,20 @@
 namespace Tests\Feature;
 
 use App\Models\Cliente;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class TenantResolutionLatencyTest extends TestCase
 {
-    use RefreshDatabase;
-
-    protected $connectionsToTransact = ['central'];
-
-    protected function afterRefreshingDatabase()
-    {
-        $this->artisan('migrate', [
-            '--database' => 'central',
-            '--path' => 'database/migrations/central',
-            '--force' => true,
-        ]);
-    }
-
+    /**
+     * Teste de latência de resolução de tenant.
+     * Simplificado para utilizar a infraestrutura consolidada de testes.
+     */
     public function test_tenant_resolution_latency_is_under_50ms()
     {
+        $subdomain = fake()->unique()->slug(1);
         $cliente = Cliente::factory()->create([
-            'subdominio' => 'fast-tenant',
+            'subdominio' => $subdomain,
             'status' => 'active',
             'supabase_db_host' => 'localhost',
             'supabase_db_password' => 'secret',
@@ -44,7 +35,7 @@ class TenantResolutionLatencyTest extends TestCase
         
         DB::purge('tenant');
         
-        // Verifica conexão ou configuração (para fins do teste em um CI mockado, apenas medir o tempo processual)
+        // Verifica configuração
         $configHost = config('database.connections.tenant.host');
         
         $end = microtime(true);

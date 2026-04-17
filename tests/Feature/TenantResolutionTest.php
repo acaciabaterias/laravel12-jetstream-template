@@ -3,24 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Cliente;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class TenantResolutionTest extends TestCase
 {
-    use RefreshDatabase;
-
-    protected $connectionsToTransact = ['central', 'tenant'];
-
-    protected function afterRefreshingDatabase()
-    {
-        $this->artisan('migrate', [
-            '--database' => 'central',
-            '--path' => 'database/migrations/central',
-            '--force' => true,
-        ]);
-    }
-
     public function test_subdomain_is_resolved_to_client_and_tenant_connection_is_configured(): void
     {
         $cliente = Cliente::factory()->create([
