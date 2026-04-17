@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('estoque_saldos', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('bateria_id')->constrained('baterias')->onDelete('restrict');
+            $table->foreignId('filial_id')->constrained('filiais')->onDelete('cascade');
+            $table->foreignId('deposito_id')->constrained('depositos')->onDelete('restrict');
+            $table->integer('quantidade_atual')->default(0);
+            $table->timestamps();
+
+            $table->unique(['bateria_id', 'deposito_id', 'filial_id'], 'idx_unique_estoque_saldo');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('estoque_saldos');
+    }
+};
