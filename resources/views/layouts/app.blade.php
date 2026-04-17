@@ -1,6 +1,5 @@
 @php
-    $filial = auth()->user()?->filial;
-    $whiteLabel = $filial?->whiteLabelConfig;
+    $whiteLabel = \App\Models\WhiteLabelConfig::first();
 @endphp
 
 <!DOCTYPE html>
@@ -22,7 +21,7 @@
         <!-- Styles -->
         @livewireStyles
 
-        <title>{{ $whiteLabel?->titulo_login ?? config('app.name') }} - {{ $filial?->nome ?? 'BateriaExpert' }}</title>
+        <title>{{ $whiteLabel?->titulo_login ?? config('app.name') }} - BateriaExpert</title>
         
         <link rel="icon" href="{{ $whiteLabel?->favicon_url ?? asset('favicon.ico') }}">
         

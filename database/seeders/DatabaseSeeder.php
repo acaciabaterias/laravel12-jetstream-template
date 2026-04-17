@@ -19,5 +19,15 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Criar Super Admin da Plataforma (Central)
+        if (\App\Models\UsuarioPlataforma::count() === 0) {
+            \App\Models\UsuarioPlataforma::create([
+                'nome' => 'Super Admin',
+                'email' => 'admin@bateriaexpert.com',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'papel' => 'super_admin',
+            ]);
+        }
     }
 }

@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Assinatura extends Model
 {
     use HasFactory;
+
+    protected $connection = 'central';
+
     protected $fillable = [
-        'filial_id', 'plano_id', 'status', 'data_inicio',
+        'cliente_id', 'plano_id', 'status', 'data_inicio',
         'data_proximo_ciclo', 'data_termino', 'stripe_subscription_id',
-        'stripe_customer_id'
+        'stripe_customer_id',
     ];
 
     protected function casts(): array
@@ -23,9 +26,9 @@ class Assinatura extends Model
         ];
     }
 
-    public function filial()
+    public function cliente()
     {
-        return $this->belongsTo(Filial::class);
+        return $this->belongsTo(Cliente::class);
     }
 
     public function plano()

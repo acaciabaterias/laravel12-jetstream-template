@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Fatura extends Model
 {
     use HasFactory;
+
+    protected $connection = 'central';
+
     protected $fillable = [
         'assinatura_id', 'stripe_invoice_id', 'numero', 'valor',
-        'data_vencimento', 'data_pagamento', 'status', 'pdf_url'
+        'data_vencimento', 'data_pagamento', 'status', 'pdf_url',
     ];
 
     protected function casts(): array

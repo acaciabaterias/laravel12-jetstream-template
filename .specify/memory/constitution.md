@@ -1,21 +1,16 @@
 <!--
 Sync Impact Report
-- Version change: 1.4.0 → 1.5.0
+- Version change: 1.5.0 → 2.0.0
 - Modified principles:
-  - I. Laravel 12 First → I. Business Domain Specialization
-  - II. Reactive UI via Livewire 4 + Filament → II. Mobile-First Field Operations
-  - III. Test-First Delivery (NON-NEGOTIABLE) → III. Automated Financial Microservices
-  - IV. PostgreSQL Data Integrity → IV. Comprehensive Inventory & Reverse Logistics
-  - V. Boost-Guided, Minimal Changes → V. Proactive Quality & Customer Service
-  - VI. Production-Ready Integrations → VI. Integrated Fiscal Compliance
+  - Multi-Tenancy (Filial) → Multi-Tenancy Isolado (Database-per-Client)
+  - Multi-tenancy Absoluto → Removed (merged into Multi-Tenancy Isolado)
 - Added sections:
   - None
 - Removed sections:
-  - None
+  - Duplicate legacy "Constituição do Projeto" block.
 - Templates requiring updates:
   - ✅ updated: .specify/templates/plan-template.md
   - ✅ updated: .specify/templates/spec-template.md
-  - ⚠ pending: .specify/templates/commands/*.md (directory not present in repository)
 - Follow-up TODOs:
   - None
 -->
@@ -56,10 +51,10 @@ Rationale: Ensures full compliance with fiscal regulations, simplifies tax repor
 
 ## Princípios de Arquitetura
 
-### Multi-Tenancy (Filial)
-- Todo registro no banco de dados DEVE conter `filial_id` como chave estrangeira
-- Isolamento de dados entre filiais é obrigatório
-- Usuários só podem acessar dados da(s) sua(s) filial(is)
+### Multi-Tenancy Isolado (Database-per-Client)
+- A infraestrutura adota isolamento FÍSICO a nível de banco de dados suportado por Supabase/PostgreSQL. O uso de `filial_id` ou `branch_id` como modelo de separação lógica (via Global Scopes) está estritamente **obsoleto** e NÃO DEVE ser utilizado.
+- Operações do core do ERP e modelos de Tenant DEVEM obrigatoriamente operar sobre a conexão de runtime resolvida pelo App\Http\Middleware\TenantConnectionMiddleware.
+- Metadados universais e administrativos (como Gestão de Lojistas, Assinaturas e Pagamentos Base) DEVEM repousar estritamente na conexão genérica `central`.
 
 ### RBAC (Perfis)
 - O sistema deve implementar controle de acesso baseado em papéis (Roles)
@@ -68,9 +63,9 @@ Rationale: Ensures full compliance with fiscal regulations, simplifies tax repor
 
 ### Ordem de Implementação
 Os módulos DEVEM ser implementados na seguinte ordem:
-1. Filial/Tenant
-2. Cadastros Estruturais
-3. Usuários e Perfis
+1. Multi-Tenancy Isolado (Supabase/DB-per-client)
+2. Autenticação e Perfis Tenant-aware
+3. Cadastros Estruturais Isolados
 4. Estoque
 5. Vendas e Assistência
 6. Empréstimo de Ativos
@@ -131,17 +126,10 @@ Compliance Review Expectations:
 - Every task list MUST include explicit testing tasks.
 - Every pull request review MUST verify constitutional compliance prior to approval.
 
-**Version**: 1.5.0 | **Ratified**: 2026-02-19 | **Last Amended**: 2026-04-11
+**Version**: 2.0.0 | **Ratified**: 2026-02-19 | **Last Amended**: 2026-04-17
 
-# Constituição do Projeto: ERP Baterias
-
-## Princípios de Arquitetura
-1. **Multi-tenancy Absoluto:** Todo e qualquer dado deve ser filtrado por `branch_id` (Filial). O isolamento de dados é a prioridade número 1.
-2. **Precedência Hierárquica:** O desenvolvimento deve seguir a ordem de Níveis (1 a 4). Nenhuma funcionalidade de nível superior pode ser implementada sem que a sua dependência no nível inferior esteja estável.
-3. **RBAC (Role-Based Access Control):** O acesso a funcionalidades e dados é estritamente controlado por perfis de utilizador.
-
-## Padrão de Documentação (SDD)
-Todas as especificações devem seguir obrigatoriamente a estrutura:
+## Padrão de Documentação Secundário (Legacy SDD)
+Todas as especificações de features menores DEVEM continuar seguindo opcionalmente a estrutura:
 - **Contexto e Dependências:** O que é e o que precisa de existir antes.
 - **User Scenarios (Given-When-Then):** Comportamento esperado.
 - **Edge Cases:** Tratamento de erros e exceções.

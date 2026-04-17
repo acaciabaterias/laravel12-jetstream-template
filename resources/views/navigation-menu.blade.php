@@ -19,10 +19,6 @@
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <!-- Filial Selector -->
-                <div class="ms-3 relative">
-                    <livewire:filial-selector />
-                </div>
 
                 <!-- Teams Dropdown -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
@@ -149,15 +145,6 @@
             </x-responsive-nav-link>
         </div>
 
-        <!-- Responsive Filial Selector -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4 py-2 text-xs text-gray-400">
-                {{ __('Filial Atual') }}
-            </div>
-            <div class="mt-3 space-y-1">
-                <livewire:filial-selector />
-            </div>
-        </div>
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">

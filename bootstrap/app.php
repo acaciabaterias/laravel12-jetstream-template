@@ -10,14 +10,19 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            Route::middleware('web')
+                ->domain('admin.'.config('app.url'))
+                ->group(base_path('routes/admin.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web(append: [
-            \App\Http\Middleware\SetFilialContext::class,
+        $middleware->alias([
+            'tenant' => \App\Http\Middleware\TenantConnectionMiddleware::class,
         ]);
 
-        $middleware->alias([
-            'tenant' => \App\Http\Middleware\TenantResolver::class,
+        $middleware->web(append: [
+            \App\Http\Middleware\TenantConnectionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

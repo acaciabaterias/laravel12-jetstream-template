@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'central'),
 
     /*
     |--------------------------------------------------------------------------
@@ -95,6 +95,30 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+        ],
+
+        'central' => [
+            'driver' => env('DB_CENTRAL_DRIVER', 'pgsql'),
+            'host' => env('DB_CENTRAL_HOST', 'localhost'),
+            'port' => env('DB_CENTRAL_PORT', '5432'),
+            'database' => env('DB_CENTRAL_DATABASE', 'erp_central'),
+            'username' => env('DB_CENTRAL_USERNAME', 'gil'),
+            'password' => env('DB_CENTRAL_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+        ],
+
+        'tenant' => [ // Conexão dinâmica configurada em runtime
+            'driver' => env('DB_TENANT_DRIVER', 'pgsql'),
+            'host' => '',
+            'port' => env('DB_TENANT_PORT', '6543'),
+            'database' => env('DB_TENANT_DATABASE', 'postgres'),
+            'username' => env('DB_TENANT_USERNAME', 'postgres'),
+            'password' => '',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
         ],
 
         'sqlsrv' => [

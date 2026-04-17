@@ -2,19 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class PlanoAssinatura extends Model
 {
     use HasFactory;
-    protected $table = 'planos_assinatura';
+
+    protected $connection = 'central';
+
+    protected $table = 'planos';
 
     protected $fillable = [
-        'nome', 'slug', 'preco_mensal', 'preco_anual', 'max_usuarios',
-        'max_estoque_itens', 'has_white_label', 'has_api_integration',
-        'has_support_priority', 'stripe_price_id_mensal', 'stripe_price_id_anual',
-        'ativo'
+        'nome', 'slug', 'preco_mensal', 'max_usuarios',
+        'max_estoque_itens', 'has_white_label',
+        'has_support_priority', 'ativo',
     ];
 
     protected function casts(): array

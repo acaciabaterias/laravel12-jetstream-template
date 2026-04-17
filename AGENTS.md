@@ -261,3 +261,10 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - IMPORTANT: Always use `search-docs` tool for version-specific Tailwind CSS documentation and updated code examples. Never rely on training data.
 - IMPORTANT: Activate `tailwindcss-development` every time you're working with a Tailwind CSS or styling-related task.
 </laravel-boost-guidelines>
+
+## Active Technologies
+- PHP 8.3 / Laravel 12 + `livewire/livewire`, `laravel/jetstream`, `laravel/fortify`, `supabase/postgrest-php` (CLI tools) (001-multi-filial-tenant)
+- PostgreSQL (Central) + Multiple PostgreSQL Instances (Tenants/Supabase) (001-multi-filial-tenant)
+
+## Recent Changes
+- 001-multi-filial-tenant: Added PHP 8.3 / Laravel 12 + `livewire/livewire`, `laravel/jetstream`, `laravel/fortify`, `supabase/postgrest-php` (CLI tools)
