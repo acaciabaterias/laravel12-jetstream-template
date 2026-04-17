@@ -1,0 +1,234 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Bateria;
+use App\Models\Fabricante;
+use App\Models\Veiculo;
+use Illuminate\Validation\Rule;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+class VeiculoManager extends Component
+{
+    use WithPagination;
+
+    // Vehicle fields
+    public $fabricante_id, $modelo, $motorizacao, $ano_inicio, $ano_fim, $atributos_dinamicos = '';
+    
+    // UI State
+    public $veiculoId;
+    public $isEditMode = false;
+    public $showModal = false;
+    public $search = '';
+    public $fabricanteFilter = '';
+    public $currentTab = 'basico'; // basico | aplicacoes
+
+    // Applications State
+    public $aplicacoes = []; // [ ['bateria_id' => 1, 'sku'=> '...', 'observacao' => '...'], ... ]
+    public $searchBateria = '';
+    public $bateriasResults = [];
+    public $bateriaSelecionada = null;
+    public $novaObservacao = '';
+
+    protected function rules()
+    {
+        return [
+            'fabricante_id' => 'required|exists:fabricantes,id',
+            'modelo' => 'required|string|max:255',
+            'motorizacao' => 'nullable|string|max:255',
+            'ano_inicio' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'ano_fim' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'atributos_dinamicos' => 'nullable|string',
+        ];
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFabricanteFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSearchBateria()
+    {
+        if (strlen($this->searchBateria) >= 2) {
+            $this->bateriasResults = Bateria::where('sku', 'like', '%' . $this->searchBateria . '%')
+                ->orWhere('marca', 'like', '%' . $this->searchBateria . '%')
+                ->take(5)->get();
+        } else {
+            $this->bateriasResults = [];
+        }
+    }
+
+    public function selectBateria($bateriaId)
+    {
+        $this->bateriaSelecionada = Bateria::find($bateriaId);
+        $this->bateriasResults = [];
+        $this->searchBateria = $this->bateriaSelecionada->sku . ' - ' . $this->bateriaSelecionada->marca;
+    }
+
+    public function addAplicacao()
+    {
+        if (!$this->bateriaSelecionada) return;
+
+        // Check for duplicates
+        foreach ($this->aplicacoes as $app) {
+            if ($app['bateria_id'] === $this->bateriaSelecionada->id) {
+                $this->addError('bateria_duplicada', 'Esta bateria já está vinculada.');
+                return;
+            }
+        }
+
+        $this->aplicacoes[] = [
+            'bateria_id' => $this->bateriaSelecionada->id,
+            'sku' => $this->bateriaSelecionada->sku,
+            'marca' => $this->bateriaSelecionada->marca,
+            'tecnologia' => $this->bateriaSelecionada->tecnologia,
+            'observacao' => $this->novaObservacao,
+        ];
+
+        $this->bateriaSelecionada = null;
+        $this->searchBateria = '';
+        $this->novaObservacao = '';
+    }
+
+    public function removeAplicacao($index)
+    {
+        unset($this->aplicacoes[$index]);
+        $this->aplicacoes = array_values($this->aplicacoes); // Re-index
+    }
+
+    public function create()
+    {
+        $this->resetInputFields();
+        $this->isEditMode = false;
+        $this->showModal = true;
+        $this->currentTab = 'basico';
+    }
+
+    public function edit($id)
+    {
+        $veiculo = Veiculo::with('baterias')->withTrashed()->findOrFail($id);
+        $this->veiculoId = $veiculo->id;
+        $this->fabricante_id = $veiculo->fabricante_id;
+        $this->modelo = $veiculo->modelo;
+        $this->motorizacao = $veiculo->motorizacao;
+        $this->ano_inicio = $veiculo->ano_inicio;
+        $this->ano_fim = $veiculo->ano_fim;
+        $this->atributos_dinamicos = $veiculo->atributos_dinamicos ? json_encode($veiculo->atributos_dinamicos, JSON_PRETTY_PRINT) : '';
+        
+        $this->aplicacoes = $veiculo->baterias->map(function($bateria) {
+            return [
+                'bateria_id' => $bateria->id,
+                'sku' => $bateria->sku,
+                'marca' => $bateria->marca,
+                'tecnologia' => $bateria->tecnologia,
+                'observacao' => $bateria->pivot->observacao,
+            ];
+        })->toArray();
+
+        $this->isEditMode = true;
+        $this->showModal = true;
+        $this->currentTab = 'basico';
+    }
+
+    public function store()
+    {
+        $this->validate();
+
+        $atributos = null;
+        if (!empty($this->atributos_dinamicos)) {
+            $atributos = json_decode($this->atributos_dinamicos, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $this->addError('atributos_dinamicos', 'Formato JSON inválido.');
+                $this->currentTab = 'basico';
+                return;
+            }
+        }
+
+        $data = [
+            'fabricante_id' => $this->fabricante_id,
+            'modelo' => $this->modelo,
+            'motorizacao' => $this->motorizacao,
+            'ano_inicio' => $this->ano_inicio,
+            'ano_fim' => $this->ano_fim,
+            'atributos_dinamicos' => $atributos,
+            'filial_id' => auth()->user()->filial_id ?? session('filial_id'),
+        ];
+
+        if ($this->isEditMode) {
+            $veiculo = Veiculo::withTrashed()->findOrFail($this->veiculoId);
+            $veiculo->update($data);
+        } else {
+            $veiculo = Veiculo::create($data);
+        }
+
+        // Sync Applications (Baterias)
+        $syncData = [];
+        foreach ($this->aplicacoes as $app) {
+            // Include tenant isolation in pivot
+            $syncData[$app['bateria_id']] = [
+                'observacao' => $app['observacao'],
+                'filial_id' => auth()->user()->filial_id ?? session('filial_id')
+            ];
+        }
+        $veiculo->baterias()->sync($syncData);
+
+        $this->showModal = false;
+        $this->resetInputFields();
+    }
+
+    public function toggleStatus($id)
+    {
+        $veiculo = Veiculo::withTrashed()->findOrFail($id);
+        if ($veiculo->trashed()) {
+            $veiculo->restore();
+        } else {
+            $veiculo->delete();
+        }
+    }
+
+    public function setTab($tabName)
+    {
+        $this->currentTab = $tabName;
+    }
+
+    private function resetInputFields()
+    {
+        $this->veiculoId = null;
+        $this->fabricante_id = '';
+        $this->modelo = '';
+        $this->motorizacao = '';
+        $this->ano_inicio = null;
+        $this->ano_fim = null;
+        $this->atributos_dinamicos = '';
+        $this->aplicacoes = [];
+        $this->searchBateria = '';
+        $this->bateriasResults = [];
+        $this->bateriaSelecionada = null;
+        $this->novaObservacao = '';
+    }
+
+    public function render()
+    {
+        $query = Veiculo::with('fabricante')->withTrashed();
+        
+        if (!empty($this->search)) {
+            $query->where('modelo', 'like', '%' . $this->search . '%')
+                  ->orWhere('motorizacao', 'like', '%' . $this->search . '%');
+        }
+
+        if (!empty($this->fabricanteFilter)) {
+            $query->where('fabricante_id', $this->fabricanteFilter);
+        }
+
+        return view('livewire.veiculo-manager', [
+            'veiculos' => $query->latest()->paginate(10),
+            'fabricantes' => Fabricante::orderBy('nome')->get(),
+        ]);
+    }
+}
