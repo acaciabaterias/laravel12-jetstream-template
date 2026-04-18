@@ -19,12 +19,14 @@ class EstoqueSaldo extends Model
         'filial_id',
         'deposito_id',
         'quantidade_atual',
+        'quantidade_reservada',
     ];
 
     protected function casts(): array
     {
         return [
             'quantidade_atual' => 'integer',
+            'quantidade_reservada' => 'integer',
         ];
     }
 

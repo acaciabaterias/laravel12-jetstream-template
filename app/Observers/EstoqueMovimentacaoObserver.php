@@ -4,8 +4,8 @@ namespace App\Observers;
 
 use App\Models\EstoqueMovimentacao;
 use App\Models\EstoqueSaldo;
-use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class EstoqueMovimentacaoObserver
 {
@@ -23,32 +23,52 @@ class EstoqueMovimentacaoObserver
                 ->lockForUpdate()
                 ->first();
 
-            if (!$saldo) {
-                if ($movimentacao->tipo === 'saida') {
-                    throw new Exception("Estoque insuficiente para realizar saída.");
+            if (! $saldo) {
+                if (in_array($movimentacao->tipo, ['saida', 'reserva'])) {
+                    throw new Exception("Estoque insuficiente para a operação requisitada. (Id Deposito: {$movimentacao->deposito_id})");
                 }
 
                 EstoqueSaldo::create([
                     'bateria_id' => $movimentacao->bateria_id,
                     'deposito_id' => $movimentacao->deposito_id,
                     'filial_id' => $movimentacao->filial_id,
-                    'quantidade_atual' => $movimentacao->quantidade
+                    'quantidade_atual' => $movimentacao->quantidade,
+                    'quantidade_reservada' => 0,
                 ]);
             } else {
                 $novoSaldo = $saldo->quantidade_atual;
+                $novaReserva = $saldo->quantidade_reservada;
 
                 if ($movimentacao->tipo === 'entrada') {
                     $novoSaldo += $movimentacao->quantidade;
                 } elseif ($movimentacao->tipo === 'saida') {
                     $novoSaldo -= $movimentacao->quantidade;
-                    
-                    if ($novoSaldo < 0) {
-                        throw new Exception("Estoque insuficiente. Saldo disponível: {$saldo->quantidade_atual}");
+
+                    if ($novoSaldo < $novaReserva) {
+                        // Não pode tirar estoque se a quantidade restante for menor do que aquilo que está prometido (reservado) a outros pedidos.
+                        // (Nota: se for a conversão de *uma* reserva, o controller deve despachar o estorno_reserva ANTES da saída real)
+                        throw new Exception('Estoque insuficiente/comprometido em reservas. (Disponível p/ Venda: '.($saldo->quantidade_atual - $saldo->quantidade_reservada).')');
+                    }
+                } elseif ($movimentacao->tipo === 'reserva') {
+                    $disponível = $saldo->quantidade_atual - $saldo->quantidade_reservada;
+                    if ($disponível < $movimentacao->quantidade) {
+                        throw new Exception("Estoque físico comprometido com outras reservas. (Disponível p/ Venda Limitado: {$disponível})");
+                    }
+                    $novaReserva += $movimentacao->quantidade;
+                } elseif ($movimentacao->tipo === 'estorno_reserva') {
+                    $novaReserva -= $movimentacao->quantidade;
+                    // Garante que não zere bugado negativamente
+                    if ($novaReserva < 0) {
+                        $novaReserva = 0;
                     }
                 }
 
-                $saldo->update(['quantidade_atual' => $novoSaldo]);
+                $saldo->update([
+                    'quantidade_atual' => $novoSaldo,
+                    'quantidade_reservada' => $novaReserva,
+                ]);
             }
+
         });
     }
 }
