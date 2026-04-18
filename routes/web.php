@@ -15,4 +15,7 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    // Módulo 006 - App do Entregador
+    Route::get('/entregador', [\App\Http\Controllers\LogisticsController::class, 'entregadorApp'])->name('entregador.app');
 });

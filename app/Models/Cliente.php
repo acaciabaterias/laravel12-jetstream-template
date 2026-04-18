@@ -18,6 +18,7 @@ class Cliente extends Model
         'subdominio', 'plano', 'status', 'trial_ends_at', 'subscription_ends_at',
         'supabase_project_ref', 'supabase_url', 'supabase_db_host',
         'supabase_db_password', 'supabase_anon_key', 'supabase_service_role_key',
+        'saldo_sucata_kg', 'saldo_sucata_financeiro',
     ];
 
     protected function casts(): array
