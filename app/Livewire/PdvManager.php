@@ -158,6 +158,15 @@ class PdvManager extends Component
         $this->calcularTotal();
     }
 
+    public function updateSerialNumber($itemId, $serialNumber)
+    {
+        $item = ItemVale::findOrFail($itemId);
+        $item->numero_serie = $serialNumber;
+        $item->save();
+        
+        session()->flash('success', 'Nº de Série atualizado.');
+    }
+
     public function removerItem($itemId, ReservaEstoqueService $reservaService)
     {
         $item = ItemVale::findOrFail($itemId);

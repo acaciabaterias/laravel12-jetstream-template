@@ -25,6 +25,7 @@ class Bateria extends Model
         'peso_sucata_kg',
         'valor_base_sucata_kg',
         'tem_logistica_reversa',
+        'indice_retorno',
         'filial_id',
     ];
 

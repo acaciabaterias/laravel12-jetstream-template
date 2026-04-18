@@ -16,6 +16,7 @@ class ItemVale extends Model
         'preco_unitario_original',
         'preco_unitario_final',
         'flag_devolveu_sucata',
+        'numero_serie',
     ];
 
     protected function casts(): array

@@ -17,5 +17,6 @@ Route::middleware([
     })->name('dashboard');
 
     // Módulo 006 - App do Entregador
-    Route::get('/entregador', [\App\Http\Controllers\LogisticsController::class, 'entregadorApp'])->name('entregador.app');
+    // Módulo 008 - Suporte e Rastreabilidade
+    Route::get('/suporte', \App\Livewire\SuporteCentral::class)->name('suporte.central');
 });

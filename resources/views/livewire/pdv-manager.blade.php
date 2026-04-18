@@ -106,7 +106,14 @@
                         <tr>
                             <td class="px-4 py-3">
                                 <div class="font-medium text-gray-900">{{ $item->bateria->marca }}</div>
-                                <div class="text-xs text-gray-500">Ref: {{ $item->bateria->sku }}</div>
+                                <div class="text-xs text-gray-500 flex items-center justify-between gap-4">
+                                    <span>Ref: {{ $item->bateria->sku }}</span>
+                                    <input type="text" 
+                                        wire:blur="updateSerialNumber({{ $item->id }}, $event.target.value)"
+                                        value="{{ $item->numero_serie }}"
+                                        class="text-[10px] py-1 px-2 border-gray-100 bg-gray-50/50 rounded flex-1 focus:ring-1 focus:ring-indigo-500" 
+                                        placeholder="Nº de Série (Opcional)">
+                                </div>
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <label class="inline-flex items-center cursor-pointer">
