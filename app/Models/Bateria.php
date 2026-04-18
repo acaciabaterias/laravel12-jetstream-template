@@ -21,6 +21,7 @@ class Bateria extends Model
         'amperagem',
         'polo',
         'preco_venda',
+        'custo_aquisicao',
         'atributos_dinamicos',
         'peso_sucata_kg',
         'valor_base_sucata_kg',
@@ -34,6 +35,7 @@ class Bateria extends Model
         return [
             'atributos_dinamicos' => 'json',
             'preco_venda' => 'decimal:2',
+            'custo_aquisicao' => 'decimal:2',
             'peso_sucata_kg' => 'decimal:2',
             'valor_base_sucata_kg' => 'decimal:2',
             'tem_logistica_reversa' => 'boolean',

@@ -100,6 +100,27 @@ class ConvertValeToPedidoJob implements ShouldQueue
             $vale->status = 'faturado';
             $vale->data_faturamento = now();
             $vale->save();
+
+            // 5. Integração Módulo 008 - Financeiro Inteligente
+            $conta = \App\Models\ContaBancaria::where('filial_id', $this->filialId)->first();
+            if ($conta) {
+                (new \App\Services\FinanceService())->registrar([
+                    'conta_id' => $conta->id,
+                    'tipo' => 'receita',
+                    'categoria' => 'venda',
+                    'valor' => $totalLiquido,
+                    'data' => now()->format('Y-m-d'),
+                    'status' => 'pendente', // Aguardando conciliação bancária
+                    'vale_id' => $vale->id,
+                    'origem' => "Faturamento de Vale #{$vale->id}",
+                ]);
+            }
+
+            // 6. Disparar recálculo de rentabilidade (Módulo 008)
+            $analyzer = new \App\Services\ProfitabilityAnalyzer();
+            foreach ($vale->itens as $item) {
+                $analyzer->recolherDadosPeriodo($item->bateria_id, now()->format('Y-m'));
+            }
         });
     }
 }

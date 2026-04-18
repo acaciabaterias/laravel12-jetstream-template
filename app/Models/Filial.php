@@ -11,7 +11,21 @@ class Filial extends Model
 
     protected $table = 'filiais';
 
-    protected $fillable = ['nome', 'cnpj'];
+    protected $fillable = [
+        'nome',
+        'cnpj',
+        'comissao_tipo',
+        'comissao_valor',
+        'data_fechamento_contabil',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'data_fechamento_contabil' => 'date',
+            'comissao_valor' => 'decimal:2',
+        ];
+    }
 
     public function users()
     {
