@@ -3,7 +3,7 @@
 **Identificador**: `MS-001-FISCAL-ACBR`
 **Status**: Ready for Implementation
 **Tipo**: Microserviço Autônomo (projeto separado do ERP)
-**Dependências ERP**: Módulo 005 (Vendas/Vales), Módulo 009 (Orquestrador Fiscal)
+**Dependências ERP**: Módulo 005 (Vendas e Assistência), Módulo 009 (Orquestração Fiscal e Bancária)
 
 ---
 

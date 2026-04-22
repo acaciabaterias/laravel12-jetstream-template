@@ -3,7 +3,7 @@
 **Identificador**: `MS-002-BANCARIO`
 **Status**: Ready for Implementation
 **Tipo**: Microserviço Autônomo (projeto separado do ERP)
-**Dependências ERP**: Módulo 008 (Financeiro), Módulo 009 (Orquestrador Fiscal/Bancário)
+**Dependências ERP**: Módulo 008 (Financeiro Inteligente), Módulo 009 (Orquestração Fiscal e Bancária)
 
 ---
 

@@ -8,7 +8,7 @@
 
 ## Constitution Check
 
-> Requisito da constitution v1.5.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
+> Requisito da constitution v2.0.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
 
 | Functional Requirement | Princípio da Constitution | Status | Notas |
 |---|---|---|---|
@@ -23,8 +23,8 @@
 
 **Princípios sem conflito identificado:** I, II, IV, V, VI — não impactados diretamente por este MS.
 
-**Desvio Arquitetural Documentado — `empresa_id` vs `filial_id`:**
-> A constitution architecture principle exige `filial_id` em todos os registros para isolamento multi-tenant por filial. Neste MS, o tenant key é `empresa_id` em vez de `filial_id`. **Justificativa aprovada**: Extratos bancários são vinculados a uma conta bancária (CNPJ raiz da empresa), não a uma filial específica. Uma empresa com 3 filiais pode ter 1 conta bancária central — o consentimento representaria essa conta, e as transações se aplicariam a todas as filiais. O isolamento multi-company é garantido por `empresa_id`. O mapeamento ERP filial → empresa_id é responsabilidade do Módulo 008 (consumidor dos eventos).
+**Alinhamento Arquitetural — Identificação por Tenant/CNPJ:**
+> Na Constitution v2.0.0, o ERP usa isolamento `database-per-client`, sem `filial_id` como mecanismo de tenancy. Neste MS, o consentimento bancário é identificado por `empresa_id` como chave de integração externa entre ERP e microserviço, representando o tenant/CNPJ autorizado no provider bancário. O vínculo entre consentimento, conta bancária e contexto financeiro é resolvido pelo Módulo 008 no lado do ERP, sem reintroduzir separação lógica por coluna no core tenant-aware.
 
 **Stack Tecnológica (Quality Gate — Technology Stack Constraints):**
 - Python 3.11+ (FastAPI): ✅ Serviço autônomo. Justificativa: bibliotecas OAuth e de parsing financeiro mais maduras em Python; async I/O nativo via httpx/asyncio

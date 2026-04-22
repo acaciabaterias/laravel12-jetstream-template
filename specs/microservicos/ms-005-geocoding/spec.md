@@ -3,7 +3,7 @@
 **Identificador**: `MS-005-GEOCODING`
 **Status**: Ready for Implementation
 **Tipo**: Microserviço Autônomo (projeto separado do ERP)
-**Dependências ERP**: Módulo 006 (Logística / App do Entregador)
+**Dependências ERP**: Módulo 006 (Logística e Entregas)
 
 ---
 
@@ -24,7 +24,7 @@ Uma loja de baterias que faz entregas precisa organizar a ordem das paradas do e
 ## Key Entities
 
 - **EnderecoGeocodificado**: (id, endereco_hash, logradouro, numero, bairro, cidade, uf, cep, latitude, longitude, provider_usado, confianca, created_at, expires_at)
-- **Rota**: (id, filial_id, data_entrega, status [pendente/em_andamento/concluida], paradas_json, distancia_total_km, duracao_estimada_min, otimizada_em)
+- **Rota**: (id, tenant_id_externo, base_operacional_id, data_entrega, status [pendente/em_andamento/concluida], paradas_json, distancia_total_km, duracao_estimada_min, otimizada_em)
 - **Parada**: (id, rota_id, ordem, entrega_id, cliente_nome, endereco, latitude, longitude, eta_chegada, status [pendente/chegou/entregue/falhou], chegada_real, saída_real)
 - **LocalizacaoEntregador**: (id, entregador_id, latitude, longitude, velocidade_kmh, heading, timestamp)
 
@@ -41,7 +41,7 @@ Uma loja de baterias que faz entregas precisa organizar a ordem das paradas do e
 - Endereços com confiança `low` devem sinalizar para ajuste manual via pin no App do Entregador
 
 ### FR-005-02: Otimização de Rota (TSP)
-- Dado uma lista de endereços de entrega (N paradas) e um ponto de partida (filial), o MS DEVE calcular a ordem ótima das paradas
+- Dado uma lista de endereços de entrega (N paradas) e um ponto de partida (`base_operacional` do tenant), o MS DEVE calcular a ordem ótima das paradas
 - Para N ≤ 15 paradas: algoritmo local (nearest neighbor + 2-opt improvement) — execução em memória, sem chamadas externas
 - Para N > 15 paradas: algoritmo heurístico via Google Maps Routes API com waypoints optimization (ou OR-Tools como fallback)
 - Para N > 50 paradas: clustering K-means geográfico antes da otimização, gerando múltiplas sub-rotas

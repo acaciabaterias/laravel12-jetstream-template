@@ -3,7 +3,7 @@
 **Identificador**: `MS-003-WHATSAPP-N8N`
 **Status**: Ready for Implementation
 **Tipo**: Microserviço Autônomo — Plataforma Low-Code (n8n + Evolution API)
-**Dependências ERP**: Módulo 007 (Garantias), Módulo 005 (Vendas), Módulo 006 (Logística)
+**Dependências ERP**: Módulo 007 (Garantias e Feedback), Módulo 005 (Vendas e Assistência), Módulo 006 (Logística e Entregas)
 
 ---
 

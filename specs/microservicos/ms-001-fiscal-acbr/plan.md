@@ -8,7 +8,7 @@
 
 ## Constitution Check
 
-> Requisito da constitution v1.5.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
+> Requisito da constitution v2.0.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
 
 | Functional Requirement | Princípio da Constitution | Status | Notas |
 |---|---|---|---|
