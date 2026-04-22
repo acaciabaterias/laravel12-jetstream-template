@@ -1,6 +1,6 @@
 # Implementation Plan: Isolated Tenancy Architecture (Supabase)
 
-**Branch**: `001-isolated-tenancy` | **Date**: 2026-04-17 | **Spec**: [spec.md](spec.md)
+**Branch**: `001-multi-filial-tenant` | **Date**: 2026-04-17 | **Spec**: [spec.md](spec.md)
 **Input**: Feature specification from `/specs/001-multi-filial-tenant/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
@@ -17,7 +17,7 @@ Refatoração da arquitetura multi-tenant para um modelo de **Isolamento Físico
 **Target Platform**: Web (SaaS)  
 **Project Type**: Laravel Web Application  
 **Performance Goals**: Tenant Resolution < 50ms, Scalability to 1000+ isolated databases.  
-**Constraints**: Absolute physical isolation, no shared global scopes for core tenancy.  
+**Constraints**: Strong physical isolation between tenants, no shared global scopes for core tenancy.  
 **Scale/Scope**: Platform-wide management of client life cycle.
 
 ## ERP Modernization Context
@@ -37,6 +37,12 @@ Refatoração da arquitetura multi-tenant para um modelo de **Isolamento Físico
 - **GATE 1**: O isolamento é absoluto em nível de driver de banco? (PASS)
 - **GATE 2**: Existe risco de cross-tenant leak no Banco Central? (PASS - apenas metadados)
 - **GATE 3**: O provisionamento segue os Níveis de Modernização? (PASS - Nível 1: Infra)
+- **GATE 4**: A UI administrativa segue a stack canônica? (EXCEPTION DOCUMENTED)
+  - O módulo usa Blade/Volt apenas para a interface administrativa inicial de provisionamento.
+  - Justificativa: reduzir tempo de implementação da fundação multi-tenant e evitar complexidade adicional antes da estabilização da infraestrutura de isolamento.
+  - Escopo da exceção: telas administrativas de plataforma deste módulo.
+  - Condição futura: reavaliar migração para Filament após estabilização do provisioning e da autenticação platform-admin.
+  - Status de aprovação: exceção documentada para validação explícita em revisão/PR do módulo.
 
 ## Project Structure
 
@@ -56,8 +62,13 @@ specs/001-multi-filial-tenant/
 ```text
 app/
 ├── Models/
-│   ├── Central/        # Cliente, PlanoAssinatura, Fatura
-│   └── Tenant/         # User, Post, WhiteLabelConfig
+│   ├── Cliente.php
+│   ├── PlanoAssinatura.php
+│   ├── Assinatura.php
+│   ├── Fatura.php
+│   ├── User.php
+│   ├── Post.php
+│   └── WhiteLabelConfig.php
 ├── Http/
 │   ├── Middleware/
 │   │   ├── TenantConnectionMiddleware.php

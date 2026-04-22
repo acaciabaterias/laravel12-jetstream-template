@@ -1,34 +1,56 @@
-# Tasks: Módulo de Garantias e Feedback
+# Tasks: Módulo 007 - Garantias e Feedback
 
 **Feature Branch**: `007-guarantees-feedback`
 **Spec File**: [spec.md](spec.md)
 
-## Phase 1: Database & Model Structures
-- [ ] T001: Criar migration para `ordem_servico_garantias` garantindo relacionamentos complexos com vales, bateria avaliada, data_abertura e status).
-- [ ] T002: Criar migration e Relacionamento `1:1` para `baterias_emprestimo` abrigando as restrições logísticas e de tempo estipuladas.
-- [ ] T003: Criar migration para fila analítica de log em `notificacoes_whatsapp` (telefone, status, identificador externo, tracking_error).
-- [ ] T004: Adicionar campo numérico complementar na tabela e migration do Módulo 003 (`baterias.kpi_retorno_percent`).
-- [ ] T005: Adicionar todas as Políticas (Gates/Policies RBAC do Módulo 002) para acesso restrito aos modelos instanciados.
+## Constitution Traceability
 
-## Phase 2: Livewire Flow & Service Orders Panel
-- [ ] T006: Criar Dashboard do Técnico (Tabela ou Estilo Kanban) exibindo Card das Garantias correntes focadas por `filial_id`.
-- [ ] T007: Criar Step Modal de inclusão: Input do Vale Referência permitindo buscar e arrastar os dados fiscais/pedidos automaticamente para a nova O.S local.
-- [ ] T008: Implementar Seção de inserção técnica, anexação de arquivo de imagem (Laudo Visual do Multímetro) e a troca entre os botões categóricos de Laudo (Procedente/Improcedente).
-- [ ] T009: Inserir pipeline geracional automática do "Vale Avulso" ou Débito Aditivo Financeiro na conta, caso o clique na interface aponte para `Improcedente` engatilhando tarifa de "Serviço Adicional".
+- **Multi-Tenancy Isolado (v2.0.0)**: T001-T005, T010-T026
+- **Proactive Quality & Customer Service**: T006-T026
+- **RBAC**: T006-T014, T021-T026
+- **Comprehensive Inventory & Reverse Logistics**: T007-T009, T015-T020, T022-T024
 
-## Phase 3: Termos de Empréstimo (SC-GAR-01)
-- [ ] T010: Fatiar layout com Flexbox de Impressão HTML5 + Tailwind em `views/pdf/termo_emprestimo.blade.php`.
-- [ ] T011: Integrar Controlador / Service para servir o buffer via Package PDF convertendo e devolvendo Content-Disposition download instantâneo `< 2s`.
+## Phase 1: Database Migrations (Tenant)
 
-## Phase 4: WhatsApp Core e Queues 
-- [ ] T012: Instalar pacote driver ou montar Http Request formatado para a Gateway de WhatsApp (Contract Service).
-- [ ] T013: Fabricar Job Queue Laravel `TriggerGuarantyWhatsAppComm` rodando as variáveis injetadas na mensagem final.
-- [ ] T014: Disparar Job a cada salto de Lifecycle do Status da Garantia (Aberto via Observer Models).
+- [ ] T001: Criar migration `create_ordens_servico_garantia_table`
+- [ ] T002: Criar migration `create_baterias_emprestimo_table`
+- [ ] T003: Criar migration `create_notificacoes_whatsapp_table`
+- [ ] T004: Criar migration `create_indices_retorno_produto_table`
+- [ ] T005: Criar migration `create_audit_logs_table`
 
-## Phase 5: Rebalanceamento de KPIS e Red Flags
-- [ ] T015: Injetar classe Event/Observer que recompila o totalizador Global em Banco nativo para extrair a divisão (% Retorno) sempre atrelada a uma chave na tabela base de Cadastros/Produtos (Módulo 003).
+## Phase 2: Models, Services e Policies
 
-## Phase 6: Rotinas Coroutine de Edge Casings e Testes Automatizados
-- [ ] T016: Gravar Console Command Schedule Diário que varre na madrugada todas as `data_devolucao_prevista` vencidas, empurrando Alerta Vermelho de "Cobrança/Recuperação Pêndente" aos gerentes.
-- [ ] T017: Mocar um envio WhatsApp retornando Network Exception proposital (HTTP 500) e garantir Asserção Unitária de que a O.S fecha independentemente com a log isolada sem falhar e cair a tela do funcionário (500 do servidor).
-- [ ] T018: Testar e validar que Módulos de Filial (Multi-Tenant) dividem atritamente relatórios de WhatsApp impedindo SMS cruzados pela franquia.
+- [ ] T006: Criar Model `OrdemServicoGarantia`
+- [ ] T007: Criar Model `BateriaEmprestimo`
+- [ ] T008: Criar Model `NotificacaoWhatsApp`
+- [ ] T009: Criar Model `IndiceRetornoProduto`
+- [ ] T010: Criar service `LoanBatteryTermService`
+- [ ] T011: Criar service `GuaranteeChargeService`
+- [ ] T012: Criar service `ReturnIndexService`
+- [ ] T013: Criar Trait `Auditable`
+- [ ] T014: Configurar Policies/Gates para atendimento, técnico e gestão
+
+## Phase 3: Fluxo de Garantia e Laudo
+
+- [ ] T015: Criar Livewire component `GarantiaBoard`
+- [ ] T016: Criar Livewire component `GarantiaForm`
+- [ ] T017: Criar Livewire component `GarantiaLaudoForm`
+- [ ] T018: Implementar abertura de OS vinculada ou avulsa
+- [ ] T019: Implementar bateria de empréstimo com geração de termo PDF
+- [ ] T020: Implementar cobrança de improcedência
+
+## Phase 4: WhatsApp e KPI
+
+- [ ] T021: Criar job `SendGuaranteeWhatsAppNotificationJob`
+- [ ] T022: Implementar disparo assíncrono em mudanças de status
+- [ ] T023: Implementar tratamento resiliente de falha de envio
+- [ ] T024: Atualizar índice de retorno do produto com base em vendas e garantias
+
+## Phase 5: Tests
+
+- [ ] T025: Testar abertura de garantia com bateria de empréstimo
+- [ ] T026: Testar laudo improcedente com cobrança associada
+- [ ] T027: Testar falha do WhatsApp sem quebrar a OS
+- [ ] T028: Testar atualização do índice de retorno do produto
+- [ ] T029: Testar alerta para empréstimo vencido
+- [ ] T030: Testar isolamento entre tenants sem cross-access

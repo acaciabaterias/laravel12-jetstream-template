@@ -19,6 +19,13 @@
 - Central models: `app/Models/` (connected to `central`)
 - Tenant models: `app/Models/` (connected to `tenant`)
 
+## Constitution Traceability
+
+- **Multi-Tenancy Isolado (Database-per-Client)**: T001-T017, T029-T035, T037
+- **Metadados administrativos na conexão `central`**: T004-T010, T022
+- **Ordem de Implementação**: este módulo implementa a etapa 1 obrigatória da arquitetura
+- **Quality Gates e testes de sucesso/falha**: T011-T012, T018, T028 e os testes de falha adicionados abaixo
+
 ---
 
 ## Phase 1: Setup (Shared Infrastructure)
@@ -56,11 +63,16 @@
 ### Tests for User Story 1
 
 - [x] T011 [P] [US1] Integration test for tenant resolution and database switching in `tests/Feature/TenantResolutionTest.php`
+- [ ] T011A [P] [US1] Add failure test for unknown subdomain in `tests/Feature/TenantResolutionTest.php`
+- [ ] T011B [P] [US1] Add failure test for inactive or expired tenant in `tests/Feature/TenantResolutionTest.php`
 - [x] T012 [P] [US1] Performance test verifying tenant resolution latency (<50ms) in tests.
+- [ ] T013A [P] [US1] Add failure test for overdue tenant access denial in `tests/Feature/TenantResolutionTest.php`
 
 ### Implementation for User Story 1
 
 - [x] T013 [US1] Implement `TenantConnectionMiddleware` in `app/Http/Middleware/TenantConnectionMiddleware.php`
+- [ ] T013B [US1] Update `TenantConnectionMiddleware` in `app/Http/Middleware/TenantConnectionMiddleware.php` to validate billing status from `central`
+- [ ] T013C [US1] Define denial response or redirect for overdue tenants in the web flow
 - [x] T014 [US1] Register `TenantConnectionMiddleware` globally for web routes in `bootstrap/app.php`
 - [x] T015 [P] [US1] Modify `app/Models/User.php` to use `tenant` connection and remove `filial_id`.
 - [x] T016 [P] [US1] Modify `app/Models/Post.php` to use `tenant` connection and remove `filial_id`.
@@ -79,6 +91,7 @@
 ### Tests for User Story 2
 
 - [x] T018 [P] [US2] Integration test for tenant provisioning CLI command.
+- [ ] T018A [P] [US2] Add failure test for partial provisioning error and incomplete tenant status handling in provisioning tests
 
 ### Implementation for User Story 2
 
@@ -86,10 +99,10 @@
 - [x] T020 [US2] Create `platform_users` auth provider and guard in `config/auth.php`
 - [x] T021 [US2] Register admin routes under `admin.{domain}` in `bootstrap/app.php` and create `routes/admin.php`
 - [x] T022 [US2] Create `UsuarioPlataforma` central model and seeder in `database/seeders/DatabaseSeeder.php`
-- [x] T023 [US2] Create premium Volt Layout for Admin platform in `resources/views/layouts/admin.blade.php`
-- [x] T024 [P] [US2] Implement Admin Home Dashboard Volt component in `resources/views/pages/admin/dashboard.blade.php`
-- [x] T025 [P] [US2] Implement Clients Management Volt component in `resources/views/pages/admin/clientes/index.blade.php`
-- [x] T026 [P] [US2] Implement Tenant Provisioning form Volt component in `resources/views/pages/admin/clientes/create.blade.php`
+- [x] T023 [US2] Create temporary platform admin layout in `resources/views/layouts/admin.blade.php` with constitution exception documented in `plan.md`
+- [x] T024 [P] [US2] Implement temporary Admin Home Dashboard Volt component in `resources/views/pages/admin/dashboard.blade.php`
+- [x] T025 [P] [US2] Implement temporary Clients Management Volt component in `resources/views/pages/admin/clientes/index.blade.php`
+- [x] T026 [P] [US2] Implement temporary Tenant Provisioning form Volt component in `resources/views/pages/admin/clientes/create.blade.php`
 - [x] T027 [US2] Develop `tenant:create` artisan command integrating Supabase API in `app/Console/Commands/`
 
 **Checkpoint**: Admin platform successfully registers and manages independent Supabase environments.
@@ -104,7 +117,7 @@
 
 ### Tests for User Story 3
 
-- [x] T028 [P] [US3] Unit tests verifying branding application from tenant settings.
+- [x] T028 [P] [US3] Unit tests verifying branding application from tenant settings in `tests/Unit/WhiteLabelConfigTest.php`
 
 ### Implementation for User Story 3
 
@@ -124,6 +137,7 @@
 - [x] T035 [P] Remove `app/Http/Middleware/TenantResolver.php`
 - [x] T036 Code cleanup and refactoring (Laravel Pint)
 - [x] T037 Security hardening regarding Supabase connection string storage
+- [ ] T037A [P] Add test or assertion to ensure tenant credentials are not leaked in logs or exceptions
 
 ---
 
@@ -147,4 +161,4 @@
 3. Eloquent models point to the respective physical DB cleanly.
 
 ### Current Status
-Most foundational logic, User Story 1, and User Story 2 have been completed. Next logical focus is ensuring proper CLI interaction for Supabase integration (`tenant:create`) if not yet functionally built out, and expanding test coverages.
+Foundational logic and the main implementation tracks for User Stories 1, 2, and 3 are documented as complete. The next logical focus is closing the newly identified failure-path, billing-block, and credential-handling coverage gaps.

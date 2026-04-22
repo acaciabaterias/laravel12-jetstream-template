@@ -1,48 +1,103 @@
-# Feature Specification: Módulo de Logística e App do Entregador
+# Feature Specification: Módulo 006 - Logística e App do Entregador
 
 **Feature Branch**: `006-logistics-delivery-app`
 **Status**: Ready for Implementation
-**Dependencies**: 001-multi-filial-tenant, 002-users-permissions-rbac, 003-structural-registries, 004-inventory-reverse-logistics, 005-sales-vales
+**Dependências**: Módulo 001 (Multi-Tenancy Isolado), Módulo 002 (RBAC), Módulo 003 (Cadastros Estruturais), Módulo 004 (Estoque e Logística Reversa), Módulo 005 (Vendas e Assistência)
 
-## Overview
-Permite que entregadores acessem rotas de entrega pelo celular, editem pedidos em função do peso real da sucata coletada no local de entrega, registrem recebimentos (pagamentos), e a loja acompanhe as coordenadas em tempo real. O fechamento final do pedido e saída efetiva do estoque ocorrem somente após a confirmação sistêmica do recebimento físico e devolução da bateria inservível (sucata).
+## Contexto
+
+Este módulo gerencia rotas de entrega, acompanhamento operacional, recebimentos móveis e sincronização offline do app do entregador dentro do banco de dados do tenant. O isolamento físico é garantido pelo `TenantConnectionMiddleware`, sem uso de `filial_id` ou escopos globais de tenant.
+
+## Constitution Mapping
+
+| Principle | How this module satisfies |
+|-----------|--------------------------|
+| Multi-Tenancy Isolado (v2.0.0) | Rotas, pontos e recebimentos vivem no banco do tenant, sem `filial_id` |
+| Mobile-First Field Operations | Operação offline, coleta em campo, recebimentos e atualização de rota |
+| Comprehensive Inventory & Reverse Logistics | Ajuste de sucata e integração com devolução e saldo |
+| Proactive Quality & Customer Service | Rastreabilidade da entrega e confirmação operacional |
 
 ## Key Entities
-- **RotaEntrega**: (id, entregador_id, filial_id, data_rota, status, veiculo_id)
-- **PontoEntrega**: (id, rota_id, vale_id, cliente_id, endereco, ordem, status, peso_sucata_coletado, observacao)
-- **Geolocalizacao**: (id, ponto_entrega_id, latitude, longitude, timestamp)
-- **RecebimentoMovel**: (id, ponto_entrega_id, valor, metodo [pix/cartao/dinheiro], status_sincronizado)
+
+### Tenant Database
+- **RotaEntrega**: `(id, entregador_id, data_rota, status, veiculo_id, observacoes, created_at, updated_at)`
+- **PontoEntrega**: `(id, rota_entrega_id, vale_id, cliente_id, endereco_entrega, ordem_parada, status, peso_sucata_coletado, observacao, created_at, updated_at)`
+- **RecebimentoMovel**: `(id, ponto_entrega_id, valor, metodo_pagamento, status_sincronizado, comprovante_path, created_at, updated_at)`
+- **GeolocalizacaoEvento**: `(id, rota_entrega_id, ponto_entrega_id, latitude, longitude, tipo_evento, recorded_at)`
+- **SyncEvento**: `(id, dispositivo_uuid, entidade_tipo, entidade_id, payload, status, created_at, updated_at)`
+- **AuditLog**: `(id, user_id, action, table_name, record_id, old_values, new_values, ip, user_agent, created_at)`
 
 ## Functional Requirements
-- **FR-LOG-01 - Sincronicidade Offline**: O sistema PWA ou aplicativo do entregador DEVE suportar capacidade offline para interação com o roteiro em áreas sem conectividade e sincronização reativa imediata assim que voltar à área de cobertura.
-- **FR-LOG-02 - Monitoramento Contínuo**: Rastreamento de GPS em tempo real DEVE ser exibido ativamente na matriz associando um veículo à uma localização e hora.
-- **FR-LOG-03 - Net Price Dinâmico de Rua**: O entregador DEVE ser capaz de editar o peso efetivo da sucata in loco, permitindo que o sistema recalcule dinamicamente o valor do pedido para o cliente com base nas regras do módulo 005.
-- **FR-LOG-04 - Pagamento Particionado**: O sistema deve habilitar e armazenar modalidades múltiplas de transação/recebimento no app móvel (Dinheiro e Cartão na mesma entrega, por exemplo).
-- **FR-LOG-05 - Trava de Encerramento**: A conversão rigorosa do Vale em 'Faturado' nas dependências de logísticas devem respeitar que os recebíveis batem com a sucata registrada em sistema e os meios físicos de dinheiro e boletos de controle do motorista.
+
+### FR-LOG-01: Operação Offline
+- O app do entregador deve funcionar offline por até um turno operacional.
+- Alterações locais devem ser persistidas no dispositivo até a sincronização.
+- Ao reconectar, o sistema deve sincronizar alterações pendentes de forma ordenada.
+
+### FR-LOG-02: Gestão de Rotas
+- O sistema deve permitir montar rotas com múltiplos pontos de entrega.
+- Cada rota deve ser atribuída a um entregador e opcionalmente a um veículo.
+- O painel operacional deve exibir status das rotas ativas do tenant.
+
+### FR-LOG-03: Ajuste Dinâmico de Sucata em Campo
+- O entregador deve poder ajustar o peso real da sucata coletada no local.
+- O sistema deve recalcular o impacto financeiro conforme regras do módulo 005.
+- A diferença deve ser registrada e sincronizada com rastreabilidade.
+
+### FR-LOG-04: Recebimentos Móveis
+- O sistema deve permitir registrar recebimentos por múltiplos meios, como `pix`, `cartao` e `dinheiro`.
+- O sistema deve suportar pagamento particionado em uma mesma entrega.
+- Recebimentos offline devem ser sincronizados com status confiável.
+
+### FR-LOG-05: Rastreamento Operacional
+- O sistema deve registrar eventos de geolocalização relevantes para acompanhamento de rota.
+- O painel tático deve exibir a evolução das rotas ativas com baixa latência.
+- Apenas eventos necessários para auditoria devem ser persistidos no banco.
+
+### FR-LOG-06: Trava de Encerramento
+- O fechamento logístico só deve ocorrer quando recebimentos, sucata coletada e status do atendimento estiverem consistentes.
+- O sistema deve impedir encerramento da rota quando houver divergência operacional pendente.
+
+### FR-LOG-07: Auditoria
+- Alterações em rotas, pontos, recebimentos e sincronizações críticas devem ser auditadas.
+- O log deve conter usuário, ação, entidade, valores antes e depois, IP e user agent quando disponível.
 
 ## User Scenarios
 
-### US01: Entrega Offline e Sincronização
-**Given** que o entregador parou o caminhão dentro de um subsolo com zero conectividade de rede
-**When** ele pesa a sucata, calcula o valor e finaliza todos os "Recebimentos Móveis" 
-**Then** os dados ficam preservados no dispositivo do entregador, permitindo com que ele execute a rota seguinte. Em um raio de acesso LTE/4G instantes seguintes, o sistema empurra agressivamente todos os dados gerados para central na base de matriz de forma invisível.
+### US01: Entrega offline com sincronização posterior
+**Given** que o entregador está sem conectividade  
+**When** ele registra peso da sucata, recebimento e status da parada  
+**Then** os dados ficam preservados localmente e são sincronizados ao reconectar
 
-### US02: Recálculo do Net Price Dinâmico C/ Quebra
-**Given** que a venda contava preliminarmente com o retorno de duas sucatas de 20KG
-**When** o entregador chega ao cliente e uma bateria estava totalmente corroída/danificada e é rejeitada
-**Then** ele ajusta pelo aplicativo local que retornará meramente 1 bateria. O aplicativo cobra digitalmente a diferença estipulada pela regra e o Entregador recebe o novo valor exato da mão do cliente.
+### US02: Ajuste do net price em campo
+**Given** que a sucata esperada na venda não corresponde ao peso coletado  
+**When** o entregador ajusta o peso real no app  
+**Then** o sistema recalcula a diferença financeira e registra a alteração
 
-### US03: Rastreamento Operacional e Visual
-**Given** que há mais de 10 Entregadores rodando na filial
-**When** a sala de controle abre o mapa tático 
-**Then** eles podem acompanhar o avanço dos entregadores simultaneamente, atualizado sem causar impacto de lentidão, permitindo realocar novos pedidos para quem está nas proximidades do novo cliente de emergência.
+### US03: Monitoramento operacional
+**Given** que há múltiplas rotas em andamento  
+**When** o gestor abre o painel tático  
+**Then** ele visualiza avanço de rotas, status das paradas e eventos recentes sem degradar a operação
 
 ## Edge Cases
-- **Entregador coleta Sucata de Terceiros e Volume Cedo**: Podem haver pesagens massivas de Clientes/Revendas que ultrapassam as previsões, devendo adicionar os quilogramas em excesso na "Conta de Sucata Corrente" do cliente e gerando superávits nas transações de Logística Reversa (via Módulo 004).
-- **Falta de PIX Confirmada**: Se o cliente afirma que transferiu mas a API/Dashboard não confirma na rua, o Entregador submete o comprovante visual assinado como flag `Contestável` não barrando a entrega se sua gerência permitir com um override.
+
+- Sincronização duplicada do mesmo evento não deve gerar duplicidade de recebimento.
+- Recebimento marcado como `contestavel` deve permitir continuidade apenas com política autorizada.
+- Divergência entre peso previsto e peso coletado deve recalcular impacto sem perder o histórico anterior.
+- Encerramento de rota com ponto pendente deve ser bloqueado.
+- Queda de conexão durante sincronização deve permitir retomada idempotente.
 
 ## Success Criteria
-- **SC-LOG-01**: A aplicação suporta até 1 shift inteiro (+- 8 horas corridas) em operação assíncrona blindada sem deslogar usuários em cachê.
-- **SC-LOG-02**: O despachante de frota local tem visibilidade de posições GPS refrescadas num delay `< 10 segundos`.
-- **SC-LOG-03**: Índice de confiabilidade da sincronicidade dos registros atinge 100% de estabilidade pós re-handshake online da frota na fábrica.
-- **SC-LOG-04**: O App do Entregador cacheia localmente os dados de rota (paradas, coordenadas e ETAs) recebidos do MS-005 ao início do turno e permanece operacional por até 8 horas sem conexão ativa, sincronizando status das paradas automaticamente ao reconectar.
+
+- **SC-LOG-01**: O app permanece operacional offline por até 8 horas.
+- **SC-LOG-02**: Eventos críticos de rota aparecem no painel em menos de 10 segundos quando online.
+- **SC-LOG-03**: 100% dos eventos sincronizados são reconciliados sem duplicidade.
+- **SC-LOG-04**: Ajustes de sucata e recebimentos móveis mantêm rastreabilidade completa.
+
+## Dependencies
+
+- Módulo 001 (Multi-Tenancy Isolado) para `TenantConnectionMiddleware`
+- Módulo 002 (RBAC) para autenticação e papéis
+- Módulo 003 (Cadastros Estruturais) para clientes e veículos relacionados
+- Módulo 004 (Estoque e Logística Reversa) para conta sucata e reversa
+- Módulo 005 (Vendas e Assistência) para vales, net price e fechamento comercial

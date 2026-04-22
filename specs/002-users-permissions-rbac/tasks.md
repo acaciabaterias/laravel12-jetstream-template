@@ -1,45 +1,55 @@
-# Tasks: Módulo de Usuários e Perfis (RBAC)
+# Tasks: Módulo 002 - RBAC (Database-per-Client)
 
 **Feature Branch**: `002-users-permissions-rbac`
 **Spec File**: [spec.md](spec.md)
 
-## Phase 1: Database & Migrations
+## Constitution Traceability
 
-- [x] T001: Criar migration `add_filial_id_to_users_table` com `filial_id` BIGINT UNSIGNED NULL
-- [x] T002: Criar migration `add_papel_to_users_table` com `papel` ENUM('super_admin','dono','gestor','vendedor','tecnico','estoquista')
-- [x] T003: Criar migration `add_ativo_to_users_table` com `ativo` BOOLEAN DEFAULT TRUE
-- [x] T004: Adicionar índices para `filial_id` e `papel` na tabela users
-- [x] T005: Garantir UNIQUE constraint no email da tabela users
+- **Multi-Tenancy Isolado (v2.0.0)**: T001-T007, T010, T013, T018-T023
+- **RBAC**: T005-T012, T014-T019
+- **Auditoria de Acesso**: T004, T007, T013, T021-T023
 
-## Phase 2: Models & Traits
+## Phase 1: Database Migrations (Tenant)
 
-- [x] T006: Atualizar Model User com `fillable` para novos campos
-- [x] T007: Adicionar relacionamento `belongsTo(Filial::class)` no Model User
-- [x] T008: Adicionar método `isSuperAdmin()` no Model User
-- [x] T009: Adicionar método `hasRole($papel)` no Model User
+- [ ] T001: Criar migration `create_users_table` no tenant sem `filial_id`
+- [ ] T002: Criar migration `create_permissoes_table` no tenant
+- [ ] T003: Criar migration `create_papel_permissao_table` no tenant
+- [ ] T004: Criar migration `create_audit_logs_acesso_table` no tenant
 
-## Phase 3: Middleware
+## Phase 2: Models and Seeders
 
-- [x] T010: Criar middleware `FilialIsolation`
-- [x] T011: Registrar middleware `filial.isolation` no `bootstrap/app.php`
-- [x] T012: Aplicar middleware às rotas protegidas (web e api)
+- [ ] T005: Criar Model `User` no tenant com papéis como enum
+- [ ] T006: Criar Model `Permissao`
+- [ ] T007: Criar Model `AuditLogAcesso`
+- [ ] T008: Criar Seeder `PermissoesSeeder` com permissões padrão
+- [ ] T009: Criar Seeder `PapelPermissaoSeeder` associando permissões aos papéis
 
-## Phase 4: Seeders
+## Phase 3: Authentication & Authorization
 
-- [x] T013: Criar seeder `SuperAdminSeeder`
-- [x] T014: Registrar seeder no `DatabaseSeeder.php`
-- [x] T015: Adicionar variáveis `SUPER_ADMIN_EMAIL` e `SUPER_ADMIN_PASSWORD` no `.env.example`
+- [ ] T010: Configurar Fortify para usar a conexão tenant
+- [ ] T011: Criar `UserPolicy` com regras baseadas em papel
+- [ ] T012: Registrar Gates no `AuthServiceProvider`
+- [ ] T013: Implementar registro de auditoria de acesso para login com sucesso e falha
+
+## Phase 4: User Management UI
+
+- [ ] T014: Criar Livewire component `UserManager` para listar usuários
+- [ ] T015: Criar Livewire component `UserForm` para criar e editar usuários
+- [ ] T016: Implementar validação de email único dentro do tenant
+- [ ] T017: Implementar ativação e desativação de usuários
 
 ## Phase 5: Tests
 
-- [x] T016: Testar que super_admin acessa todos os CNPJs
-- [x] T017: Testar que usuário comum NÃO acessa outro CNPJ (HTTP 403)
-- [x] T018: Testar que usuário sem filial_id (não super_admin) é bloqueado
-- [x] T019: Testar que middleware não interfere em rotas públicas
-- [x] T020: Testar que papéis têm as permissões corretas (CRUD de recursos)
+- [ ] T018: Testar que `dono` pode criar `vendedor`
+- [ ] T019: Testar que `vendedor` não pode criar usuários
+- [ ] T020: Testar que Super Admin acessa tenant via seletor de contexto
+- [ ] T021: Testar que usuário inativo não autentica
+- [ ] T022: Testar que tentativa de acesso sem permissão retorna HTTP 403
+- [ ] T023: Testar que auditoria registra IP, User Agent e timestamp
 
-## Phase 6: Integration
+## Phase 6: Super Admin (Central Database)
 
-- [x] T021: Adicionar seletor de CNPJ no dashboard do super_admin
-- [x] T022: Implementar listagem de usuários por CNPJ (apenas dono/gestor)
-- [x] T023: Implementar criação de usuários com `filial_id` automático (contexto atual)
+- [ ] T024: Criar migration `create_usuarios_plataforma_table` no banco central
+- [ ] T025: Criar Model `UsuarioPlataforma` na conexão central
+- [ ] T026: Criar Seeder `SuperAdminSeeder`
+- [ ] T027: Criar middleware para verificar `super_admin` em rotas administrativas da plataforma

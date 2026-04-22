@@ -35,4 +35,22 @@ return [
         ],
     ],
 
+    'ms_fiscal' => [
+        'url' => env('MS_FISCAL_URL', 'http://localhost:8001'),
+        'api_key' => env('MS_FISCAL_API_KEY'), // Chave central opcional, prioriza chave por filial
+    ],
+
+    'ms_bancario' => [
+        'url' => env('MS_BANCARIO_URL', 'http://localhost:8002'),
+        'api_key' => env('MS_BANCARIO_API_KEY'),
+    ],
+
+    'ms_whatsapp' => [
+        'url' => env('MS_WHATSAPP_URL', 'http://localhost:8003'),
+    ],
+
+    'suporte' => [
+        'whatsapp' => env('SUPPORT_WHATSAPP_NUMBER'),
+    ],
+
 ];

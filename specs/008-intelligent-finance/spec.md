@@ -1,46 +1,101 @@
-# Feature Specification: Módulo Financeiro Inteligente
+# Feature Specification: Módulo 008 - Financeiro Inteligente
 
 **Feature Branch**: `008-intelligent-finance`
 **Status**: Ready for Implementation
-**Dependencies**: 001-multi-filial-tenant, 002-users-permissions-rbac, 003-structural-registries, 004-inventory-reverse-logistics, 005-sales-vales, 007-guarantees-feedback
+**Dependências**: Módulo 001 (Multi-Tenancy Isolado), Módulo 002 (RBAC), Módulo 003 (Cadastros Estruturais), Módulo 004 (Estoque e Logística Reversa), Módulo 005 (Vendas e Assistência), Módulo 007 (Garantias e Feedback)
 
-## Overview
-Gestão automatizada e preditiva das finanças das filiais. Introduz a conciliação automática via banco, projeta o fluxo de caixa, apura a margem de lucro real e consolida integrações vindas das Vendas, Garantias e Logística (vales, OS, recargas de bateria e reembolsos).
+## Contexto
+
+Este módulo gerencia conciliação bancária, projeção de fluxo de caixa, apuração de margem real e integração financeira com vendas, garantias e logística dentro do banco de dados do tenant. O isolamento físico é garantido pelo `TenantConnectionMiddleware`, sem uso de `filial_id`.
+
+## Constitution Mapping
+
+| Principle | How this module satisfies |
+|-----------|--------------------------|
+| Multi-Tenancy Isolado (v2.0.0) | Contas, transações e projeções vivem no banco do tenant, sem `filial_id` |
+| Automated Financial Microservices | Conciliação via APIs bancárias e processamento assíncrono |
+| Proactive Quality & Customer Service | Cobrança automática de improcedência e alertas operacionais |
+| RBAC | Controle de acesso para caixa, financeiro e gestão |
 
 ## Key Entities
-- **ContaBancaria**: (id, filial_id, banco, agencia, conta, tipo, token_api, status)
-- **TransacaoFinanceira**: (id, conta_id, tipo [receita/despesa], valor, data, status_conciliado, vale_id, origem)
-- **FluxoCaixaProjetado**: (id, filial_id, data, saldo_inicial, total_receber, total_pagar, saldo_projetado)
-- **MargemLucroReal**: (id, bateria_id, periodo, valor_venda, custo_aquisicao, frete, imposto, comissao, margem_calculada)
+
+### Tenant Database
+- **ContaBancaria**: `(id, banco, agencia, conta, tipo, token_api, status, created_at, updated_at)`
+- **TransacaoFinanceira**: `(id, conta_bancaria_id, tipo, valor, data_transacao, status_conciliado, origem_tipo, origem_id, descricao, created_at, updated_at)`
+- **FluxoCaixaProjetado**: `(id, data_referencia, saldo_inicial, total_receber, total_pagar, saldo_projetado, created_at, updated_at)`
+- **MargemLucroReal**: `(id, bateria_id, periodo_inicio, periodo_fim, valor_venda, custo_aquisicao, frete, imposto, comissao, margem_calculada, created_at, updated_at)`
+- **ConciliacaoPendente**: `(id, transacao_financeira_id, motivo, payload_bancario, status, created_at, updated_at)`
+- **FechamentoContabil**: `(id, competencia, status, fechado_em, fechado_por, created_at, updated_at)`
+- **AuditLog**: `(id, user_id, action, table_name, record_id, old_values, new_values, ip, user_agent, created_at)`
 
 ## Functional Requirements
-- **FR-FIN-01 - Integração API Bancária**: O sistema DEVE conectar automatizadamente (Open Finance/PIX API), efetuando o match ("Conciliação bancária") entre os recebíveis logísticos/balcão do ERP frente ao Extrato do Banco na nuvem.
-- **FR-FIN-02 - Fluxo de Caixa Diário Projetado**: O Painel Financeiro DEVE processar o `saldo em conta + contas a receber - contas a pagar (fornecedor/impostos)` de datas estipuladas, informando furos ou folgas de tesouraria de uma determinada Filial.
-- **FR-FIN-03 - Apuração de Margem Real**: Na consolidação do BI de painel, a Gerência DEVE enxergar a margem líquida por item (Mark-up), abatendo custo da sucata reversa, fretes, impostos fiscais e comissões para aquela determinada bateria (Rentabilidade Limpa).
-- **FR-FIN-04 - Emissão Condicional C/ Cobrança Garantia**: A geração automática de Faturas/Vales de Recebimento proveniente das O.S de Pós-Venda (Módulo 007) será engatilhada condicional e imperativamente — forçando crédito devido da taxa de recarga para a loja APENAS e logo APÓS o Laudo técnico ser assinalado "Improcedente".
+
+### FR-FIN-01: Integração Bancária
+- O sistema deve consumir APIs bancárias ou gateways financeiros para importar transações.
+- A conciliação automática deve tentar associar recebimentos e pagamentos às origens do ERP.
+- Transações ambíguas devem permanecer pendentes para averiguação humana.
+
+### FR-FIN-02: Fluxo de Caixa Projetado
+- O sistema deve consolidar saldo atual, contas a receber e contas a pagar por data.
+- O painel deve destacar déficits e folgas projetadas.
+
+### FR-FIN-03: Margem de Lucro Real
+- O sistema deve calcular margem real por produto considerando custos, frete, impostos, comissões e efeito da sucata.
+- O indicador deve ser acessível no contexto analítico do produto.
+
+### FR-FIN-04: Cobrança de Improcedência
+- Quando uma OS de garantia for marcada como improcedente, o sistema deve gerar a cobrança correspondente.
+- A cobrança deve ser registrada como transação financeira rastreável.
+
+### FR-FIN-05: Lançamentos Manuais
+- O sistema deve permitir lançamentos manuais de receitas e despesas com trilha de auditoria.
+- Lançamentos devem respeitar permissões de acesso por papel.
+
+### FR-FIN-06: Fechamento Contábil
+- O sistema deve bloquear edição de períodos já fechados contabilmente.
+- Qualquer tentativa de modificação em competência encerrada deve falhar com bloqueio explícito.
+
+### FR-FIN-07: Auditoria Financeira
+- Conciliação, lançamentos, cobranças e bloqueios contábeis devem ser auditados.
+- O log deve conter usuário, ação, entidade, valores antes e depois, IP e user agent.
 
 ## User Scenarios
 
-### US01: Conciliação Invisível e Rápida (Automação API)
-**Given** que o entregador recolheu e faturou 10 vendas via PIX na rua (Módulo 006)
-**When** o Gerente Financeiro abrir a Gestão de Transações no dia seguinte
-**Then** ele enxerga 10 boletos ou depósitos marcados com "Check Verdinho" já liquidados e validados oficialmente de forma automática, através da Engine Operadora executada em Background pela noite que detectou as liquidações nos comprovantes.
+### US01: Conciliação automática
+**Given** que o banco importou transações do dia anterior  
+**When** o gestor financeiro acessa a tela de conciliação  
+**Then** o sistema já apresenta os matches automáticos e destaca apenas as pendências reais
 
-### US02: Painel de Alerta e Previsibilidade
-**Given** que há um saldo de R$ 500 reais no cofre da Matriz hoje
-**When** a Analista de Contabilidade acessa a aba "Visão de Fim de Semana" no ERP
-**Then** o sistema agrupa os custos correntes e vencimentos de boletos previstos, calculando o `Saldo Final Projetado` e disparando um gráfico/grid alertando déficit imediato de operação para sexta-feira.
+### US02: Projeção de caixa
+**Given** que existem contas a pagar e a receber nos próximos dias  
+**When** o analista financeiro abre o painel projetado  
+**Then** o sistema calcula o saldo futuro e sinaliza risco de déficit
 
-### US03: Margens de Lucro Brutalmente Claras
-**Given** que a Peça Y é precificada por R$ 400 sem análise direta da base
-**When** o Diretor seleciona o extrato dessa bateria para compras da Filial A na tabela da MargemReal
-**Then** a tabela cruza as integrações: Preço (-400), Impostos (-40), Perda de Casco/Sucata (-45), Comissão do Entregador (-20), apurando e estampando uma % de Margem Final exata do fabricante que previne fechamentos mensais cegos na companhia.
+### US03: Cobrança de garantia improcedente
+**Given** que uma garantia foi classificada como improcedente  
+**When** o fluxo é concluído no módulo 007  
+**Then** o sistema cria automaticamente a transação financeira correspondente
 
 ## Edge Cases
-- **Boletos sem Referência / Multi-match (API)**: Se existirem depósitos avulsos que a Engine de Conciliação via API não tiver assertividade plena (Valores genéricos e idênticos recebidos no mesmo minuto sem distinções), a Engine Aborta o Match automático e os pendura em colunas "Aguardando Averiguação Humana".
-- **Transação Retroativa em Mês Contábil Trancado**: O Módulo NÃO PODE PERMITIR edições corriqueiras (updates/deletes) provindos de diretores/vendedores sobre depósitos pertencentes à competências antigas na qual a Contabilidade e impostos já rodaram fechamento de balanço mensal.
+
+- Transações bancárias com múltiplos candidatos de match devem ficar pendentes.
+- Token bancário inválido não pode quebrar o painel financeiro; deve gerar erro rastreável.
+- Fechamento contábil já encerrado deve impedir edição retroativa.
+- Falha na cobrança automática de improcedência deve gerar alerta financeiro sem perder o vínculo com a OS.
+- Duplicidade de importação bancária deve ser bloqueada por identificador externo.
 
 ## Success Criteria
-- **SC-FIN-01**: A conciliação noturna do script Open Finance deverá atingir ao menos `95% de exatidão` nos matches simples identificados pelo banco.
-- **SC-FIN-02**: A engrenagem de consolidação do "Fluxo Projetado" jamais tranca o Front-End, desaguando respostas das queries robustas nas visões analíticas em `< 2.5 Segundos`.
-- **SC-FIN-03**: Laudos Improcedentes que sofrerem abortos de comunicação falhando na "Cobrança Automática da OS" sinalizam imediatamente um bloqueio impeditivo para alerta de vazamento humano.
+
+- **SC-FIN-01**: A conciliação automática atinge pelo menos 95% de acerto nos matches simples.
+- **SC-FIN-02**: O fluxo de caixa projetado responde em menos de 2.5 segundos.
+- **SC-FIN-03**: Cobranças de improcedência geram transação financeira rastreável sem intervenção manual.
+- **SC-FIN-04**: Períodos fechados contabilmente não sofrem alterações indevidas.
+
+## Dependencies
+
+- Módulo 001 (Multi-Tenancy Isolado) para `TenantConnectionMiddleware`
+- Módulo 002 (RBAC) para autenticação e permissões
+- Módulo 003 (Cadastros Estruturais) para produtos
+- Módulo 004 (Estoque e Logística Reversa) para custos e sucata
+- Módulo 005 (Vendas e Assistência) para recebíveis comerciais
+- Módulo 007 (Garantias e Feedback) para cobrança de improcedência

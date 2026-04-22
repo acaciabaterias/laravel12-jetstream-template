@@ -1,30 +1,64 @@
-# Tasks: Módulo de Estoque e Logística Reversa
+# Tasks: Módulo 004 - Estoque e Logística Reversa
 
 **Feature Branch**: `004-inventory-reverse-logistics`
 **Spec File**: [spec.md](spec.md)
 
-## Phase 1: Database & Models
-- [ ] T001: Criar migration para tabela `depositos` (id, nome, filial_id).
-- [ ] T002: Criar migration para tabela `estoque_movimentacoes` (id, bateria_id, filial_id, deposito_id, user_id, tipo_operacao, quantidade, justificativa, data).
-- [ ] T003: Criar migration para consolidado `estoque_saldos` (bateria_id, filial_id, deposito_id, quantidade_atual).
-- [ ] T004: Adicionar campos de crédito de sucata e logística reversa na migration dos models de `Cliente` e `Fornecedor`.
-- [ ] T005: Criar os Models (`Deposito`, `EstoqueMovimentacao`, `EstoqueSaldo`) e seus relacionamentos padrões.
+## Constitution Traceability
 
-## Phase 2: Logística Core e Livewire UI
-- [ ] T006: Componentes Livewire 4 para consultar saldo de estoque agregando visões por depósito e filial.
-- [ ] T007: Sistema que detecta e acusa baterias de "Shelf Life" vencido com base na data da mais recente movimentação daquele produto.
-- [ ] T008: Implementar sistema de Movimentação/Ajuste manual com obrigatoriedade de Log/Justificativa do usuário logado.
+- **Multi-Tenancy Isolado (v2.0.0)**: T001-T006, T012-T027
+- **Comprehensive Inventory & Reverse Logistics**: T001-T023
+- **Proactive Quality**: T006, T013-T027
 
-## Phase 3: Importação de NFe (XML)
-- [ ] T009: Desenvolver Serviço de Parser para extração dos produtos, pesos de sucata e valores das Notas Fiscais Eletrônicas via SimpleXML.
-- [ ] T010: Criar interface Livewire/Tailwind de Upload (Drag & Drop) de múltiplos arquivos XML.
-- [ ] T011: Criar engine de correspondência (de/para), exibindo tela para o usuário confirmar vínculos de produtos da nota com baterias que existem nativamente no sistema (ERP) se o código de barras for desconhecido.
+## Phase 1: Database Migrations (Tenant)
 
-## Phase 4: A "Conta Sucata"
-- [ ] T012: Inserir transações de débito e crédito na Conta de Sucata do Fornecedor após leitura do XML onde constam cascos retornados/devidos.
-- [ ] T013: View gerencial das pendências agregadas de Sucata de todas as operações (Filtrado para usuários com acesso de Gestores+).
+- [ ] T001: Criar migration `create_depositos_table`
+- [ ] T002: Criar migration `create_estoque_movimentacoes_table`
+- [ ] T003: Criar migration `create_estoque_saldos_table`
+- [ ] T004: Criar migration `create_xml_importacoes_table`
+- [ ] T005: Criar migration `create_conta_sucata_movimentacoes_table`
+- [ ] T006: Criar migration `create_audit_logs_table`
 
-## Phase 5: Testes Integrados e Edge Cases
-- [ ] T014: Mocks & Unit Tests processando um mock XML e garantindo criação correta de movimentações de estoque.
-- [ ] T015: Testes de concorrência mitigando a possibilidade de `estoque_movimentacoes` forçar a gravação e deixar a quantidade_atual abaixo de zero no DB.
-- [ ] T016: Verificar isolamento Multi-filial do Global Scope evitando que um estoquista veja o caminhão ou a loja da cidade vizinha.
+## Phase 2: Models, Services e Jobs
+
+- [ ] T007: Criar Model `Deposito`
+- [ ] T008: Criar Model `EstoqueMovimentacao`
+- [ ] T009: Criar Model `EstoqueSaldo`
+- [ ] T010: Criar Model `XmlImportacao`
+- [ ] T011: Criar Model `ContaSucataMovimentacao`
+- [ ] T012: Criar service `EstoqueSaldoService` para consolidar saldos
+- [ ] T013: Criar service `XmlNfeParser` para leitura de NF-e
+- [ ] T014: Criar job `ProcessXmlImportJob`
+
+## Phase 3: Estoque e Ajustes
+
+- [ ] T015: Criar Livewire component `EstoqueDashboard`
+- [ ] T016: Criar Livewire component `EstoqueAdjustmentForm`
+- [ ] T017: Implementar entradas, saídas, transferências e ajustes manuais
+- [ ] T018: Implementar bloqueio de estoque negativo
+- [ ] T019: Exigir justificativa obrigatória em ajustes manuais
+
+## Phase 4: XML e Conta Sucata
+
+- [ ] T020: Criar Livewire component `XmlImportForm`
+- [ ] T021: Implementar fluxo de importação com pausa para itens não mapeados
+- [ ] T022: Criar Livewire component `ContaSucataDashboard`
+- [ ] T023: Implementar débitos e créditos da conta sucata para clientes e fornecedores
+
+## Phase 5: Shelf Life e Auditoria
+
+- [ ] T024: Implementar cálculo e alerta de shelf life
+- [ ] T025: Criar Trait `Auditable` para estoque e sucata
+- [ ] T026: Registrar auditoria completa em movimentações críticas
+- [ ] T027: Bloquear reprocessamento de XML já importado pela mesma `chave_nfe`
+
+## Phase 6: Tests
+
+- [ ] T028: Testar importação de XML com itens compatíveis
+- [ ] T029: Testar pausa da importação para item não mapeado
+- [ ] T030: Testar bloqueio de estoque negativo
+- [ ] T031: Testar atualização correta de saldo consolidado
+- [ ] T032: Testar ajuste manual com justificativa obrigatória
+- [ ] T033: Testar conta sucata com débito e crédito
+- [ ] T034: Testar alerta de shelf life
+- [ ] T035: Testar auditoria de movimentações
+- [ ] T036: Testar isolamento entre tenants sem cross-access

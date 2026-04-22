@@ -1,33 +1,64 @@
-# Tasks: Módulo de Logística e App do Entregador
+# Tasks: Módulo 006 - Logística e App do Entregador
 
 **Feature Branch**: `006-logistics-delivery-app`
 **Spec File**: [spec.md](spec.md)
 
-## Phase 1: Database Setup & Models
-- [ ] T001: Criar migration para `rotas_entrega` (id, entregador_id, filial_id, data_rota, status, veiculo_id).
-- [ ] T002: Criar migration pivotada relacional para `pontos_entrega` (rota_id, vale_id, ordem_parada, status, peso_sucata_coletado).
-- [ ] T003: Criar migration isolada para `recebimentos_moveis` registrando parciais de pagamento atrelados ao local móvel com status de sync.
-- [ ] T004: Instanciar Models (`RotaEntrega`, `PontoEntrega`, `RecebimentoMovel`) adicionando as restrições de Global Scopes `Tenant`.
+## Constitution Traceability
 
-## Phase 2: Livewire Web Dashboard (Tático / Matriz)
-- [ ] T005: Componente Livewire "Montagem de Rotas", permitindo que o gestor filtre e puxe de uma fila drag and drop os Vales emitidos ativando eles na caçamba de um entregador.
-- [ ] T006: Habilitar o servidor de mensageria WebSockets nativo local implementando `laravel/reverb`.
-- [ ] T007: Construir Painel Interativo Geográfico com biblioteca robusta de JavaScript integrando assinaturas via Livewire JS listeners das correntes coordenadas ativas provindas da rota dos motoristas que estão conectados.
+- **Multi-Tenancy Isolado (v2.0.0)**: T001-T006, T010-T027
+- **Mobile-First Field Operations**: T007-T020, T028-T035
+- **Comprehensive Inventory & Reverse Logistics**: T013-T020, T029-T034
+- **Proactive Quality & Customer Service**: T012-T027, T030-T035
 
-## Phase 3: PWA Entregador Offline (Tecnologia Mobile-First)
-- [ ] T008: Configurar framework PWA instalável injetando Manifest.json, ícones de desktop mobile e serviceWorker isolado no `app.blade.php`.
-- [ ] T009: Codificar UI do Celular em Tailwind + Alpine.js que priorize clareza sobre Vales em aberto, navegação entre Pontos de Parada da rota ativa em blocos grandes adaptados a toque contínuo.
-- [ ] T010: Engine de persistência JavaScript consumindo/captando inputs do Celular na prateleira Local do Navegador `window.indexedDB` permitindo manipulação da sucata real x sucata imaginada em Offline.
+## Phase 1: Database Migrations (Tenant)
 
-## Phase 4: Sincronismo Core Local e Remoto 
-- [ ] T011: Elaborar algoritmos lógicos e UI/UX validando Pagamentos Mistos e Recálculo Matemático Instantâneo do Net Price no front-end do dispositivo e forçar gravação em `recebimentos_moveis` locale (Off).
-- [ ] T012: Capturar Evento HTML5 `window.addEventListener('online')` acionando a trigger de disparo e desaguamento ordenado do cache via POST de todos os requests pausados até a API final para conversão de Vales e Quitação Financeira de sucata efetivamente recolhida.
-- [ ] T013: API Web Geolocation no Alpine.JS despachando a cada decêndio de segundo eixos geográficos pelo fluxo do Canal WebSocket instanciado do Entregador da Filial ativa.
+- [ ] T001: Criar migration `create_rotas_entrega_table`
+- [ ] T002: Criar migration `create_pontos_entrega_table`
+- [ ] T003: Criar migration `create_recebimentos_moveis_table`
+- [ ] T004: Criar migration `create_geolocalizacao_eventos_table`
+- [ ] T005: Criar migration `create_sync_eventos_table`
+- [ ] T006: Criar migration `create_audit_logs_table`
 
-## Phase 5: Amarrações a Módulo 004 e 005
-- [ ] T014: Criar Observers que interagem em escuta impedindo a finalização manual do ciclo na Matriz (Passo final do FR-LOG-05) caso a integridade do app acuse valores conflitantes ou sem batimentos no fechamento global da Rota.
-- [ ] T015: Trigger validando e efetuando a baixa exata e somatória na Conta de Crédito Corrente da Logística Reversa de um dado cliente à partir da sucata confirmada sincronizada após viagem finalizada pelo Entregador na doca.
+## Phase 2: Models, Services e Jobs
 
-## Phase 6: E2E and Edge Case Certifications
-- [ ] T016: Execução em bateria de Teste (Motor Unitário Dusk via Chrome Headless) isolando derrubada de Rede do browser e atestando os saves do banco local indexado.
-- [ ] T017: Garantir que Scopes de rastreamento blindam que a "Unidade Filial X" capte escutas geográficas ou espionagem logísticas oriundas de transportes locados da "Unidade Y filial".
+- [ ] T007: Criar Model `RotaEntrega`
+- [ ] T008: Criar Model `PontoEntrega`
+- [ ] T009: Criar Model `RecebimentoMovel`
+- [ ] T010: Criar Model `GeolocalizacaoEvento`
+- [ ] T011: Criar Model `SyncEvento`
+- [ ] T012: Criar service `RouteCloseValidator`
+- [ ] T013: Criar service `DeliverySyncService`
+- [ ] T014: Criar Trait `Auditable`
+- [ ] T015: Criar job `SyncDeliveryEventsJob`
+
+## Phase 3: Painel Web e Rotas
+
+- [ ] T016: Criar Livewire component `RoutePlanner`
+- [ ] T017: Criar Livewire component `LogisticsDashboard`
+- [ ] T018: Implementar montagem de rotas com múltiplos pontos
+- [ ] T019: Implementar visualização tática de status e eventos de rota
+
+## Phase 4: App do Entregador e Offline
+
+- [ ] T020: Criar Livewire/PWA screen `DeliveryRouteScreen`
+- [ ] T021: Configurar PWA com Service Worker e IndexedDB
+- [ ] T022: Implementar persistência offline de alterações da rota
+- [ ] T023: Implementar sincronização ordenada ao reconectar
+- [ ] T024: Implementar recebimentos múltiplos no app móvel
+- [ ] T025: Implementar ajuste de sucata em campo com recálculo
+
+## Phase 5: Fechamento, Auditoria e Integrações
+
+- [ ] T026: Implementar bloqueio de encerramento com divergência operacional
+- [ ] T027: Integrar ajustes de sucata e recebimentos com módulos 004 e 005
+- [ ] T028: Registrar auditoria de rota, ponto, recebimento e sincronização crítica
+
+## Phase 6: Tests
+
+- [ ] T029: Testar operação offline por turno completo com sincronização posterior
+- [ ] T030: Testar idempotência da sincronização para evitar duplicidade
+- [ ] T031: Testar ajuste de sucata com recálculo financeiro
+- [ ] T032: Testar recebimento móvel com pagamento particionado
+- [ ] T033: Testar bloqueio de encerramento com divergência
+- [ ] T034: Testar rastreamento operacional com persistência apenas de eventos relevantes
+- [ ] T035: Testar isolamento entre tenants sem cross-access

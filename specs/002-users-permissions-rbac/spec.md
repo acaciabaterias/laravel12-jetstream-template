@@ -1,66 +1,105 @@
-# Feature Specification: Módulo de Usuários e Perfis (RBAC)
+# Feature Specification: Módulo 002 - Usuários e Perfis (RBAC)
 
 **Feature Branch**: `002-users-permissions-rbac`
 **Status**: Ready for Implementation
+**Dependências**: Módulo 001 (Multi-Filial Tenant)
 
-## Overview
-Gerenciamento de usuários e controle de acesso estrito com base em papéis (Role-Based Access Control) assegurados pela Constituição arquitetural.
+## Contexto
+
+Este módulo gerencia usuários e permissões dentro de cada tenant (CNPJ), respeitando o isolamento físico por banco de dados. O Super Admin (Dono do SaaS) é gerenciado separadamente no banco central.
+
+## Constitution Mapping
+
+| Principle | How this module satisfies |
+|-----------|--------------------------|
+| Multi-Tenancy Isolado (v2.0.0) | Database-per-client com autenticação dentro do tenant |
+| RBAC | Papéis e permissões granulares dentro do tenant |
+| Auditoria de Acesso | Logs com IP, dispositivo e timestamp |
 
 ## Key Entities
-### Papel (Role)
-- Dono, Gestor, Vendedor, Técnico, Estoquista, Entregador.
-### Usuário (User)
-- Email, Senha, Papel, status, Filial Padrão, Filiais Permitidas.
+
+### Tenant Database (dentro do banco do CNPJ)
+- **User**: `(id, name, email, password, papel, ativo, ultimo_login, ultimo_ip, created_at, updated_at)`
+- **Papel**: `dono`, `gestor`, `vendedor`, `tecnico`, `estoquista`, `entregador`
+- **Permissao**: `(id, nome, slug, descricao)`
+- **PapelPermissao**: `(papel, permissao_id)`
+- **AuditLogAcesso**: `(id, user_id, ip, user_agent, timestamp, sucesso)`
+
+### Central Database (banco central)
+- **UsuarioPlataforma**: `(id, name, email, password, papel, created_at)`
+- **PapelPlataforma**: `super_admin`, `support`, `billing`
 
 ## Functional Requirements
 
-### FR-002-01: Usuário Vinculado a UM CNPJ
-- Todo usuário comum DEVE ter `filial_id` obrigatório (NOT NULL)
-- Um usuário NÃO PODE ser associado a múltiplos CNPJs
-- O papel do usuário é definido DENTRO do seu CNPJ
-- Ao criar um usuário, o `filial_id` DEVE ser informado (exceto para super_admin)
+### FR-RBAC-01: Usuário no Banco do Tenant
+- Todo usuário operacional (`dono`, `gestor`, `vendedor`, `tecnico`, `estoquista`, `entregador`) DEVE existir no banco de dados do seu respectivo tenant.
+- A tabela `users` NÃO DEVE ter coluna `filial_id`.
+- A criação de usuários DEVE ser feita via formulário dentro do dashboard do tenant.
 
-### FR-002-02: Super Administrador (Dono do SaaS)
-- O sistema DEVE ter um papel especial `super_admin`
-- O `super_admin` NÃO tem `filial_id` (`filial_id = NULL`)
-- O `super_admin` pode visualizar e gerenciar TODOS os CNPJs
-- O `super_admin` pode criar/editar/bloquear qualquer assinante
-- O `super_admin` tem um dashboard administrativo separado
+### FR-RBAC-02: Super Admin (Banco Central)
+- O Super Admin DEVE existir no banco central (`usuarios_plataforma`).
+- O Super Admin NÃO DEVE ter conta em nenhum banco de tenant.
+- O Super Admin pode acessar qualquer tenant via seletor de contexto já implementado no módulo 001.
 
-### FR-002-03: Hierarquia de Papéis (por CNPJ)
-Os papéis dentro de um CNPJ são:
+### FR-RBAC-03: Papéis e Permissões
+- Papéis mínimos no tenant: `dono`, `gestor`, `vendedor`, `tecnico`, `estoquista`, `entregador`.
+- Cada papel DEVE ter um conjunto de permissões associadas.
+- O papel `dono` DEVE ter todas as permissões do tenant.
+- O sistema PODE permitir criação de papéis customizados em evolução futura, sem bloquear a implementação base.
 
-- **dono**: Acesso total ao seu CNPJ, pode gerenciar usuários, configurações e assinatura
-- **gestor**: Acesso total ao CNPJ, mas não pode gerenciar assinatura
-- **vendedor**: Acesso a vendas, clientes, vales (não acessa estoque ou financeiro)
-- **tecnico**: Acesso a OS (Ordens de Serviço), garantias, empréstimos
-- **estoquista**: Acesso a estoque, compras, movimentações (não acessa vendas)
+### FR-RBAC-04: Autenticação
+- A autenticação DEVE ocorrer dentro do contexto do tenant após resolução do banco.
+- O `TenantConnectionMiddleware` do módulo 001 DEVE ser o único responsável por definir qual banco usar.
+- NÃO DEVE existir middleware `FilialIsolation`.
 
-### FR-002-04: Middleware de Isolamento
-- O sistema DEVE ter um middleware `FilialIsolation` aplicado às rotas protegidas
-- O middleware DEVE verificar se o usuário autenticado tem acesso ao recurso solicitado
-- Para `super_admin`: permite acesso a qualquer filial_id
-- Para usuários comuns: bloqueia acesso a filial_id diferente do seu (HTTP 403)
+### FR-RBAC-05: Auditoria de Acesso
+- O sistema DEVE registrar todo acesso de usuário com IP address, User Agent, timestamp e sucesso ou falha da autenticação.
+- Os logs de acesso DEVEM ser armazenados no banco do tenant.
+- O Super Admin NÃO DEVE ter acesso aos logs de acesso dos tenants.
 
-### FR-002-05: Seeder de Super Admin
-- O sistema DEVE ter um seeder que cria o usuário `super_admin` padrão
-- O email do super_admin DEVE ser configurável via `.env` (SUPER_ADMIN_EMAIL)
-- A senha do super_admin DEVE ser configurável via `.env` (SUPER_ADMIN_PASSWORD)
+### FR-RBAC-06: Usuário Ativo/Inativo
+- O sistema DEVE permitir desativar e ativar usuários.
+- Usuários inativos NÃO DEVEM conseguir autenticar.
+- Usuários inativos DEVEM manter seus dados para auditoria.
 
-## User Stories
-1. **Given** um Vendedor logado, **When** ele tenta excluir um cliente, **Then** a interface oculta o botão e o Laravel retorna erro `403` via HTTP.
-2. **Given** um Entregador, **When** ele faz login mobile, **Then** seu IP e OS são registrados para fins de auditoria de segurança.
+## User Scenarios
+
+### US01: Dono do tenant cria novo vendedor
+**Given** que o usuário logado tem papel `dono`  
+**When** ele acessa a tela de usuários e cria um novo usuário com papel `vendedor`  
+**Then** o sistema deve:
+- Criar o usuário no banco de dados do tenant atual
+- Atribuir as permissões do papel `vendedor`
+- Registrar o IP e User Agent do criador no log de auditoria
+
+### US02: Super Admin acessa tenant
+**Given** que o Super Admin está logado no banco central  
+**When** ele seleciona um tenant via seletor de contexto  
+**Then** o sistema deve:
+- Resolver a conexão com o banco do tenant via `TenantConnectionMiddleware`
+- Permitir acesso com papel de `super_admin` sem exigir conta no tenant
+
+### US03: Tentativa de acesso sem permissão
+**Given** que um usuário com papel `vendedor` tenta acessar a tela de configurações do tenant  
+**When** ele acessa a URL `/admin/configuracoes`  
+**Then** o sistema deve:
+- Bloquear o acesso com HTTP 403
+- Registrar a tentativa no log de auditoria
+
+## Edge Cases
+
+- Usuário inativo tenta logar: deve receber a mensagem `Usuário desativado. Contate o administrador.`
+- Papel inválido: se o papel não existir no enum, retornar erro de validação.
+- Tentativa de acesso a tenant diferente: o `TenantConnectionMiddleware` já bloqueia no módulo 001.
+- Super Admin sem permissão operacional: o Super Admin não pode criar usuários dentro do tenant.
 
 ## Success Criteria
-- **SC01**: Acesso proibido testado em todos os papéis (ex: Vendedor não consegue gerenciar usuários).
-- **SC02**: Tabela pivô `filial_user` criada para associar acesso aos Tenants corretos.
 
-### SC-002-01: Isolamento de Papéis por CNPJ
-- 100% dos usuários de um CNPJ só enxergam dados do seu CNPJ
-- Usuários de CNPJ A não aparecem em listagens do CNPJ B
-- O `super_admin` tem visão global (dashboard exclusivo com todos os CNPJs)
+- **SC-RBAC-01**: 100% dos acessos são registrados com IP, User Agent e timestamp.
+- **SC-RBAC-02**: Usuário de um tenant nunca acessa dados de outro tenant.
+- **SC-RBAC-03**: Dono consegue criar usuários em menos de 30 segundos.
+- **SC-RBAC-04**: Papéis aplicam permissões corretas com cobertura de testes automatizados.
 
-### SC-002-02: Middleware Funcional
-- Tentativas de acesso cross-CNPJ retornam HTTP 403
-- O middleware não interfere nas rotas públicas (login, register)
-- O super_admin consegue acessar qualquer rota de qualquer CNPJ
+## Dependencies
+
+- Módulo 001 (Multi-Filial Tenant) para `TenantConnectionMiddleware` e resolução de banco.
