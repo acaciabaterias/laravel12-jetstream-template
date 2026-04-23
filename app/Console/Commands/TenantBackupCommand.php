@@ -12,7 +12,8 @@ use Symfony\Component\Process\Process;
 class TenantBackupCommand extends Command
 {
     protected $signature = 'tenant:backup
-        {tenant : ID, subdominio ou CNPJ do tenant}
+        {tenant? : ID, subdominio ou CNPJ do tenant}
+        {--all : Executa backup para todos os tenants ativos}
         {--path= : Diretório de destino do backup}
         {--format=sql : Formato do backup}
         {--pretend : Apenas exibe o comando sem executar}';
@@ -21,7 +22,19 @@ class TenantBackupCommand extends Command
 
     public function handle(): int
     {
-        $cliente = $this->resolveTenant((string) $this->argument('tenant'));
+        if ((bool) $this->option('all')) {
+            return $this->backupAllTenants();
+        }
+
+        $tenantArgument = $this->argument('tenant');
+
+        if (! is_string($tenantArgument) || $tenantArgument === '') {
+            $this->error('Informe um tenant ou use a opção --all.');
+
+            return self::FAILURE;
+        }
+
+        $cliente = $this->resolveTenant($tenantArgument);
 
         if (! $cliente instanceof Cliente) {
             $this->error('Tenant não encontrado.');
@@ -71,6 +84,37 @@ class TenantBackupCommand extends Command
         $this->info("Backup gerado em {$targetPath}");
 
         return self::SUCCESS;
+    }
+
+    private function backupAllTenants(): int
+    {
+        $result = self::SUCCESS;
+
+        Cliente::query()
+            ->whereIn('status', ['trial', 'active'])
+            ->orderBy('id')
+            ->each(function (Cliente $cliente) use (&$result): void {
+                $parameters = [
+                    'tenant' => (string) $cliente->id,
+                    '--path' => $this->option('path'),
+                    '--format' => $this->option('format'),
+                ];
+
+                if ((bool) $this->option('pretend')) {
+                    $parameters['--pretend'] = true;
+                }
+
+                $exitCode = $this->call('tenant:backup', array_filter(
+                    $parameters,
+                    static fn (mixed $value): bool => $value !== null && $value !== false,
+                ));
+
+                if ($exitCode !== self::SUCCESS) {
+                    $result = self::FAILURE;
+                }
+            });
+
+        return $result;
     }
 
     private function resolveTenant(string $tenant): ?Cliente
