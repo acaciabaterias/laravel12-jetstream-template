@@ -17,6 +17,7 @@ class UserManagementTest extends TestCase
         $owner = User::factory()->withPersonalTeam()->create([
             'papel' => 'dono',
             'filial_id' => $filial->id,
+            'ativo' => true,
         ]);
 
         $this->actingAs($owner);
@@ -47,6 +48,7 @@ class UserManagementTest extends TestCase
         $seller = User::factory()->withPersonalTeam()->create([
             'papel' => 'vendedor',
             'filial_id' => $filial->id,
+            'ativo' => true,
         ]);
 
         $this->assertFalse(Gate::forUser($seller)->check('create', User::class));
@@ -58,6 +60,7 @@ class UserManagementTest extends TestCase
         $manager = User::factory()->withPersonalTeam()->create([
             'papel' => 'gestor',
             'filial_id' => $filial->id,
+            'ativo' => true,
         ]);
         $target = User::factory()->create([
             'papel' => 'vendedor',
@@ -87,16 +90,19 @@ class UserManagementTest extends TestCase
         $manager = User::factory()->withPersonalTeam()->create([
             'papel' => 'gestor',
             'filial_id' => $filialA->id,
+            'ativo' => true,
         ]);
 
         User::factory()->create([
             'name' => 'Usuario A',
             'filial_id' => $filialA->id,
+            'ativo' => true,
         ]);
 
         User::factory()->create([
             'name' => 'Usuario B',
             'filial_id' => $filialB->id,
+            'ativo' => true,
         ]);
 
         $this->actingAs($manager);

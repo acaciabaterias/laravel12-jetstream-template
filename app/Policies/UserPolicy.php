@@ -1,45 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\User;
+use App\Policies\Concerns\HandlesErpAuthorization;
 
 class UserPolicy
 {
+    use HandlesErpAuthorization;
+
     public function viewAny(User $user): bool
     {
-        return $user->isSuperAdmin() || $user->hasRole(['dono', 'gestor']);
+        return $this->can($user, ['dono', 'gestor']);
     }
 
     public function view(User $user, User $model): bool
     {
-        if ($user->isSuperAdmin()) {
-            return true;
-        }
-
-        if (! $user->hasRole(['dono', 'gestor'])) {
-            return $user->is($model);
-        }
-
-        return $user->filial_id !== null && $user->filial_id === $model->filial_id;
+        return $this->viewAny($user) || $user->is($model);
     }
 
     public function create(User $user): bool
     {
-        return $user->hasRole(['dono', 'gestor']);
+        return $this->can($user, ['dono', 'gestor']);
     }
 
     public function update(User $user, User $model): bool
     {
-        if (! $user->hasRole(['dono', 'gestor'])) {
-            return false;
-        }
-
-        if ($user->filial_id === null || $model->filial_id === null) {
-            return false;
-        }
-
-        return $user->filial_id === $model->filial_id;
+        return $this->can($user, ['dono', 'gestor']) || $user->is($model);
     }
 
     public function delete(User $user, User $model): bool
