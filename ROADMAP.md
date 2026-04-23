@@ -1,41 +1,38 @@
-# Roadmap
+# Roadmap do ERP BateriaExpert
 
-## Visao Geral
+## Status Atual (v1.0.0 - pronto para lançamento)
 
-O projeto ja tem base arquitetural, modulos core, microservicos, documentacao operacional e stack Docker versionados. Os proximos passos priorizam execucao integrada, endurecimento operacional e entrada em producao.
+✅ 9 módulos core implementados (`001` a `009`)
+✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
+✅ 136 testes passando (`345 assertions`)
+✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
+✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
+✅ RBAC completo (`15+` policies, gates)
+✅ Seeders de demonstração
 
-## Fase 1: First Boot Integrado
+## Fase 1: Estabilização e Produção (v1.1.0)
 
-- subir o stack completo com `docker compose up --build -d`
-- validar ERP Core, worker, scheduler e microservicos
-- executar smoke tests operacionais
-- validar migrations centrais e fluxo de provisionamento tenant
+- [ ] Subir ambiente com Docker e validar integração ponta a ponta
+- [ ] Configurar Supabase para tenants reais
+- [ ] Implementar autenticação real entre ERP Core e microserviços
+- [ ] Adicionar monitoramento com Prometheus e Grafana
+- [ ] Executar teste de carga e otimização de queries
 
-## Fase 2: Homologacao
+## Fase 2: Expansão Comercial (v1.2.0)
 
-- validar fluxos ponta a ponta dos modulos `001` a `009`
-- validar integracoes mock e reais dos microservicos
-- revisar filas, retries, timeouts e healthchecks
-- revisar backups e restore em ambiente controlado
+- [ ] White label avançado com temas customizáveis
+- [ ] Dashboard analítico para Super Admin
+- [ ] Relatórios avançados com exportação Excel e PDF
+- [ ] Integração com plataformas de pagamento como Stripe e ASAAS
 
-## Fase 3: Hardening de Producao
+## Fase 3: Internacionalização (v2.0.0)
 
-- revisar segredos, rotacao e armazenamento seguro
-- endurecer configuracoes de Nginx, Supervisor, Redis e PostgreSQL
-- revisar politicas de observabilidade, logs e alertas
-- finalizar estrategia de deploy em Proxmox e Supabase
+- [ ] Suporte a múltiplos idiomas (`pt-BR`, `en`, `es`)
+- [ ] Regras fiscais e CFOPs para exportação e importação
+- [ ] Suporte a múltiplas moedas
 
-## Fase 4: Go-Live
+## Fase 4: IA e Automação (v3.0.0)
 
-- publicar primeira release versionada
-- executar checklist de rollout
-- acompanhar desempenho e incidentes iniciais
-- fechar backlog de ajustes de onboarding e suporte
-
-## Backlog Estrategico
-
-- cobertura automatizada adicional para execucao integrada com containers
-- dashboards operacionais e alertas de negocio
-- runbooks de incidentes por modulo e por microservico
-- refinamento de CI/CD para deploy automatizado
-- documentacao externa para clientes e parceiros
+- [ ] Previsão de demanda com machine learning
+- [ ] Otimização de rotas com modelos preditivos
+- [ ] Chatbot de suporte integrado
