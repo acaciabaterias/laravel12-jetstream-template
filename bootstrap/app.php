@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,15 +12,24 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            Route::middleware('web')
-                ->domain('admin.'.config('app.url'))
-                ->group(base_path('routes/admin.php'));
+            $adminHost = parse_url(config('app.url'), PHP_URL_HOST);
+
+            if ($adminHost) {
+                Route::middleware('web')
+                    ->domain('admin.'.$adminHost)
+                    ->group(base_path('routes/admin.php'));
+            }
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'tenant' => \App\Http\Middleware\TenantConnectionMiddleware::class,
             'filial.isolation' => \App\Http\Middleware\FilialIsolation::class,
+            'cors.custom' => \App\Http\Middleware\CorsMiddleware::class,
+            'security.headers' => \App\Http\Middleware\SecurityHeadersMiddleware::class,
+            'rate.role' => \App\Http\Middleware\RateLimitByRoleMiddleware::class,
+            'audit.requests' => \App\Http\Middleware\AuditMiddleware::class,
+            'maintenance.allowlist' => \App\Http\Middleware\MaintenanceModeMiddleware::class,
         ]);
 
         $middleware->web(append: [

@@ -51,6 +51,16 @@ return [
 
     'suporte' => [
         'whatsapp' => env('SUPPORT_WHATSAPP_NUMBER'),
+        'compras_email' => env('COMPRAS_NOTIFICATION_TARGET', env('MAIL_FROM_ADDRESS', 'compras@example.com')),
+    ],
+
+    'platform' => [
+        'maintenance_mode' => env('MAINTENANCE_MODE', false),
+        'maintenance_allowed_ips' => array_values(array_filter(array_map('trim', explode(',', (string) env('MAINTENANCE_ALLOWED_IPS', ''))))),
+        'cors_allowed_origins' => array_values(array_filter(array_map('trim', explode(',', (string) env('CORS_ALLOWED_ORIGINS', '*'))))),
+        'cors_allowed_methods' => array_values(array_filter(array_map('trim', explode(',', (string) env('CORS_ALLOWED_METHODS', 'GET,POST,PUT,PATCH,DELETE,OPTIONS'))))),
+        'csp' => env('SECURITY_CSP', "default-src 'self'; frame-ancestors 'self'; base-uri 'self';"),
+        'hsts' => env('SECURITY_HSTS', 'max-age=31536000; includeSubDomains'),
     ],
 
 ];

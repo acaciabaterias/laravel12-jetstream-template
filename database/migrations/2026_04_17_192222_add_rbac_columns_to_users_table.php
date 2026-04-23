@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->unsignedBigInteger('filial_id')->nullable()->index();
-            $table->enum('papel', ['super_admin', 'dono', 'gestor', 'vendedor', 'tecnico', 'estoquista'])->default('vendedor')->index();
+            $table->enum('papel', ['super_admin', 'dono', 'gestor', 'vendedor', 'tecnico', 'estoquista', 'entregador'])->default('vendedor')->index();
             $table->boolean('ativo')->default(true);
 
             // Unique index on email is usually already present, but T005 mentions to ensure it.

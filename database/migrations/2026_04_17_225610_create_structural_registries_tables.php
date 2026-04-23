@@ -16,11 +16,8 @@ return new class extends Migration
             $table->id();
             $table->string('nome');
             $table->string('codigo')->nullable();
-            $table->foreignId('filial_id')->constrained('filiais')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
-
-            $table->index('filial_id');
         });
 
         // Veículos
@@ -32,12 +29,10 @@ return new class extends Migration
             $table->integer('ano_inicio')->nullable();
             $table->integer('ano_fim')->nullable();
             $table->jsonb('atributos_dinamicos')->nullable();
-            $table->foreignId('filial_id')->constrained('filiais')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
 
             $table->index(['fabricante_id', 'modelo']);
-            $table->index('filial_id');
         });
 
         // Baterias
@@ -50,18 +45,16 @@ return new class extends Migration
             $table->string('polo')->nullable();
             $table->decimal('preco_venda', 12, 2)->default(0);
             $table->jsonb('atributos_dinamicos')->nullable();
-            
+
             // Logística Reversa (Princípio IV)
             $table->decimal('peso_sucata_kg', 10, 2)->nullable();
             $table->decimal('valor_base_sucata_kg', 10, 2)->nullable();
             $table->boolean('tem_logistica_reversa')->default(true);
 
-            $table->foreignId('filial_id')->constrained('filiais')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
 
             $table->index('sku');
-            $table->index('filial_id');
         });
 
         // Aplicações (N:N entre Veículo e Bateria)
@@ -70,12 +63,10 @@ return new class extends Migration
             $table->foreignId('veiculo_id')->constrained('veiculos')->onDelete('cascade');
             $table->foreignId('bateria_id')->constrained('baterias')->onDelete('cascade');
             $table->text('observacao')->nullable();
-            $table->foreignId('filial_id')->constrained('filiais')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
 
-            $table->unique(['veiculo_id', 'bateria_id', 'filial_id'], 'idx_unique_aplicacao');
-            $table->index('filial_id');
+            $table->unique(['veiculo_id', 'bateria_id'], 'idx_unique_aplicacao');
         });
     }
 
@@ -84,6 +75,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('structural_registries_tables');
+        Schema::dropIfExists('aplicacoes');
+        Schema::dropIfExists('baterias');
+        Schema::dropIfExists('veiculos');
+        Schema::dropIfExists('fabricantes');
     }
 };

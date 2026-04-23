@@ -19,6 +19,8 @@ class TransacaoFinanceira extends Model
         'tipo',
         'valor',
         'data_transacao',
+        'data_vencimento',
+        'status',
         'status_conciliado',
         'origem_tipo',
         'origem_id',
@@ -31,6 +33,7 @@ class TransacaoFinanceira extends Model
         return [
             'valor' => 'decimal:2',
             'data_transacao' => 'datetime',
+            'data_vencimento' => 'date',
             'status_conciliado' => 'boolean',
         ];
     }

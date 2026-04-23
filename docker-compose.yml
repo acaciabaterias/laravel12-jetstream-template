@@ -1,0 +1,353 @@
+services:
+  erp_core_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp_core_app
+    env_file:
+      - ./.env
+    environment:
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: central
+      DB_CENTRAL_DRIVER: pgsql
+      DB_CENTRAL_HOST: erp_core_db
+      DB_CENTRAL_PORT: 5432
+      DB_CENTRAL_DATABASE: erp_central
+      DB_CENTRAL_USERNAME: erp
+      DB_CENTRAL_PASSWORD: erp
+      REDIS_HOST: erp_core_redis
+      REDIS_PORT: 6379
+      CACHE_STORE: redis
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: redis
+      RUN_MIGRATIONS: "true"
+      MS001_BASE_URL: http://ms_001_fiscal_api:8001
+      MS002_BASE_URL: http://ms_002_banking_api:8002
+      MS003_BASE_URL: http://ms_003_notification_api:8003
+      MS004_BASE_URL: http://ms_004_openfinance_api:8004
+      MS005_BASE_URL: http://ms_005_geocoding_api:8005
+    ports:
+      - "8000:80"
+    depends_on:
+      - erp_core_db
+      - erp_core_redis
+    volumes:
+      - .:/var/www/html
+      - erp_core_storage:/var/www/html/storage
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  erp_core_queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp_core_queue
+    env_file:
+      - ./.env
+    environment:
+      APP_URL: http://erp_core_app
+      DB_CONNECTION: central
+      DB_CENTRAL_DRIVER: pgsql
+      DB_CENTRAL_HOST: erp_core_db
+      DB_CENTRAL_PORT: 5432
+      DB_CENTRAL_DATABASE: erp_central
+      DB_CENTRAL_USERNAME: erp
+      DB_CENTRAL_PASSWORD: erp
+      REDIS_HOST: erp_core_redis
+      REDIS_PORT: 6379
+      CACHE_STORE: redis
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: redis
+      RUN_MIGRATIONS: "false"
+    depends_on:
+      - erp_core_db
+      - erp_core_redis
+    volumes:
+      - .:/var/www/html
+      - erp_core_storage:/var/www/html/storage
+    command: ["php", "artisan", "queue:work", "--verbose", "--tries=3", "--timeout=120"]
+
+  erp_core_scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp_core_scheduler
+    env_file:
+      - ./.env
+    environment:
+      APP_URL: http://erp_core_app
+      DB_CONNECTION: central
+      DB_CENTRAL_DRIVER: pgsql
+      DB_CENTRAL_HOST: erp_core_db
+      DB_CENTRAL_PORT: 5432
+      DB_CENTRAL_DATABASE: erp_central
+      DB_CENTRAL_USERNAME: erp
+      DB_CENTRAL_PASSWORD: erp
+      REDIS_HOST: erp_core_redis
+      REDIS_PORT: 6379
+      CACHE_STORE: redis
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: redis
+      RUN_MIGRATIONS: "false"
+    depends_on:
+      - erp_core_db
+      - erp_core_redis
+    volumes:
+      - .:/var/www/html
+      - erp_core_storage:/var/www/html/storage
+    command: ["sh", "-c", "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
+
+  erp_core_db:
+    image: postgres:15
+    container_name: erp_core_db
+    environment:
+      POSTGRES_DB: erp_central
+      POSTGRES_USER: erp
+      POSTGRES_PASSWORD: erp
+    ports:
+      - "5432:5432"
+    volumes:
+      - erp_core_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erp -d erp_central"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  erp_core_redis:
+    image: redis:alpine
+    container_name: erp_core_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ms_001_fiscal_api:
+    build:
+      context: ./microservicos/ms-001-fiscal-acbr
+      dockerfile: Dockerfile
+    container_name: ms_001_fiscal_api
+    env_file:
+      - ./microservicos/ms-001-fiscal-acbr/.env
+    ports:
+      - "8001:8001"
+    depends_on:
+      - ms_001_fiscal_db
+      - ms_001_fiscal_redis
+      - ms_001_acbr_server
+    volumes:
+      - ./microservicos/ms-001-fiscal-acbr:/app
+
+  ms_001_fiscal_db:
+    image: postgres:15
+    container_name: ms_001_fiscal_db
+    environment:
+      POSTGRES_DB: ms_fiscal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - ms_001_fiscal_db_data:/var/lib/postgresql/data
+
+  ms_001_fiscal_redis:
+    image: redis:alpine
+    container_name: ms_001_fiscal_redis
+    ports:
+      - "6381:6379"
+
+  ms_001_acbr_server:
+    image: alpine:3.20
+    container_name: ms_001_acbr_server
+    command: ["sh", "-c", "while true; do sleep 3600; done"]
+
+  ms_002_banking_api:
+    build:
+      context: ./microservicos/ms-002-bancario
+      dockerfile: Dockerfile
+    container_name: ms_002_banking_api
+    env_file:
+      - ./microservicos/ms-002-bancario/.env
+    ports:
+      - "8002:8002"
+    depends_on:
+      - ms_002_banking_db
+      - ms_002_banking_redis
+    volumes:
+      - ./microservicos/ms-002-bancario:/app
+
+  ms_002_banking_db:
+    image: postgres:15
+    container_name: ms_002_banking_db
+    environment:
+      POSTGRES_DB: ms_banking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - ms_002_banking_db_data:/var/lib/postgresql/data
+
+  ms_002_banking_redis:
+    image: redis:alpine
+    container_name: ms_002_banking_redis
+    ports:
+      - "6382:6379"
+
+  ms_003_notification_api:
+    build:
+      context: ./microservicos/ms-003-whatsapp-n8n
+      dockerfile: Dockerfile
+    container_name: ms_003_notification_api
+    env_file:
+      - ./microservicos/ms-003-whatsapp-n8n/.env
+    ports:
+      - "8003:8003"
+    depends_on:
+      - ms_003_notification_db
+      - ms_003_notification_redis
+      - ms_003_n8n
+      - ms_003_evolution
+    volumes:
+      - ./microservicos/ms-003-whatsapp-n8n:/app
+
+  ms_003_notification_db:
+    image: postgres:15
+    container_name: ms_003_notification_db
+    environment:
+      POSTGRES_DB: ms_whatsapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5437:5432"
+    volumes:
+      - ms_003_notification_db_data:/var/lib/postgresql/data
+
+  ms_003_notification_redis:
+    image: redis:alpine
+    container_name: ms_003_notification_redis
+    ports:
+      - "6383:6379"
+
+  ms_003_n8n:
+    image: n8nio/n8n:latest
+    container_name: ms_003_n8n
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_DATABASE: ms_whatsapp
+      DB_POSTGRESDB_HOST: ms_003_notification_db
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_USER: postgres
+      DB_POSTGRESDB_PASSWORD: postgres
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: admin
+      N8N_BASIC_AUTH_PASSWORD: admin
+      WEBHOOK_URL: http://localhost:5678/
+    ports:
+      - "5678:5678"
+    depends_on:
+      - ms_003_notification_db
+    volumes:
+      - ms_003_n8n_data:/home/node/.n8n
+
+  ms_003_evolution:
+    image: atendai/evolution-api:v2
+    container_name: ms_003_evolution
+    environment:
+      SERVER_TYPE: http
+      SERVER_PORT: 8080
+      DATABASE_ENABLED: "true"
+      DATABASE_CONNECTION_URI: postgres://postgres:postgres@ms_003_notification_db:5432/ms_whatsapp
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://ms_003_notification_redis:6379
+      AUTHENTICATION_TYPE: apikey
+      AUTHENTICATION_API_KEY: BateriaExpertSecretKey
+      WEBHOOK_GLOBAL_URL: http://ms_003_n8n:5678/webhook/evolution
+      WEBHOOK_GLOBAL_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ms_003_notification_db
+      - ms_003_notification_redis
+
+  ms_004_openfinance_api:
+    build:
+      context: ./microservicos/ms-004-openfinance
+      dockerfile: Dockerfile
+    container_name: ms_004_openfinance_api
+    env_file:
+      - ./microservicos/ms-004-openfinance/.env
+    ports:
+      - "8004:8004"
+    depends_on:
+      - ms_004_openfinance_db
+      - ms_004_openfinance_redis
+    volumes:
+      - ./microservicos/ms-004-openfinance:/app
+
+  ms_004_openfinance_db:
+    image: postgres:15
+    container_name: ms_004_openfinance_db
+    environment:
+      POSTGRES_DB: ms_openfinance
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5438:5432"
+    volumes:
+      - ms_004_openfinance_db_data:/var/lib/postgresql/data
+
+  ms_004_openfinance_redis:
+    image: redis:alpine
+    container_name: ms_004_openfinance_redis
+    ports:
+      - "6384:6379"
+
+  ms_005_geocoding_api:
+    build:
+      context: ./microservicos/ms-005-geocoding
+      dockerfile: Dockerfile
+    container_name: ms_005_geocoding_api
+    env_file:
+      - ./microservicos/ms-005-geocoding/.env
+    ports:
+      - "8005:8005"
+    depends_on:
+      - ms_005_geocoding_db
+      - ms_005_geocoding_redis
+    volumes:
+      - ./microservicos/ms-005-geocoding:/app
+
+  ms_005_geocoding_db:
+    image: postgis/postgis:15-3.4
+    container_name: ms_005_geocoding_db
+    environment:
+      POSTGRES_DB: ms_geocoding
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5439:5432"
+    volumes:
+      - ms_005_geocoding_db_data:/var/lib/postgresql/data
+
+  ms_005_geocoding_redis:
+    image: redis:alpine
+    container_name: ms_005_geocoding_redis
+    ports:
+      - "6385:6379"
+
+volumes:
+  erp_core_db_data:
+  erp_core_storage:
+  ms_001_fiscal_db_data:
+  ms_002_banking_db_data:
+  ms_003_notification_db_data:
+  ms_003_n8n_data:
+  ms_004_openfinance_db_data:
+  ms_005_geocoding_db_data:

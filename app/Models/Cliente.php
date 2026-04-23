@@ -10,7 +10,6 @@ class Cliente extends Model
 {
     use HasFactory, SoftDeletes;
 
-
     protected $table = 'clientes';
 
     protected $fillable = [
@@ -18,6 +17,7 @@ class Cliente extends Model
         'subdominio', 'plano', 'status', 'trial_ends_at', 'subscription_ends_at',
         'supabase_project_ref', 'supabase_url', 'supabase_db_host',
         'supabase_db_password', 'supabase_anon_key', 'supabase_service_role_key',
+        'endereco', 'saldo_sucata_kg',
     ];
 
     protected function casts(): array
@@ -25,6 +25,7 @@ class Cliente extends Model
         return [
             'trial_ends_at' => 'date',
             'subscription_ends_at' => 'date',
+            'saldo_sucata_kg' => 'decimal:2',
             'supabase_db_password' => 'encrypted',
             'supabase_anon_key' => 'encrypted',
             'supabase_service_role_key' => 'encrypted',

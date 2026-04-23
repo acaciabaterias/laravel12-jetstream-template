@@ -1,8 +1,11 @@
 # BateriaExpert ERP
 
-[![Tests](https://img.shields.io/badge/tests-112%20passed-brightgreen)](#testes)
-[![Coverage](https://img.shields.io/badge/coverage-ci%20ready-blue)](#github-actions)
-[![License](https://img.shields.io/badge/license-MIT-green)](./composer.json)
+[![Tests Passing](https://img.shields.io/badge/tests-136%20passed-brightgreen)](#testes)
+[![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
+[![PHP Version](https://img.shields.io/badge/php-8.4-777bb4)](#stack)
+[![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](./composer.json)
+[![Docker Ready](https://img.shields.io/badge/docker-ready-2496ed)](#rodando-com-docker)
 
 ERP especializado para distribuidores, revendas e operacoes de baterias automotivas, com arquitetura `database-per-client`, backoffice SaaS central e microservicos dedicados para fiscal, bancario, notificacoes, Open Finance e geocoding.
 
@@ -229,12 +232,28 @@ Executar healthcheck:
 
 - [openapi.yaml](./openapi.yaml)
 - [postman_collection.json](./postman_collection.json)
+- [API_GUIDE.md](./API_GUIDE.md)
+- [MICROSERVICES.md](./MICROSERVICES.md)
 
 ### Deploy
 
 - [DEPLOY_PROXMOX.md](./DEPLOY_PROXMOX.md)
 - [DEPLOY_SUPABASE.md](./DEPLOY_SUPABASE.md)
 - [DEPLOY_PRODUCAO.md](./DEPLOY_PRODUCAO.md)
+- [DEPLOYMENT_DETAILED.md](./DEPLOYMENT_DETAILED.md)
+
+### Operacao
+
+- [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+- [PERFORMANCE.md](./PERFORMANCE.md)
+
+### Governanca
+
+- [CONTRIBUTING.md](./CONTRIBUTING.md)
+- [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+- [SECURITY.md](./SECURITY.md)
+- [SUPPORT.md](./SUPPORT.md)
+- [CHANGELOG.md](./CHANGELOG.md)
 
 ### Banco de dados
 

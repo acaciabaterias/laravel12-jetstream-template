@@ -21,11 +21,9 @@ return new class extends Migration
             $table->json('new_values')->nullable();
             $table->string('ip_address')->nullable();
             $table->text('user_agent')->nullable();
-            $table->foreignId('filial_id')->nullable()->constrained('filiais')->onDelete('cascade');
             $table->timestamps();
 
             $table->index(['table_name', 'record_id']);
-            $table->index('filial_id');
         });
     }
 
