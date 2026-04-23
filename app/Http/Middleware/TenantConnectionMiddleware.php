@@ -4,26 +4,22 @@ namespace App\Http\Middleware;
 
 use App\Models\Cliente;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class TenantConnectionMiddleware
 {
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        // Pular rotas públicas e administrativas centrais
-        if ($request->is('login', 'register', 'user/profile', 'teams/*', 'webhooks/*', 'api/webhooks/*')) {
-            return $next($request);
-        }
-
-        // Para super_admin (acesso via dashboard central)
-        if ($request->is('admin/*', 'dashboard') && auth()->check() && auth()->user()->isSuperAdmin()) {
+        if ($this->shouldBypassTenantResolution($request)) {
             return $next($request);
         }
 
         $subdominio = $this->getSubdominio($request);
 
-        // Se não houver subdomínio identificado (ex: domínio principal ou localhost), 
+        // Se não houver subdomínio identificado (ex: domínio principal ou localhost),
         // permitimos que a requisição siga para a aplicação central.
         if (! $subdominio) {
             return $next($request);
@@ -89,10 +85,31 @@ class TenantConnectionMiddleware
         return $next($request);
     }
 
-    private function getSubdominio($request): ?string
+    private function shouldBypassTenantResolution(Request $request): bool
+    {
+        if ($request->is('login', 'register', 'user/profile', 'teams/*', 'webhooks/*', 'api/webhooks/*')) {
+            return true;
+        }
+
+        if ($request->routeIs('admin.*') || str_starts_with($request->getHost(), 'admin.')) {
+            return true;
+        }
+
+        if ($request->is('admin/*', 'dashboard') && auth()->check() && auth()->user()->isSuperAdmin()) {
+            return true;
+        }
+
+        if (auth('platform')->check()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function getSubdominio(Request $request): ?string
     {
         $host = $request->getHost();
-        
+
         // Se for localhost ou o domínio base puro, não há subdominio de tenant
         if ($host === 'localhost' || $host === '127.0.0.1') {
             return null;

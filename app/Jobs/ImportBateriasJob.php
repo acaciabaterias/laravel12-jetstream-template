@@ -14,17 +14,7 @@ class ImportBateriasJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $records;
-    public $filialId;
-
-    /**
-     * Create a new job instance.
-     */
-    public function __construct(array $records, int $filialId)
-    {
-        $this->records = $records;
-        $this->filialId = $filialId;
-    }
+    public function __construct(public array $records) {}
 
     /**
      * Execute the job.
@@ -43,8 +33,7 @@ class ImportBateriasJob implements ShouldQueue
 
                     Bateria::updateOrCreate(
                         [
-                            'sku' => $row['sku'], 
-                            'filial_id' => $this->filialId
+                            'sku' => $row['sku'],
                         ],
                         [
                             'marca' => $row['marca'],
@@ -57,9 +46,9 @@ class ImportBateriasJob implements ShouldQueue
                         ]
                     );
                 } catch (\Exception $e) {
-                    // Skip specific rows that trigger unique DB constraints or casting issues 
+                    // Skip specific rows that trigger unique DB constraints or casting issues
                     // and log silently without failing the whole chunk.
-                    Log::warning("ImportBateriasJob: Failed to import SKU {$row['sku']} - " . $e->getMessage());
+                    Log::warning("ImportBateriasJob: Failed to import SKU {$row['sku']} - ".$e->getMessage());
                 }
             }
         });

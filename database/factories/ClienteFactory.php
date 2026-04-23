@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Cliente;
@@ -13,11 +15,13 @@ class ClienteFactory extends Factory
     public function definition(): array
     {
         return [
-            'cnpj' => $this->faker->unique()->numerify('##.###.###/0001-##'),
+            'cnpj' => $this->faker->unique()->numerify('##############'),
             'razao_social' => $this->faker->company(),
             'nome_fantasia' => $this->faker->company(),
             'email_contato' => $this->faker->companyEmail(),
             'telefone' => $this->faker->phoneNumber(),
+            'endereco' => $this->faker->streetAddress(),
+            'saldo_sucata_kg' => $this->faker->randomFloat(2, 0, 1000),
             'subdominio' => $this->faker->unique()->slug(1),
             'plano' => 'essential',
             'status' => 'active',
