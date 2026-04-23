@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\MultiTenantScope;
 use App\Traits\Auditable;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[ScopedBy([MultiTenantScope::class])]
 class Bateria extends Model
 {
-    use HasFactory, SoftDeletes, Auditable;
+    use Auditable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'sku',
@@ -25,7 +23,6 @@ class Bateria extends Model
         'peso_sucata_kg',
         'valor_base_sucata_kg',
         'tem_logistica_reversa',
-        'filial_id',
     ];
 
     protected function casts(): array
@@ -39,12 +36,7 @@ class Bateria extends Model
         ];
     }
 
-    public function filial()
-    {
-        return $this->belongsTo(Filial::class);
-    }
-
-    public function veiculos()
+    public function veiculos(): BelongsToMany
     {
         return $this->belongsToMany(Veiculo::class, 'aplicacoes')
             ->withPivot('observacao')

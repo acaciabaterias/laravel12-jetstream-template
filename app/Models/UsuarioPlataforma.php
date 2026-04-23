@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class UsuarioPlataforma extends Authenticatable
 {
+    use HasFactory;
     use Notifiable;
-
-    
 
     protected $table = 'usuarios_plataforma';
 
@@ -26,13 +26,25 @@ class UsuarioPlataforma extends Authenticatable
         'remember_token',
     ];
 
-    protected $casts = [
-        'password' => 'hashed',
-        'ativo' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'ativo' => 'boolean',
+        ];
+    }
 
     public function isSuperAdmin(): bool
     {
         return $this->papel === 'super_admin';
+    }
+
+    public function hasRole(string|array $papel): bool
+    {
+        if (is_array($papel)) {
+            return in_array($this->papel, $papel, true);
+        }
+
+        return $this->papel === $papel;
     }
 }

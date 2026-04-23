@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FilialController;
+use App\Livewire\TenantForm;
+use App\Livewire\TenantManager;
 use Illuminate\Support\Facades\Route;
-use Livewire\Volt\Volt;
 
 Route::name('admin.')->group(function () {
     // Rotas Públicas (Login)
@@ -11,10 +14,12 @@ Route::name('admin.')->group(function () {
 
     // Rotas Protegidas
     Route::middleware(['web', \App\Http\Middleware\PlatformAdminMiddleware::class])->group(function () {
-        Volt::route('/dashboard', 'admin.dashboard')->name('dashboard');
-        Volt::route('/clientes', 'admin.clientes.index')->name('clientes.index');
-        Volt::route('/clientes/novo', 'admin.clientes.create')->name('clientes.create');
-        Volt::route('/planos', 'admin.planos.index')->name('planos.index');
-        Volt::route('/assinaturas', 'admin.assinaturas.index')->name('assinaturas.index');
+        Route::get('/painel', DashboardController::class)->name('dashboard');
+        Route::resource('filiais', FilialController::class)
+            ->parameters(['filiais' => 'filial'])
+            ->except('show');
+        Route::get('/clientes', TenantManager::class)->name('clientes.index');
+        Route::get('/clientes/novo', TenantForm::class)->name('clientes.create');
+        Route::get('/clientes/{tenant}/editar', TenantForm::class)->name('clientes.edit');
     });
 });

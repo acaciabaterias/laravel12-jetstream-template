@@ -4,98 +4,95 @@ namespace Tests\Feature;
 
 use App\Models\Bateria;
 use App\Models\Fabricante;
-use App\Models\Filial;
 use App\Models\User;
 use App\Models\Veiculo;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class StructuralRegistriesTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function test_multitenant_scope_isolates_records_by_filial()
+    public function test_fabricante_crud_records_audit_logs(): void
     {
-        $filialA = Filial::factory()->create();
-        $filialB = Filial::factory()->create();
-
-        // Bypass scope by not authenticating to create data
-        Fabricante::create(['nome' => 'Fab A', 'filial_id' => $filialA->id]);
-        Fabricante::create(['nome' => 'Fab B', 'filial_id' => $filialB->id]);
-
-        $userA = User::factory()->create(['filial_id' => $filialA->id]);
-        $this->actingAs($userA);
-
-        $fabricantes = Fabricante::all();
-        $this->assertCount(1, $fabricantes);
-        $this->assertEquals('Fab A', $fabricantes->first()->nome);
-    }
-
-    public function test_audit_logs_are_recorded_on_crud_operations()
-    {
-        $filial = Filial::factory()->create();
-        $user = User::factory()->create(['filial_id' => $filial->id]);
+        $user = User::factory()->create(['papel' => 'gestor']);
         $this->actingAs($user);
 
-        $bateria = Bateria::create([
-            'sku' => 'BAT123',
-            'marca' => 'Moura',
-            'preco_venda' => 150.00,
-            'filial_id' => $filial->id
+        $fabricante = Fabricante::create([
+            'nome' => 'Moura',
+            'codigo' => 'MOU',
         ]);
 
         $this->assertDatabaseHas('audit_logs', [
             'user_id' => $user->id,
             'action' => 'created',
-            'table_name' => 'baterias',
-            'record_id' => $bateria->id,
+            'table_name' => 'fabricantes',
+            'record_id' => $fabricante->id,
         ]);
 
-        $bateria->update(['preco_venda' => 160.00]);
+        $fabricante->update(['codigo' => 'MOU-01']);
 
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'updated',
-            'record_id' => $bateria->id,
+            'record_id' => $fabricante->id,
         ]);
-        
-        $bateria->delete();
-        
+
+        $fabricante->delete();
+
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'deleted',
-            'record_id' => $bateria->id,
+            'record_id' => $fabricante->id,
         ]);
     }
 
-    public function test_cloning_applications_does_not_duplicate_existing_ones()
+    public function test_structural_crud_supports_json_attributes_and_reverse_logistics(): void
     {
-        $filial = Filial::factory()->create();
-        
-        // Scope bypass for setup or we can authenticate right away
-        $user = User::factory()->create(['filial_id' => $filial->id]);
+        $user = User::factory()->create(['papel' => 'gestor']);
         $this->actingAs($user);
 
-        $fabricante = Fabricante::create(['nome' => 'VW', 'filial_id' => $filial->id]);
+        $fabricante = Fabricante::create(['nome' => 'VW']);
 
         $veiculoOrigem = Veiculo::create([
             'fabricante_id' => $fabricante->id,
             'modelo' => 'Gol',
-            'filial_id' => $filial->id
-        ]);
-
-        $veiculoDestino = Veiculo::create([
-            'fabricante_id' => $fabricante->id,
-            'modelo' => 'Fox',
-            'filial_id' => $filial->id
+            'atributos_dinamicos' => ['categoria' => 'Carro'],
         ]);
 
         $bateria = Bateria::create([
             'sku' => 'BAT-01',
             'marca' => 'Zetta',
-            'filial_id' => $filial->id
+            'peso_sucata_kg' => 12.50,
+            'valor_base_sucata_kg' => 4.20,
+            'atributos_dinamicos' => ['tipo' => 'AGM'],
         ]);
 
-        $veiculoOrigem->baterias()->attach($bateria->id, ['filial_id' => $filial->id]);
+        $this->assertSame('Carro', $veiculoOrigem->atributos_dinamicos['categoria']);
+        $this->assertSame('AGM', $bateria->atributos_dinamicos['tipo']);
+        $this->assertSame('12.50', $bateria->peso_sucata_kg);
+        $this->assertSame('4.20', $bateria->valor_base_sucata_kg);
+    }
+
+    public function test_cloning_applications_does_not_duplicate_existing_ones(): void
+    {
+        $user = User::factory()->create(['papel' => 'gestor']);
+        $this->actingAs($user);
+
+        $fabricante = Fabricante::create(['nome' => 'VW']);
+
+        $veiculoOrigem = Veiculo::create([
+            'fabricante_id' => $fabricante->id,
+            'modelo' => 'Gol',
+        ]);
+
+        $veiculoDestino = Veiculo::create([
+            'fabricante_id' => $fabricante->id,
+            'modelo' => 'Fox',
+        ]);
+
+        $bateria = Bateria::create([
+            'sku' => 'BAT-01',
+            'marca' => 'Zetta',
+        ]);
+
+        $veiculoOrigem->baterias()->attach($bateria->id, ['observacao' => 'Aplicacao original']);
 
         Livewire::test(\App\Livewire\AplicacaoCloner::class)
             ->call('openCloner', $veiculoDestino->id)
@@ -103,7 +100,7 @@ class StructuralRegistriesTest extends TestCase
             ->call('cloneAplicacoes');
 
         $this->assertCount(1, $veiculoDestino->fresh()->baterias);
-        
+
         Livewire::test(\App\Livewire\AplicacaoCloner::class)
             ->call('openCloner', $veiculoDestino->id)
             ->set('origemVeiculoId', $veiculoOrigem->id)

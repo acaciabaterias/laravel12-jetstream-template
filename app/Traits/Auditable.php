@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 trait Auditable
 {
-    public static function bootAuditable()
+    public static function bootAuditable(): void
     {
         static::created(function ($model) {
             $model->logAudit('created');
@@ -22,7 +22,7 @@ trait Auditable
         });
     }
 
-    protected function logAudit(string $action)
+    protected function logAudit(string $action): void
     {
         $oldValues = $action === 'updated' ? array_intersect_key($this->getOriginal(), $this->getDirty()) : null;
         $newValues = $action === 'updated' ? $this->getDirty() : ($action === 'created' ? $this->getAttributes() : null);
@@ -45,7 +45,6 @@ trait Auditable
             'new_values' => $newValues,
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'filial_id' => $this->filial_id ?? (Auth::check() ? Auth::user()->filial_id : session('filial_id')),
         ]);
     }
 }

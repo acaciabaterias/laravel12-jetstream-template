@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Models\Bateria;
 use App\Models\Fabricante;
 use App\Models\Veiculo;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -14,21 +13,40 @@ class VeiculoManager extends Component
     use WithPagination;
 
     // Vehicle fields
-    public $fabricante_id, $modelo, $motorizacao, $ano_inicio, $ano_fim, $atributos_dinamicos = '';
-    
+    public $fabricante_id;
+
+    public $modelo;
+
+    public $motorizacao;
+
+    public $ano_inicio;
+
+    public $ano_fim;
+
+    public $atributos_dinamicos = '';
+
     // UI State
     public $veiculoId;
+
     public $isEditMode = false;
+
     public $showModal = false;
+
     public $search = '';
+
     public $fabricanteFilter = '';
+
     public $currentTab = 'basico'; // basico | aplicacoes
 
     // Applications State
     public $aplicacoes = []; // [ ['bateria_id' => 1, 'sku'=> '...', 'observacao' => '...'], ... ]
+
     public $searchBateria = '';
+
     public $bateriasResults = [];
+
     public $bateriaSelecionada = null;
+
     public $novaObservacao = '';
 
     protected function rules()
@@ -37,48 +55,51 @@ class VeiculoManager extends Component
             'fabricante_id' => 'required|exists:fabricantes,id',
             'modelo' => 'required|string|max:255',
             'motorizacao' => 'nullable|string|max:255',
-            'ano_inicio' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
-            'ano_fim' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'ano_inicio' => 'nullable|integer|min:1900|max:'.(date('Y') + 1),
+            'ano_fim' => 'nullable|integer|min:1900|max:'.(date('Y') + 1),
             'atributos_dinamicos' => 'nullable|string',
         ];
     }
 
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function updatingFabricanteFilter()
+    public function updatingFabricanteFilter(): void
     {
         $this->resetPage();
     }
 
-    public function updatedSearchBateria()
+    public function updatedSearchBateria(): void
     {
         if (strlen($this->searchBateria) >= 2) {
-            $this->bateriasResults = Bateria::where('sku', 'like', '%' . $this->searchBateria . '%')
-                ->orWhere('marca', 'like', '%' . $this->searchBateria . '%')
+            $this->bateriasResults = Bateria::where('sku', 'like', '%'.$this->searchBateria.'%')
+                ->orWhere('marca', 'like', '%'.$this->searchBateria.'%')
                 ->take(5)->get();
         } else {
             $this->bateriasResults = [];
         }
     }
 
-    public function selectBateria($bateriaId)
+    public function selectBateria(int $bateriaId): void
     {
         $this->bateriaSelecionada = Bateria::find($bateriaId);
         $this->bateriasResults = [];
-        $this->searchBateria = $this->bateriaSelecionada->sku . ' - ' . $this->bateriaSelecionada->marca;
+        $this->searchBateria = $this->bateriaSelecionada->sku.' - '.$this->bateriaSelecionada->marca;
     }
 
-    public function addAplicacao()
+    public function addAplicacao(): void
     {
-        if (!$this->bateriaSelecionada) return;
+        if (! $this->bateriaSelecionada) {
+            return;
+        }
 
         // Check for duplicates
         foreach ($this->aplicacoes as $app) {
             if ($app['bateria_id'] === $this->bateriaSelecionada->id) {
                 $this->addError('bateria_duplicada', 'Esta bateria já está vinculada.');
+
                 return;
             }
         }
@@ -96,13 +117,13 @@ class VeiculoManager extends Component
         $this->novaObservacao = '';
     }
 
-    public function removeAplicacao($index)
+    public function removeAplicacao(int $index): void
     {
         unset($this->aplicacoes[$index]);
         $this->aplicacoes = array_values($this->aplicacoes); // Re-index
     }
 
-    public function create()
+    public function create(): void
     {
         $this->resetInputFields();
         $this->isEditMode = false;
@@ -110,7 +131,7 @@ class VeiculoManager extends Component
         $this->currentTab = 'basico';
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         $veiculo = Veiculo::with('baterias')->withTrashed()->findOrFail($id);
         $this->veiculoId = $veiculo->id;
@@ -120,8 +141,8 @@ class VeiculoManager extends Component
         $this->ano_inicio = $veiculo->ano_inicio;
         $this->ano_fim = $veiculo->ano_fim;
         $this->atributos_dinamicos = $veiculo->atributos_dinamicos ? json_encode($veiculo->atributos_dinamicos, JSON_PRETTY_PRINT) : '';
-        
-        $this->aplicacoes = $veiculo->baterias->map(function($bateria) {
+
+        $this->aplicacoes = $veiculo->baterias->map(function ($bateria) {
             return [
                 'bateria_id' => $bateria->id,
                 'sku' => $bateria->sku,
@@ -136,16 +157,17 @@ class VeiculoManager extends Component
         $this->currentTab = 'basico';
     }
 
-    public function store()
+    public function store(): void
     {
         $this->validate();
 
         $atributos = null;
-        if (!empty($this->atributos_dinamicos)) {
+        if (! empty($this->atributos_dinamicos)) {
             $atributos = json_decode($this->atributos_dinamicos, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $this->addError('atributos_dinamicos', 'Formato JSON inválido.');
                 $this->currentTab = 'basico';
+
                 return;
             }
         }
@@ -157,7 +179,6 @@ class VeiculoManager extends Component
             'ano_inicio' => $this->ano_inicio,
             'ano_fim' => $this->ano_fim,
             'atributos_dinamicos' => $atributos,
-            'filial_id' => auth()->user()->filial_id ?? session('filial_id'),
         ];
 
         if ($this->isEditMode) {
@@ -170,10 +191,8 @@ class VeiculoManager extends Component
         // Sync Applications (Baterias)
         $syncData = [];
         foreach ($this->aplicacoes as $app) {
-            // Include tenant isolation in pivot
             $syncData[$app['bateria_id']] = [
                 'observacao' => $app['observacao'],
-                'filial_id' => auth()->user()->filial_id ?? session('filial_id')
             ];
         }
         $veiculo->baterias()->sync($syncData);
@@ -182,7 +201,7 @@ class VeiculoManager extends Component
         $this->resetInputFields();
     }
 
-    public function toggleStatus($id)
+    public function toggleStatus(int $id): void
     {
         $veiculo = Veiculo::withTrashed()->findOrFail($id);
         if ($veiculo->trashed()) {
@@ -192,12 +211,12 @@ class VeiculoManager extends Component
         }
     }
 
-    public function setTab($tabName)
+    public function setTab(string $tabName): void
     {
         $this->currentTab = $tabName;
     }
 
-    private function resetInputFields()
+    private function resetInputFields(): void
     {
         $this->veiculoId = null;
         $this->fabricante_id = '';
@@ -216,13 +235,13 @@ class VeiculoManager extends Component
     public function render()
     {
         $query = Veiculo::with('fabricante')->withTrashed();
-        
-        if (!empty($this->search)) {
-            $query->where('modelo', 'like', '%' . $this->search . '%')
-                  ->orWhere('motorizacao', 'like', '%' . $this->search . '%');
+
+        if (! empty($this->search)) {
+            $query->where('modelo', 'like', '%'.$this->search.'%')
+                ->orWhere('motorizacao', 'like', '%'.$this->search.'%');
         }
 
-        if (!empty($this->fabricanteFilter)) {
+        if (! empty($this->fabricanteFilter)) {
             $query->where('fabricante_id', $this->fabricanteFilter);
         }
 

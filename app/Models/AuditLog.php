@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AuditLog extends Model
 {
@@ -15,7 +16,6 @@ class AuditLog extends Model
         'new_values',
         'ip_address',
         'user_agent',
-        'filial_id',
     ];
 
     protected function casts(): array
@@ -26,13 +26,8 @@ class AuditLog extends Model
         ];
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function filial()
-    {
-        return $this->belongsTo(Filial::class);
     }
 }

@@ -2,28 +2,19 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\MultiTenantScope;
 use App\Traits\Auditable;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[ScopedBy([MultiTenantScope::class])]
 class Fabricante extends Model
 {
-    use HasFactory, SoftDeletes, Auditable;
+    use Auditable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'nome',
         'codigo',
-        'filial_id',
     ];
-
-    public function filial()
-    {
-        return $this->belongsTo(Filial::class);
-    }
 
     public function veiculos()
     {

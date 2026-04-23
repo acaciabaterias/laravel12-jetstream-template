@@ -9,13 +9,16 @@ use Livewire\Component;
 class AplicacaoCloner extends Component
 {
     public $destinoVeiculoId;
+
     public $origemVeiculoId;
+
     public $showModal = false;
+
     public $veiculosCompativeis = [];
 
     protected $listeners = ['openCloner'];
 
-    public function openCloner($destinoId)
+    public function openCloner(int $destinoId): void
     {
         $this->destinoVeiculoId = $destinoId;
         $veiculo = Veiculo::findOrFail($destinoId);
@@ -30,7 +33,7 @@ class AplicacaoCloner extends Component
         $this->showModal = true;
     }
 
-    public function cloneAplicacoes()
+    public function cloneAplicacoes(): void
     {
         $this->validate([
             'origemVeiculoId' => 'required|exists:veiculos,id',
@@ -41,6 +44,7 @@ class AplicacaoCloner extends Component
 
         if ($veiculoOrigem->fabricante_id !== $veiculoDestino->fabricante_id) {
             $this->addError('origemVeiculoId', 'A clonagem só é permitida entre veículos do mesmo fabricante.');
+
             return;
         }
 
@@ -49,12 +53,11 @@ class AplicacaoCloner extends Component
 
         foreach ($veiculoOrigem->baterias as $bateria) {
             // Evitar duplicidade
-            if (!in_array($bateria->id, $bateriasDestinoIds)) {
+            if (! in_array($bateria->id, $bateriasDestinoIds)) {
                 Aplicacao::create([
                     'veiculo_id' => $veiculoDestino->id,
                     'bateria_id' => $bateria->id,
                     'observacao' => $bateria->pivot->observacao,
-                    'filial_id' => auth()->user()->filial_id ?? session('filial_id')
                 ]);
                 $clonedCount++;
             }
@@ -62,7 +65,7 @@ class AplicacaoCloner extends Component
 
         session()->flash('message', "{$clonedCount} aplicações clonadas com sucesso.");
         $this->showModal = false;
-        
+
         // Notify parent to refresh
         $this->dispatch('aplicacoesUpdated');
     }

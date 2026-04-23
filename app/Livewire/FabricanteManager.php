@@ -11,10 +11,15 @@ class FabricanteManager extends Component
     use WithPagination;
 
     public $nome;
+
     public $codigo;
+
     public $fabricanteId;
+
     public $isEditMode = false;
+
     public $showModal = false;
+
     public $search = '';
 
     protected $rules = [
@@ -22,37 +27,36 @@ class FabricanteManager extends Component
         'codigo' => 'nullable|string|max:50',
     ];
 
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function create()
+    public function create(): void
     {
         $this->resetInputFields();
         $this->isEditMode = false;
         $this->showModal = true;
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         $fabricante = Fabricante::withTrashed()->findOrFail($id);
         $this->fabricanteId = $fabricante->id;
         $this->nome = $fabricante->nome;
         $this->codigo = $fabricante->codigo;
-        
+
         $this->isEditMode = true;
         $this->showModal = true;
     }
 
-    public function store()
+    public function store(): void
     {
         $this->validate();
 
         $data = [
             'nome' => $this->nome,
             'codigo' => $this->codigo,
-            'filial_id' => auth()->user()->filial_id ?? session('filial_id'),
         ];
 
         if ($this->isEditMode) {
@@ -66,7 +70,7 @@ class FabricanteManager extends Component
         $this->resetInputFields();
     }
 
-    public function toggleStatus($id)
+    public function toggleStatus(int $id): void
     {
         $fabricante = Fabricante::withTrashed()->findOrFail($id);
         if ($fabricante->trashed()) {
@@ -76,7 +80,7 @@ class FabricanteManager extends Component
         }
     }
 
-    private function resetInputFields()
+    private function resetInputFields(): void
     {
         $this->nome = '';
         $this->codigo = '';
@@ -86,10 +90,10 @@ class FabricanteManager extends Component
     public function render()
     {
         $query = Fabricante::withTrashed();
-        
-        if (!empty($this->search)) {
-            $query->where('nome', 'like', '%' . $this->search . '%')
-                  ->orWhere('codigo', 'like', '%' . $this->search . '%');
+
+        if (! empty($this->search)) {
+            $query->where('nome', 'like', '%'.$this->search.'%')
+                ->orWhere('codigo', 'like', '%'.$this->search.'%');
         }
 
         return view('livewire.fabricante-manager', [

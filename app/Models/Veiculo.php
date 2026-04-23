@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\MultiTenantScope;
 use App\Traits\Auditable;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[ScopedBy([MultiTenantScope::class])]
 class Veiculo extends Model
 {
-    use HasFactory, SoftDeletes, Auditable;
+    use Auditable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'fabricante_id',
@@ -21,7 +18,6 @@ class Veiculo extends Model
         'ano_inicio',
         'ano_fim',
         'atributos_dinamicos',
-        'filial_id',
     ];
 
     protected function casts(): array
@@ -34,11 +30,6 @@ class Veiculo extends Model
     public function fabricante()
     {
         return $this->belongsTo(Fabricante::class);
-    }
-
-    public function filial()
-    {
-        return $this->belongsTo(Filial::class);
     }
 
     public function baterias()

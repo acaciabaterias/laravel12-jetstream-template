@@ -10,13 +10,32 @@ class BateriaManager extends Component
 {
     use WithPagination;
 
-    public $sku, $marca, $tecnologia, $amperagem, $polo, $preco_venda;
-    public $peso_sucata_kg, $valor_base_sucata_kg, $tem_logistica_reversa = true;
+    public $sku;
+
+    public $marca;
+
+    public $tecnologia;
+
+    public $amperagem;
+
+    public $polo;
+
+    public $preco_venda;
+
+    public $peso_sucata_kg;
+
+    public $valor_base_sucata_kg;
+
+    public $tem_logistica_reversa = true;
+
     public $atributos_dinamicos = '';
 
     public $bateriaId;
+
     public $isEditMode = false;
+
     public $showModal = false;
+
     public $search = '';
 
     protected $rules = [
@@ -32,19 +51,19 @@ class BateriaManager extends Component
         'atributos_dinamicos' => 'nullable|string', // Validated as json string for now
     ];
 
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function create()
+    public function create(): void
     {
         $this->resetInputFields();
         $this->isEditMode = false;
         $this->showModal = true;
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         $bateria = Bateria::withTrashed()->findOrFail($id);
         $this->bateriaId = $bateria->id;
@@ -63,15 +82,16 @@ class BateriaManager extends Component
         $this->showModal = true;
     }
 
-    public function store()
+    public function store(): void
     {
         $this->validate();
 
         $atributos = null;
-        if (!empty($this->atributos_dinamicos)) {
+        if (! empty($this->atributos_dinamicos)) {
             $atributos = json_decode($this->atributos_dinamicos, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $this->addError('atributos_dinamicos', 'Formato JSON inválido.');
+
                 return;
             }
         }
@@ -87,7 +107,6 @@ class BateriaManager extends Component
             'valor_base_sucata_kg' => $this->valor_base_sucata_kg,
             'tem_logistica_reversa' => $this->tem_logistica_reversa,
             'atributos_dinamicos' => $atributos,
-            'filial_id' => auth()->user()->filial_id ?? session('filial_id'),
         ];
 
         if ($this->isEditMode) {
@@ -101,7 +120,7 @@ class BateriaManager extends Component
         $this->resetInputFields();
     }
 
-    public function toggleStatus($id)
+    public function toggleStatus(int $id): void
     {
         $bateria = Bateria::withTrashed()->findOrFail($id);
         if ($bateria->trashed()) {
@@ -111,7 +130,7 @@ class BateriaManager extends Component
         }
     }
 
-    private function resetInputFields()
+    private function resetInputFields(): void
     {
         $this->sku = '';
         $this->marca = '';
@@ -129,10 +148,10 @@ class BateriaManager extends Component
     public function render()
     {
         $query = Bateria::withTrashed();
-        
-        if (!empty($this->search)) {
-            $query->where('sku', 'like', '%' . $this->search . '%')
-                  ->orWhere('marca', 'like', '%' . $this->search . '%');
+
+        if (! empty($this->search)) {
+            $query->where('sku', 'like', '%'.$this->search.'%')
+                ->orWhere('marca', 'like', '%'.$this->search.'%');
         }
 
         return view('livewire.bateria-manager', [
