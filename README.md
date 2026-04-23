@@ -1,61 +1,284 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# BateriaExpert ERP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Tests](https://img.shields.io/badge/tests-112%20passed-brightgreen)](#testes)
+[![Coverage](https://img.shields.io/badge/coverage-ci%20ready-blue)](#github-actions)
+[![License](https://img.shields.io/badge/license-MIT-green)](./composer.json)
 
-## About Laravel
+ERP especializado para distribuidores, revendas e operacoes de baterias automotivas, com arquitetura `database-per-client`, backoffice SaaS central e microservicos dedicados para fiscal, bancario, notificacoes, Open Finance e geocoding.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Visao Geral
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+O BateriaExpert foi estruturado como um monorepo com:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- ERP Core em Laravel 12
+- Autenticacao e UI com Jetstream, Livewire e Volt
+- Banco central para catalogo SaaS, assinaturas e provisionamento
+- Bancos isolados por tenant/CNPJ
+- Microservicos independentes para integracoes especializadas
 
-## Learning Laravel
+Os modulos core cobrem:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- multi-tenancy isolado
+- RBAC
+- cadastros estruturais
+- estoque e logistica reversa
+- vendas, pedidos e OS
+- logistica e entregas
+- garantias e feedback
+- financeiro inteligente
+- orquestracao fiscal e bancaria
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Arquitetura
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```mermaid
+flowchart LR
+    U[Usuarios ERP e Plataforma]
+    A[ERP Core<br/>Laravel 12 + Livewire]
+    C[(Banco Central<br/>PostgreSQL)]
+    T[(Banco Tenant<br/>PostgreSQL / Supabase)]
 
-## Laravel Sponsors
+    MS1[MS-001 Fiscal ACBr]
+    MS2[MS-002 Bancario]
+    MS3[MS-003 WhatsApp n8n]
+    MS4[MS-004 Open Finance]
+    MS5[MS-005 Geocoding]
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+    R[(Redis / Queues)]
+    W[Workers / Jobs]
 
-### Premium Partners
+    U --> A
+    A --> C
+    A --> T
+    A --> R
+    R --> W
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+    A <--> MS1
+    A <--> MS2
+    A <--> MS3
+    A <--> MS4
+    A <--> MS5
 
-## Contributing
+    MS1 --> R
+    MS2 --> R
+    MS3 --> R
+    MS4 --> R
+    MS5 --> R
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Stack
 
-## Code of Conduct
+- PHP `^8.3`
+- Laravel `12`
+- Livewire `4`
+- Volt
+- PostgreSQL `15+`
+- Redis
+- Vite
+- Docker Compose para ambiente integrado
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Pre-requisitos
 
-## Security Vulnerabilities
+Para desenvolvimento local sem Docker:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- PHP `8.3+`
+- Composer `2+`
+- Node.js `20+`
+- npm
+- PostgreSQL `15+`
+- Redis
 
-## License
+Para ambiente integrado:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Docker
+- Docker Compose
+
+## Instalacao Local
+
+### 1. Clonar o repositorio
+
+```bash
+git clone <seu-repo>.git
+cd laravel12-jetstream-template
+```
+
+### 2. Instalar dependencias
+
+```bash
+composer install
+npm install
+```
+
+### 3. Configurar ambiente
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+### 4. Configurar PostgreSQL central
+
+Use o guia:
+
+- [POSTGRESQL_LOCAL_SETUP.md](./POSTGRESQL_LOCAL_SETUP.md)
+
+Depois valide com:
+
+```bash
+./check-pg.sh
+```
+
+### 5. Ajustar `.env`
+
+Exemplo minimo para o banco central:
+
+```dotenv
+DB_CONNECTION=central
+DB_CENTRAL_DRIVER=pgsql
+DB_CENTRAL_HOST=localhost
+DB_CENTRAL_PORT=5432
+DB_CENTRAL_DATABASE=erp_central
+DB_CENTRAL_USERNAME=gil
+DB_CENTRAL_PASSWORD=sua_senha
+```
+
+### 6. Rodar migrations centrais
+
+```bash
+php artisan migrate --database=central --path=database/migrations/central --no-interaction
+```
+
+### 7. Popular dados iniciais
+
+```bash
+php artisan db:seed --class=PlanosSeeder --no-interaction
+php artisan db:seed --class=SuperAdminSeeder --no-interaction
+```
+
+### 8. Subir a aplicacao
+
+```bash
+composer run dev
+```
+
+Se preferir processos separados:
+
+```bash
+php artisan serve
+php artisan queue:listen --tries=1
+npm run dev
+```
+
+## Testes
+
+Rodar a suite completa:
+
+```bash
+php artisan test --compact
+```
+
+Rodar um arquivo especifico:
+
+```bash
+php artisan test --compact tests/Feature/SalesServiceOsTest.php
+```
+
+Formatacao:
+
+```bash
+vendor/bin/pint --dirty --format agent
+```
+
+## Rodando com Docker
+
+O `docker-compose.yml` da raiz sobe os microservicos scaffoldados:
+
+- `MS-001 Fiscal`
+- `MS-002 Bancario`
+- `MS-003 WhatsApp n8n`
+- `MS-004 Open Finance`
+- `MS-005 Geocoding`
+
+Subir o stack:
+
+```bash
+docker compose up -d --build
+```
+
+Validar containers:
+
+```bash
+docker compose ps
+```
+
+Executar healthcheck:
+
+```bash
+./healthcheck.sh
+```
+
+## Scripts Operacionais
+
+- [check-pg.sh](./check-pg.sh): verifica PostgreSQL local
+- [backup.sh](./backup.sh): backup do banco central e opcionalmente de tenant
+- [restore.sh](./restore.sh): restore a partir de dump PostgreSQL
+- [healthcheck.sh](./healthcheck.sh): valida endpoints principais
+
+## Documentacao
+
+### API
+
+- [openapi.yaml](./openapi.yaml)
+- [postman_collection.json](./postman_collection.json)
+
+### Deploy
+
+- [DEPLOY_PROXMOX.md](./DEPLOY_PROXMOX.md)
+- [DEPLOY_SUPABASE.md](./DEPLOY_SUPABASE.md)
+- [DEPLOY_PRODUCAO.md](./DEPLOY_PRODUCAO.md)
+
+### Banco de dados
+
+- [database/schema/central_postgres.sql](./database/schema/central_postgres.sql)
+- [database/schema/tenant_postgres.sql](./database/schema/tenant_postgres.sql)
+- [database/schema/tenant_rls_policies.sql](./database/schema/tenant_rls_policies.sql)
+
+## GitHub Actions
+
+Workflows incluidos em [`.github/workflows`](./.github/workflows):
+
+- `test.yml`: executa a suite Laravel
+- `lint.yml`: valida Pint, `php -l` e a collection Postman
+- `deploy.yml`: base para deploy manual por ambiente
+
+## Estrutura do Monorepo
+
+```text
+app/                      ERP Core
+database/migrations/      Migracoes legadas e operacionais
+database/migrations/central
+database/migrations/tenant
+database/schema/          Snapshots SQL canônicos
+microservicos/
+  ms-001-fiscal-acbr/
+  ms-002-bancario/
+  ms-003-whatsapp-n8n/
+  ms-004-openfinance/
+  ms-005-geocoding/
+.github/workflows/        CI/CD
+```
+
+## Ponto de Entrada para Desenvolvimento
+
+Se voce esta chegando agora no projeto, a ordem recomendada e:
+
+1. Ler este README
+2. Configurar PostgreSQL com [POSTGRESQL_LOCAL_SETUP.md](./POSTGRESQL_LOCAL_SETUP.md)
+3. Rodar `./check-pg.sh`
+4. Aplicar migrations centrais
+5. Rodar `php artisan test --compact`
+6. Consultar [openapi.yaml](./openapi.yaml) e a collection Postman
+7. Usar os guias de deploy conforme o ambiente alvo
+
+## Licenca
+
+Este projeto utiliza licenca MIT. Consulte o metadata em [composer.json](./composer.json).
