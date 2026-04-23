@@ -1,0 +1,842 @@
+openapi: 3.1.0
+info:
+  title: Bateria Expert Platform API
+  version: 1.0.0
+  summary: ERP Core e microservicos do ecossistema Bateria Expert
+  description: >
+    Especificacao consolidada para o ERP Core tenant-aware e para os microservicos
+    fiscais, bancarios, notificacoes, open finance e geocoding scaffoldados no monorepo.
+servers:
+  - url: http://localhost:8000
+    description: ERP Core local
+tags:
+  - name: ERP Core
+  - name: ERP Mobile Sync
+  - name: MS-001 Fiscal ACBr
+  - name: MS-002 Bancario
+  - name: MS-003 WhatsApp n8n
+  - name: MS-004 Open Finance
+  - name: MS-005 Geocoding
+paths:
+  /api/user:
+    get:
+      tags: [ERP Core]
+      summary: Retorna o usuario autenticado do ERP
+      security:
+        - sanctumAuth: []
+      responses:
+        '200':
+          description: Usuario autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErpUser'
+  /api/sync/mobile:
+    get:
+      tags: [ERP Mobile Sync]
+      summary: Sincroniza payload mobile do ERP
+      security:
+        - sanctumAuth: []
+      responses:
+        '200':
+          description: Payload de sincronizacao
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  synced_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: ok
+
+  /ms-001/v1/nfe/emitir:
+    post:
+      tags: [MS-001 Fiscal ACBr]
+      servers:
+        - url: http://localhost:8001
+      summary: Emite NF-e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FiscalEmissionRequest'
+      responses:
+        '200':
+          description: Documento fiscal emitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalDocumentResponse'
+  /ms-001/v1/nfce/emitir:
+    post:
+      tags: [MS-001 Fiscal ACBr]
+      servers:
+        - url: http://localhost:8001
+      summary: Emite NFC-e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FiscalEmissionRequest'
+      responses:
+        '200':
+          description: NFC-e emitida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalDocumentResponse'
+  /ms-001/v1/nfe/cancelar:
+    post:
+      tags: [MS-001 Fiscal ACBr]
+      servers:
+        - url: http://localhost:8001
+      summary: Cancela NF-e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chave_acesso, justificativa]
+              properties:
+                chave_acesso:
+                  type: string
+                justificativa:
+                  type: string
+      responses:
+        '200':
+          description: Cancelamento registrado
+  /ms-001/v1/nfe/cce:
+    post:
+      tags: [MS-001 Fiscal ACBr]
+      servers:
+        - url: http://localhost:8001
+      summary: Emite carta de correcao
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chave_acesso, correcao]
+              properties:
+                chave_acesso:
+                  type: string
+                correcao:
+                  type: string
+      responses:
+        '200':
+          description: CC-e processada
+  /ms-001/v1/nfe/inutilizar:
+    post:
+      tags: [MS-001 Fiscal ACBr]
+      servers:
+        - url: http://localhost:8001
+      summary: Inutiliza faixa de numeracao
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [serie, numero_inicial, numero_final, justificativa]
+              properties:
+                serie:
+                  type: string
+                numero_inicial:
+                  type: integer
+                numero_final:
+                  type: integer
+                justificativa:
+                  type: string
+      responses:
+        '200':
+          description: Inutilizacao processada
+  /ms-001/v1/nfe/{chaveAcesso}:
+    get:
+      tags: [MS-001 Fiscal ACBr]
+      servers:
+        - url: http://localhost:8001
+      summary: Consulta documento fiscal
+      parameters:
+        - in: path
+          name: chaveAcesso
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Documento encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalDocumentResponse'
+  /ms-001/v1/contingencia/fila:
+    get:
+      tags: [MS-001 Fiscal ACBr]
+      servers:
+        - url: http://localhost:8001
+      summary: Lista fila de contingencia
+      responses:
+        '200':
+          description: Fila de contingencia
+  /ms-001/v1/certificado/status:
+    get:
+      tags: [MS-001 Fiscal ACBr]
+      servers:
+        - url: http://localhost:8001
+      summary: Verifica status do certificado
+      responses:
+        '200':
+          description: Status do certificado
+  /ms-001/v1/health:
+    get:
+      tags: [MS-001 Fiscal ACBr]
+      servers:
+        - url: http://localhost:8001
+      summary: Healthcheck do MS fiscal
+      responses:
+        '200':
+          description: Servico operacional
+
+  /ms-002/v1/boleto:
+    post:
+      tags: [MS-002 Bancario]
+      servers:
+        - url: http://localhost:8002
+      summary: Emite boleto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingChargeRequest'
+      responses:
+        '200':
+          description: Boleto emitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargeResponse'
+  /ms-002/v1/pix:
+    post:
+      tags: [MS-002 Bancario]
+      servers:
+        - url: http://localhost:8002
+      summary: Emite cobranca PIX
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingChargeRequest'
+      responses:
+        '200':
+          description: PIX emitido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargeResponse'
+  /ms-002/v1/cobranca/{id}:
+    get:
+      tags: [MS-002 Bancario]
+      servers:
+        - url: http://localhost:8002
+      summary: Consulta cobranca
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cobranca encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargeResponse'
+    delete:
+      tags: [MS-002 Bancario]
+      servers:
+        - url: http://localhost:8002
+      summary: Cancela cobranca
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cobranca cancelada
+  /ms-002/v1/cnab/remessa:
+    post:
+      tags: [MS-002 Bancario]
+      servers:
+        - url: http://localhost:8002
+      summary: Gera remessa CNAB
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lote:
+                  type: string
+                cobrancas:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Remessa gerada
+  /ms-002/v1/cnab/retorno:
+    post:
+      tags: [MS-002 Bancario]
+      servers:
+        - url: http://localhost:8002
+      summary: Processa retorno CNAB
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arquivo:
+                  type: string
+                  description: Conteudo base64 ou path logico
+      responses:
+        '200':
+          description: Retorno processado
+  /ms-002/v1/webhook/{banco}:
+    post:
+      tags: [MS-002 Bancario]
+      servers:
+        - url: http://localhost:8002
+      summary: Recebe webhook bancario
+      parameters:
+        - in: path
+          name: banco
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Webhook aceito
+  /ms-002/v1/bancos:
+    get:
+      tags: [MS-002 Bancario]
+      servers:
+        - url: http://localhost:8002
+      summary: Lista bancos suportados
+      responses:
+        '200':
+          description: Lista de bancos
+  /ms-002/v1/health:
+    get:
+      tags: [MS-002 Bancario]
+      servers:
+        - url: http://localhost:8002
+      summary: Healthcheck do MS bancario
+      responses:
+        '200':
+          description: Servico operacional
+
+  /ms-003/v1/notificacao/enviar:
+    post:
+      tags: [MS-003 WhatsApp n8n]
+      servers:
+        - url: http://localhost:8003
+      summary: Envia notificacao
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cliente_id, numero, mensagem]
+              properties:
+                cliente_id:
+                  type: integer
+                numero:
+                  type: string
+                mensagem:
+                  type: string
+                template:
+                  type: string
+      responses:
+        '202':
+          description: Notificacao enfileirada
+  /ms-003/v1/notificacao/historico/{clienteId}:
+    get:
+      tags: [MS-003 WhatsApp n8n]
+      servers:
+        - url: http://localhost:8003
+      summary: Historico de notificacoes
+      parameters:
+        - in: path
+          name: clienteId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Historico retornado
+  /ms-003/v1/fila:
+    get:
+      tags: [MS-003 WhatsApp n8n]
+      servers:
+        - url: http://localhost:8003
+      summary: Lista fila de mensagens
+      responses:
+        '200':
+          description: Fila atual
+  /ms-003/v1/blacklist:
+    get:
+      tags: [MS-003 WhatsApp n8n]
+      servers:
+        - url: http://localhost:8003
+      summary: Lista blacklist
+      responses:
+        '200':
+          description: Blacklist
+    post:
+      tags: [MS-003 WhatsApp n8n]
+      servers:
+        - url: http://localhost:8003
+      summary: Adiciona numero na blacklist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [numero, motivo]
+              properties:
+                numero:
+                  type: string
+                motivo:
+                  type: string
+      responses:
+        '201':
+          description: Numero bloqueado
+  /ms-003/v1/blacklist/{numero}:
+    delete:
+      tags: [MS-003 WhatsApp n8n]
+      servers:
+        - url: http://localhost:8003
+      summary: Remove numero da blacklist
+      parameters:
+        - in: path
+          name: numero
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Numero removido
+  /ms-003/v1/webhook/evolution:
+    post:
+      tags: [MS-003 WhatsApp n8n]
+      servers:
+        - url: http://localhost:8003
+      summary: Recebe webhook da Evolution API
+      responses:
+        '202':
+          description: Evento aceito
+  /ms-003/v1/webhook/erp/{evento}:
+    post:
+      tags: [MS-003 WhatsApp n8n]
+      servers:
+        - url: http://localhost:8003
+      summary: Recebe eventos do ERP
+      parameters:
+        - in: path
+          name: evento
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Evento aceito
+  /ms-003/v1/health:
+    get:
+      tags: [MS-003 WhatsApp n8n]
+      servers:
+        - url: http://localhost:8003
+      summary: Healthcheck do MS WhatsApp
+      responses:
+        '200':
+          description: Servico operacional
+
+  /ms-004/v1/oauth/authorize/{banco}:
+    get:
+      tags: [MS-004 Open Finance]
+      servers:
+        - url: http://localhost:8004
+      summary: Inicia autorizacao Open Finance
+      parameters:
+        - in: path
+          name: banco
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect para o banco/provedor
+  /ms-004/v1/oauth/callback:
+    get:
+      tags: [MS-004 Open Finance]
+      servers:
+        - url: http://localhost:8004
+      summary: Callback OAuth
+      responses:
+        '200':
+          description: Consentimento processado
+  /ms-004/v1/consentimentos:
+    get:
+      tags: [MS-004 Open Finance]
+      servers:
+        - url: http://localhost:8004
+      summary: Lista consentimentos
+      responses:
+        '200':
+          description: Consentimentos
+  /ms-004/v1/consentimentos/{id}:
+    delete:
+      tags: [MS-004 Open Finance]
+      servers:
+        - url: http://localhost:8004
+      summary: Revoga consentimento
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Consentimento removido
+  /ms-004/v1/extratos/capturar/{consentimentoId}:
+    post:
+      tags: [MS-004 Open Finance]
+      servers:
+        - url: http://localhost:8004
+      summary: Captura extrato/transacoes
+      parameters:
+        - in: path
+          name: consentimentoId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data_inicio:
+                  type: string
+                  format: date
+                data_fim:
+                  type: string
+                  format: date
+      responses:
+        '202':
+          description: Captura iniciada
+  /ms-004/v1/transacoes:
+    get:
+      tags: [MS-004 Open Finance]
+      servers:
+        - url: http://localhost:8004
+      summary: Lista transacoes capturadas
+      responses:
+        '200':
+          description: Transacoes
+  /ms-004/v1/captura/logs:
+    get:
+      tags: [MS-004 Open Finance]
+      servers:
+        - url: http://localhost:8004
+      summary: Lista logs de captura
+      responses:
+        '200':
+          description: Logs de captura
+  /ms-004/v1/health:
+    get:
+      tags: [MS-004 Open Finance]
+      servers:
+        - url: http://localhost:8004
+      summary: Healthcheck do MS Open Finance
+      responses:
+        '200':
+          description: Servico operacional
+
+  /ms-005/v1/geocodificar:
+    post:
+      tags: [MS-005 Geocoding]
+      servers:
+        - url: http://localhost:8005
+      summary: Geocodifica endereco
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [endereco]
+              properties:
+                endereco:
+                  type: string
+      responses:
+        '200':
+          description: Endereco geocodificado
+  /ms-005/v1/geocodificar/corrigir:
+    put:
+      tags: [MS-005 Geocoding]
+      servers:
+        - url: http://localhost:8005
+      summary: Corrige geocodificacao manualmente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hash, latitude, longitude]
+              properties:
+                hash:
+                  type: string
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+      responses:
+        '200':
+          description: Geocodificacao corrigida
+  /ms-005/v1/rotas/otimizar:
+    post:
+      tags: [MS-005 Geocoding]
+      servers:
+        - url: http://localhost:8005
+      summary: Calcula rota otimizada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_operacional_id:
+                  type: string
+                paradas:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Rota otimizada
+  /ms-005/v1/rotas/{id}:
+    get:
+      tags: [MS-005 Geocoding]
+      servers:
+        - url: http://localhost:8005
+      summary: Exibe rota
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rota encontrada
+  /ms-005/v1/localizacao:
+    post:
+      tags: [MS-005 Geocoding]
+      servers:
+        - url: http://localhost:8005
+      summary: Atualiza localizacao do entregador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [entregador_id, latitude, longitude]
+              properties:
+                entregador_id:
+                  type: integer
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+      responses:
+        '202':
+          description: Localizacao registrada
+  /ms-005/v1/localizacao/{entregadorId}:
+    get:
+      tags: [MS-005 Geocoding]
+      servers:
+        - url: http://localhost:8005
+      summary: Consulta ultima localizacao do entregador
+      parameters:
+        - in: path
+          name: entregadorId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Localizacao encontrada
+  /ms-005/v1/eta/recalcular:
+    post:
+      tags: [MS-005 Geocoding]
+      servers:
+        - url: http://localhost:8005
+      summary: Recalcula ETA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rota_id:
+                  type: integer
+                localizacao_atual:
+                  type: object
+      responses:
+        '200':
+          description: ETA recalculado
+  /ms-005/v1/cache/geocodificacao/{hash}:
+    delete:
+      tags: [MS-005 Geocoding]
+      servers:
+        - url: http://localhost:8005
+      summary: Invalida cache de geocodificacao
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Cache invalidado
+  /ms-005/v1/health:
+    get:
+      tags: [MS-005 Geocoding]
+      servers:
+        - url: http://localhost:8005
+      summary: Healthcheck do MS geocoding
+      responses:
+        '200':
+          description: Servico operacional
+components:
+  securitySchemes:
+    sanctumAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+  schemas:
+    ErpUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        papel:
+          type: string
+        ativo:
+          type: boolean
+    FiscalEmissionRequest:
+      type: object
+      required: [empresa_id, serie, numero, cliente, itens]
+      properties:
+        empresa_id:
+          type: string
+        serie:
+          type: string
+        numero:
+          type: integer
+        cliente:
+          type: object
+          properties:
+            nome:
+              type: string
+            documento:
+              type: string
+        itens:
+          type: array
+          items:
+            type: object
+            properties:
+              sku:
+                type: string
+              descricao:
+                type: string
+              quantidade:
+                type: number
+              valor_unitario:
+                type: number
+    FiscalDocumentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        chave_acesso:
+          type: string
+        status:
+          type: string
+        xml_url:
+          type: string
+          nullable: true
+        pdf_url:
+          type: string
+          nullable: true
+    BillingChargeRequest:
+      type: object
+      required: [empresa_id, cliente, valor]
+      properties:
+        empresa_id:
+          type: string
+        cliente:
+          type: object
+          properties:
+            nome:
+              type: string
+            documento:
+              type: string
+        valor:
+          type: number
+        vencimento:
+          type: string
+          format: date
+        referencia:
+          type: string
+    ChargeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+        linha_digitavel:
+          type: string
+          nullable: true
+        qr_code:
+          type: string
+          nullable: true
