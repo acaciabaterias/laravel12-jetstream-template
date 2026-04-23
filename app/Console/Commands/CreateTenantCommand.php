@@ -36,8 +36,9 @@ class CreateTenantCommand extends Command
 
         $cliente = Cliente::where('subdominio', $subdomain)->first();
 
-        if (!$cliente) {
+        if (! $cliente) {
             $this->error("Cliente não encontrado com o subdomínio: {$subdomain}");
+
             return Command::FAILURE;
         }
 
@@ -48,52 +49,53 @@ class CreateTenantCommand extends Command
 
         // Se tivermos as credenciais do Supabase, criamos o projeto real
         if ($token && $orgId) {
-            $this->info("Provisionando novo projeto físico no Supabase...");
-            
+            $this->info('Provisionando novo projeto físico no Supabase...');
+
             $dbPass = Str::password(16, true, true, false, false);
-            
+
             // 1. Criar Projeto no Supabase
             $response = Http::withToken($token)
                 ->post('https://api.supabase.com/v1/projects', [
                     'org_id' => $orgId,
-                    'name' => 'bx-' . $cliente->subdominio,
+                    'name' => 'bx-'.$cliente->subdominio,
                     'db_pass' => $dbPass,
                     'region' => env('SUPABASE_REGION', 'sa-east-1'),
-                    'plan' => 'free' // Em produção dinâmico dependendo do plano do cliente
+                    'plan' => 'free', // Em produção dinâmico dependendo do plano do cliente
                 ]);
 
             if ($response->failed()) {
-                $this->error("Falha ao provisionar projeto no Supabase: " . $response->body());
+                $this->error('Falha ao provisionar projeto no Supabase: '.$response->body());
+
                 return Command::FAILURE;
             }
 
             $projectData = $response->json();
-            
+
             // 2. Salvar metadados no cliente
-            $cliente->supabase_db_host = "db." . $projectData['id'] . ".supabase.co";
+            $cliente->supabase_db_host = 'db.'.$projectData['id'].'.supabase.co';
             // Nota: Numa aplicação real, criptografar e proteger bem esta senha
-            $cliente->supabase_db_password = $dbPass; 
+            $cliente->supabase_db_password = $dbPass;
             $cliente->save();
 
             $this->info("Projeto Supabase criado com sucesso! Host: {$cliente->supabase_db_host}");
-            
+
             $dbName = 'postgres';
             $dbUser = 'postgres';
             $dbHost = $cliente->supabase_db_host;
             $dbPassToUse = $dbPass;
 
         } else {
-            $this->warn("Credenciais do Supabase não encontradas. Simulando provisionamento com banco local de testes (SQLite).");
-            
+            $this->warn('Credenciais do Supabase não encontradas. Simulando provisionamento com banco local de testes (SQLite).');
+
             // Fallback para testes/local
             $dbPath = database_path("tenant_{$cliente->subdominio}.sqlite");
-            if (!file_exists($dbPath)) {
+            if (! file_exists($dbPath)) {
                 touch($dbPath);
             }
-            
+
             $cliente->supabase_db_host = $dbPath; // Para testes, vamos usar o host como o path
             $cliente->save();
-            
+
             $dbName = 'sqlite';
             $dbUser = '';
             $dbHost = '';
@@ -101,12 +103,12 @@ class CreateTenantCommand extends Command
         }
 
         // 3. Rodar migrações do Tenant
-        $this->info("Executando migrações do Tenant...");
-        
+        $this->info('Executando migrações do Tenant...');
+
         $env = app()->environment();
-        
-        if ($env === 'testing' || !($token && $orgId)) {
-             Config::set('database.connections.tenant', [
+
+        if ($env === 'testing' || ! ($token && $orgId)) {
+            Config::set('database.connections.tenant', [
                 'driver' => 'sqlite',
                 'database' => $cliente->supabase_db_host,
                 'prefix' => '',
@@ -129,20 +131,25 @@ class CreateTenantCommand extends Command
 
         DB::purge('tenant');
 
-        try {
-            Artisan::call('migrate', [
-                '--database' => 'tenant',
-                '--path' => 'database/migrations',
-                '--force' => true,
-            ]);
-            $this->info(Artisan::output());
-        } catch (\Exception $e) {
-            $this->error("Erro ao executar migrações: " . $e->getMessage());
-            return Command::FAILURE;
+        if ($env === 'testing' || ! ($token && $orgId)) {
+            $this->warn('Fallback SQLite detectado. As migrations canônicas do tenant exigem PostgreSQL e foram simuladas neste provisionamento local.');
+        } else {
+            try {
+                Artisan::call('migrate', [
+                    '--database' => 'tenant',
+                    '--path' => 'database/migrations/tenant',
+                    '--force' => true,
+                ]);
+                $this->info(Artisan::output());
+            } catch (\Exception $e) {
+                $this->error('Erro ao executar migrações: '.$e->getMessage());
+
+                return Command::FAILURE;
+            }
         }
 
-        $this->info("Tenant provisionado com sucesso!");
-        
+        $this->info('Tenant provisionado com sucesso!');
+
         return Command::SUCCESS;
     }
 }
