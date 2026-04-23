@@ -54,3 +54,202 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - Events/Listeners para desacoplamento de domínio
 - Policies e Gates para controle de acesso
 - PostgreSQL/Supabase como referência de persistência
+
+## Diagramas
+
+### 1. Fluxo de Venda
+
+```mermaid
+flowchart LR
+    A[Vale Aberto] --> B[Itens do Vale]
+    B --> C[Reserva de Estoque]
+    C --> D[Pedido de Venda / Faturamento]
+    D --> E[Boleto Orquestrado]
+    D --> F[Nota Fiscal Orquestrada]
+    F --> G[MS-001 Fiscal ACBr]
+    E --> H[MS-002 Bancario]
+
+    C --> I{Sucata devolvida?}
+    I -->|Sim| J[Preco liquido mantido]
+    I -->|Nao| K[Acrescimo por tabela de peso]
+    J --> D
+    K --> D
+```
+
+### 2. Fluxo de Garantia
+
+```mermaid
+flowchart TD
+    A[Cliente retorna com reclamacao] --> B[Ordem de Servico de Garantia]
+    B --> C[Vinculo com Vale original]
+    C --> D[Analise tecnica / Laudo]
+    D --> E{Resultado}
+    E -->|Procedente| F[Garantia aprovada]
+    E -->|Improcedente| G[Garantia improcedente]
+    F --> H[Indice de retorno atualizado]
+    F --> I[Notificacao ao cliente]
+    G --> J[Geracao de cobranca]
+    G --> I
+    J --> K[Boleto / CNAB]
+    K --> L[MS-002 Bancario]
+    I --> M[MS-003 WhatsApp n8n]
+```
+
+### 3. Fluxo de Logistica
+
+```mermaid
+flowchart LR
+    A[Rota de Entrega] --> B[Pontos de Entrega]
+    B --> C[Entrega em campo]
+    C --> D[Registro de sucata]
+    C --> E[Registro de recebimento]
+    D --> F[Conta de Sucata]
+    E --> G[Recebimento Movel]
+    G --> H[Sincronizacao com ERP]
+    F --> H
+    H --> I[Baixa e fechamento operacional]
+
+    A --> J[MS-005 Geocoding]
+    J --> K[Otimizacao de rota / ETA]
+    K --> A
+```
+
+### 4. Arquitetura dos Microservicos
+
+```mermaid
+flowchart TB
+    U[Usuarios ERP / App Entregador] --> C[ERP Core Laravel 12]
+
+    C --> DB[(Banco Central)]
+    C --> T[(Banco Tenant)]
+    C --> R[(Redis / Queues)]
+
+    C --> MS1[MS-001 Fiscal ACBr]
+    C --> MS2[MS-002 Bancario]
+    C --> MS3[MS-003 WhatsApp n8n]
+    C --> MS4[MS-004 Open Finance]
+    C --> MS5[MS-005 Geocoding]
+
+    MS1 --> X1[Emissao NF-e / NFC-e]
+    MS2 --> X2[Boleto / PIX / CNAB]
+    MS3 --> X3[Notificacoes / Webhooks]
+    MS4 --> X4[OAuth / Extratos]
+    MS5 --> X5[Geocoding / Rotas / ETA]
+
+    MS1 --> R
+    MS2 --> R
+    MS3 --> R
+    MS4 --> R
+    MS5 --> R
+```
+
+### 5. Modelo de Dados Simplificado
+
+```mermaid
+erDiagram
+    CLIENTE ||--o{ VALE : possui
+    VALE ||--|{ ITEM_VALE : contem
+    VALE ||--o{ RESERVA_ESTOQUE : gera
+    VALE ||--o{ PEDIDO_VENDA : converte_em
+    VALE ||--o{ ORDEM_SERVICO : converte_em
+    VALE ||--o{ NOTA_FISCAL_ORQUESTRADA : origina
+    VALE ||--o{ BOLETO_ORQUESTRADO : origina
+    VALE ||--o{ ORDEM_SERVICO_GARANTIA : referencia
+
+    BATERIA ||--o{ ITEM_VALE : vendida_em
+    BATERIA ||--o{ RESERVA_ESTOQUE : reservada_em
+    BATERIA ||--o{ ORDEM_SERVICO_GARANTIA : analisada_em
+
+    ROTA_ENTREGA ||--|{ PONTO_ENTREGA : possui
+    PONTO_ENTREGA }o--|| VALE : entrega_relacionada
+    PONTO_ENTREGA ||--o{ RECEBIMENTO_MOVEL : recebe
+
+    CLIENTE ||--o{ CONTA_SUCATA_MOVIMENTACAO : acumula
+    CLIENTE ||--o{ ORDEM_SERVICO_GARANTIA : abre
+
+    VALE {
+      bigint id
+      bigint cliente_id
+      string status
+      decimal valor_total
+    }
+    ITEM_VALE {
+      bigint id
+      bigint vale_id
+      bigint bateria_id
+      int quantidade
+      decimal preco_unitario
+    }
+    RESERVA_ESTOQUE {
+      bigint id
+      bigint vale_id
+      bigint item_vale_id
+      string status
+    }
+    PEDIDO_VENDA {
+      bigint id
+      bigint vale_id
+      string status
+      decimal valor_total
+    }
+    NOTA_FISCAL_ORQUESTRADA {
+      bigint id
+      bigint vale_id
+      string status
+      string idempotency_key
+    }
+    BOLETO_ORQUESTRADO {
+      bigint id
+      bigint vale_id
+      string status
+      string idempotency_key
+    }
+    ORDEM_SERVICO_GARANTIA {
+      bigint id
+      bigint cliente_id
+      bigint vale_original_id
+      bigint bateria_id
+      string status
+      string resultado
+    }
+    ROTA_ENTREGA {
+      bigint id
+      bigint entregador_id
+      string status
+      datetime data_saida
+    }
+    PONTO_ENTREGA {
+      bigint id
+      bigint rota_entrega_id
+      bigint vale_id
+      string status
+    }
+    RECEBIMENTO_MOVEL {
+      bigint id
+      bigint ponto_entrega_id
+      decimal valor
+      string metodo_pagamento
+    }
+    CONTA_SUCATA_MOVIMENTACAO {
+      bigint id
+      bigint cliente_id
+      decimal peso_kg
+      decimal credito_valor
+    }
+    CLIENTE {
+      bigint id
+      string razao_social
+      string status
+    }
+    BATERIA {
+      bigint id
+      string sku
+      string marca
+      string tecnologia
+    }
+    ORDEM_SERVICO {
+      bigint id
+      bigint vale_id
+      string status
+    }
+```
