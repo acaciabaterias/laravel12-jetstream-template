@@ -171,6 +171,23 @@ php artisan queue:listen --tries=1
 npm run dev
 ```
 
+## 📚 Documentação
+
+- **[README.md](README.md)** - Visão geral do projeto
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Arquitetura do sistema e diagramas
+- **[DATABASE.md](DATABASE.md)** - Modelo de dados e relacionamentos
+- **[API_GUIDE.md](API_GUIDE.md)** - Guia de uso da API
+- **[MICROSERVICES.md](MICROSERVICES.md)** - Detalhamento dos microserviços
+- **[FAQ.md](FAQ.md)** - Perguntas frequentes
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Guia para contribuidores
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Código de conduta
+- **[SECURITY.md](SECURITY.md)** - Política de segurança
+- **[SUPPORT.md](SUPPORT.md)** - Canais de suporte
+- **[CHANGELOG.md](CHANGELOG.md)** - Histórico de versões
+- **[ROADMAP.md](ROADMAP.md)** - Roadmap do projeto
+- **[RELEASE_PROCESS.md](RELEASE_PROCESS.md)** - Processo de release
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Solução de problemas
+
 ## Testes
 
 Rodar a suite completa:
