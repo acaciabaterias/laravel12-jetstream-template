@@ -69,6 +69,27 @@ if (! function_exists('format_phone_br')) {
     }
 }
 
+if (! function_exists('format_placa')) {
+    function format_placa(?string $value): string
+    {
+        $plate = strtoupper(trim((string) $value));
+        $normalized = preg_replace('/[^A-Z0-9]/', '', $plate) ?? '';
+
+        if (strlen($normalized) !== 7) {
+            return $plate;
+        }
+
+        return substr($normalized, 0, 3).'-'.substr($normalized, 3);
+    }
+}
+
+if (! function_exists('format_money_br')) {
+    function format_money_br(float|int $value, string $currency = 'R$'): string
+    {
+        return trim($currency.' '.number_format((float) $value, 2, ',', '.'));
+    }
+}
+
 if (! function_exists('calculate_percentage')) {
     function calculate_percentage(float|int $part, float|int $total, int $precision = 2): float
     {
