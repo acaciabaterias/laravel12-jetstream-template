@@ -27,7 +27,7 @@ services:
       MS_OPENFINANCE_URL: http://ms_004_openfinance_api:8004
       MS_GEOCODING_URL: http://ms_005_geocoding_api:8005
     ports:
-      - "8000:80"
+      - "${ERP_CORE_HTTP_PORT:-8000}:80"
     depends_on:
       - erp_core_db
       - erp_core_redis

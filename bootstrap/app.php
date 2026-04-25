@@ -15,9 +15,18 @@ return Application::configure(basePath: dirname(__DIR__))
             $adminHost = parse_url(config('app.url'), PHP_URL_HOST);
 
             if ($adminHost) {
-                Route::middleware('web')
-                    ->domain('admin.'.$adminHost)
-                    ->group(base_path('routes/admin.php'));
+                $adminRoutes = fn () => Route::group(base_path('routes/admin.php'));
+                $localHosts = ['localhost', '127.0.0.1'];
+
+                if (in_array($adminHost, $localHosts, true) || str_ends_with($adminHost, '.localhost')) {
+                    Route::middleware('web')
+                        ->prefix('admin')
+                        ->group(base_path('routes/admin.php'));
+                } else {
+                    Route::middleware('web')
+                        ->domain('admin.'.$adminHost)
+                        ->group(base_path('routes/admin.php'));
+                }
             }
         },
     )

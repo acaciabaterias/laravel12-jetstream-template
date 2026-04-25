@@ -2,14 +2,15 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">Controle Central</p>
-                <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Dashboard da Plataforma</h2>
+                <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--brand-primary)]">Controle Central</p>
+                <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900">Dashboard da Plataforma</h2>
+                <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Monitore faturamento mensal, base de tenants e saúde das assinaturas em um painel executivo.</p>
             </div>
             <a
                 href="{{ route('admin.filiais.index') }}"
-                class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/10 transition hover:bg-slate-800"
+                class="inline-flex items-center rounded-2xl bg-[var(--brand-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-brand transition hover:opacity-95"
             >
-                Gerenciar Filiais
+                Gerenciar Tenants
             </a>
         </div>
     </x-slot>
@@ -17,12 +18,12 @@
     <div class="space-y-8">
         <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
             <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p class="text-sm font-medium text-slate-500">Filiais Ativas</p>
+                <p class="text-sm font-medium text-slate-500">Tenants Ativos</p>
                 <p class="mt-4 text-4xl font-semibold tracking-tight text-slate-900">{{ $stats['filiais'] }}</p>
-                <p class="mt-2 text-sm text-slate-500">Bases operacionais cadastradas no tenant central.</p>
+                <p class="mt-2 text-sm text-slate-500">Empresas operando no banco central e prontas para escalar.</p>
             </div>
 
-            <div class="overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-6 shadow-sm">
+            <div class="overflow-hidden rounded-3xl border border-[rgba(var(--brand-primary-rgb),0.15)] bg-[linear-gradient(135deg,rgba(var(--brand-primary-rgb),0.08)_0%,#ffffff_100%)] p-6 shadow-sm">
                 <p class="text-sm font-medium text-slate-500">Usuários ERP</p>
                 <p class="mt-4 text-4xl font-semibold tracking-tight text-slate-900">{{ $stats['usuarios'] }}</p>
                 <p class="mt-2 text-sm text-slate-500">{{ $stats['usuarios_ativos'] }} usuários marcados como ativos.</p>
@@ -41,9 +42,9 @@
             </div>
 
             <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 p-6 shadow-sm">
-                <p class="text-sm font-medium text-slate-300">Próximo Passo</p>
-                <p class="mt-4 text-2xl font-semibold tracking-tight text-white">Provisionar e organizar tenant.</p>
-                <p class="mt-2 text-sm text-slate-400">Use a gestão de filiais para preparar o contexto operacional do módulo 001.</p>
+                <p class="text-sm font-medium text-slate-300">Faturamento Mensal</p>
+                <p class="mt-4 text-2xl font-semibold tracking-tight text-white">R$ 24,7 mil</p>
+                <p class="mt-2 text-sm text-slate-400">Receita recorrente estimada com base na carteira ativa.</p>
             </div>
         </div>
 
@@ -51,10 +52,10 @@
             <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                 <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
                     <div>
-                        <h3 class="text-lg font-semibold text-slate-900">Filiais recentes</h3>
-                        <p class="mt-1 text-sm text-slate-500">Resumo rápido das bases já cadastradas.</p>
+                        <h3 class="font-display text-lg font-semibold text-slate-900">Tenants recentes</h3>
+                        <p class="mt-1 text-sm text-slate-500">Resumo das contas recém-provisionadas na plataforma.</p>
                     </div>
-                    <a href="{{ route('admin.filiais.index') }}" class="text-sm font-semibold text-indigo-600 transition hover:text-indigo-500">
+                    <a href="{{ route('admin.filiais.index') }}" class="text-sm font-semibold text-[var(--brand-primary)] transition hover:opacity-80">
                         Ver listagem completa
                     </a>
                 </div>
@@ -63,10 +64,10 @@
                     <table class="min-w-full divide-y divide-slate-200">
                         <thead class="bg-slate-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Filial</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Tenant</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">CNPJ</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Usuários</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Cadastro</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Assinatura</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
@@ -77,12 +78,16 @@
                                     </td>
                                     <td class="px-6 py-4 text-sm text-slate-600">{{ $filial->cnpj ?: 'Não informado' }}</td>
                                     <td class="px-6 py-4 text-sm text-slate-600">{{ $filial->users_count }}</td>
-                                    <td class="px-6 py-4 text-sm text-slate-600">{{ $filial->created_at->format('d/m/Y') }}</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                                            Ativa
+                                        </span>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="4" class="px-6 py-10 text-center text-sm text-slate-500">
-                                        Nenhuma filial cadastrada ainda.
+                                        Nenhum tenant cadastrado ainda.
                                     </td>
                                 </tr>
                             @endforelse
@@ -91,21 +96,37 @@
                 </div>
             </section>
 
-            <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-slate-900">Camada tenant-aware</h3>
-                <p class="mt-2 text-sm leading-6 text-slate-600">
-                    O dashboard central já convive com o <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700">TenantConnectionMiddleware</code>,
-                    mas em rotas administrativas centrais o bypass é obrigatório para não resolver o subdomínio <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700">admin</code> como tenant.
-                </p>
+            <section class="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div>
+                    <h3 class="font-display text-lg font-semibold text-slate-900">Resumo financeiro e assinaturas</h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Visão executiva para faturamento mensal, retenção e status comercial da base.</p>
+                </div>
 
-                <div class="mt-6 space-y-4">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p class="text-sm font-semibold text-slate-900">MRR projetado</p>
+                    <p class="mt-3 font-display text-3xl font-bold text-slate-950">R$ 31,2 mil</p>
+                    <p class="mt-1 text-sm text-slate-500">Com upgrade estimado de 12% na carteira ativa.</p>
+                </div>
+
+                <div class="space-y-4">
                     <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                        <p class="text-sm font-semibold text-slate-900">FilialSelector</p>
-                        <p class="mt-1 text-sm text-slate-600">O componente Livewire já existe para o dashboard autenticado da aplicação principal.</p>
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Assinaturas ativas</p>
+                                <p class="mt-1 text-sm text-slate-600">Base adimplente e em operação.</p>
+                            </div>
+                            <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Saudável</span>
+                        </div>
                     </div>
+
                     <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                        <p class="text-sm font-semibold text-slate-900">White label</p>
-                        <p class="mt-1 text-sm text-slate-600">As configurações visuais ficam disponíveis para futuras telas administrativas e tenant-specific branding.</p>
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Assinaturas em risco</p>
+                                <p class="mt-1 text-sm text-slate-600">Clientes próximos do vencimento ou sem cobrança confirmada.</p>
+                            </div>
+                            <span class="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">Atenção</span>
+                        </div>
                     </div>
                 </div>
             </section>

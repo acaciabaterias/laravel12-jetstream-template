@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bateriaexpert-dev
+  labels:
+    app.kubernetes.io/part-of: bateriaexpert
+    environment: dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bateriaexpert-staging
+  labels:
+    app.kubernetes.io/part-of: bateriaexpert
+    environment: staging
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bateriaexpert
+  labels:
+    app.kubernetes.io/part-of: bateriaexpert
+    environment: production

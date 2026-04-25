@@ -44,11 +44,11 @@ require_var CACHE_STORE
 require_var SESSION_DRIVER
 require_var QUEUE_CONNECTION
 
-warn_var MS001_BASE_URL
-warn_var MS002_BASE_URL
-warn_var MS003_BASE_URL
-warn_var MS004_BASE_URL
-warn_var MS005_BASE_URL
+warn_var MS_FISCAL_URL
+warn_var MS_BANCARIO_URL
+warn_var MS_WHATSAPP_URL
+warn_var MS_OPENFINANCE_URL
+warn_var MS_GEOCODING_URL
 warn_var MAINTENANCE_MODE
 
 if [ "${APP_KEY#base64:}" = "$APP_KEY" ]; then

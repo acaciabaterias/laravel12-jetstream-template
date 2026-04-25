@@ -32,7 +32,7 @@ class SuperAdminDashboardTest extends TestCase
         $response
             ->assertOk()
             ->assertSee('Dashboard da Plataforma')
-            ->assertSee('Filiais Ativas')
+            ->assertSee('Tenants Ativos')
             ->assertSee('White Labels');
     }
 
