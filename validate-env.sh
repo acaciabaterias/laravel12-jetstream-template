@@ -57,4 +57,59 @@ else
     echo "[PASS] APP_KEY format"
 fi
 
+if [ "${APP_ENV:-}" = "production" ]; then
+    echo "[INFO] Validando guardrails de producao..."
+
+    if [ "${APP_DEBUG:-false}" != "false" ]; then
+        echo "[FAIL] APP_DEBUG deve ser false em producao."
+        status=1
+    else
+        echo "[PASS] APP_DEBUG production"
+    fi
+
+    case "${APP_URL:-}" in
+        https://*)
+            echo "[PASS] APP_URL HTTPS"
+            ;;
+        *)
+            echo "[FAIL] APP_URL deve usar HTTPS em producao."
+            status=1
+            ;;
+    esac
+
+    if [ "${APP_KEY#base64:}" = "$APP_KEY" ]; then
+        echo "[FAIL] APP_KEY deve estar no formato base64: em producao."
+        status=1
+    fi
+
+    case "${SUPER_ADMIN_PASSWORD:-}" in
+        ""|"12345678"|"password"|"change-me-before-deploy")
+            echo "[FAIL] SUPER_ADMIN_PASSWORD deve ser uma senha forte e nao-placeholder em producao."
+            status=1
+            ;;
+        *)
+            echo "[PASS] SUPER_ADMIN_PASSWORD production"
+            ;;
+    esac
+
+    if [ "${SESSION_SECURE_COOKIE:-false}" != "true" ]; then
+        echo "[FAIL] SESSION_SECURE_COOKIE deve ser true em producao."
+        status=1
+    else
+        echo "[PASS] SESSION_SECURE_COOKIE production"
+    fi
+
+    if [ "${SESSION_ENCRYPT:-false}" != "true" ]; then
+        echo "[FAIL] SESSION_ENCRYPT deve ser true em producao."
+        status=1
+    else
+        echo "[PASS] SESSION_ENCRYPT production"
+    fi
+
+    if [ "${CORS_ALLOWED_ORIGINS:-}" = "*" ]; then
+        echo "[FAIL] CORS_ALLOWED_ORIGINS nao deve ser * em producao."
+        status=1
+    fi
+fi
+
 exit "$status"

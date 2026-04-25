@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-188%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-196%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -188,6 +188,7 @@ npm run dev
 - **[CHANGELOG.md](CHANGELOG.md)** - Histórico de versões
 - **[ROADMAP.md](ROADMAP.md)** - Roadmap do projeto
 - **[RELEASE_PROCESS.md](RELEASE_PROCESS.md)** - Processo de release
+- **[GO_LIVE_RUNBOOK.md](GO_LIVE_RUNBOOK.md)** - Runbook de go-live e rollback
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Solução de problemas
 
 ## Testes
@@ -268,6 +269,12 @@ Subir o stack:
 docker compose up -d --build
 ```
 
+Se a porta `8000` ja estiver em uso, defina outra porta para o ERP Core:
+
+```bash
+ERP_CORE_HTTP_PORT=8080 docker compose up -d --build
+```
+
 Validar containers:
 
 ```bash
@@ -302,6 +309,7 @@ Executar healthcheck:
 - [DEPLOY_SUPABASE.md](./DEPLOY_SUPABASE.md)
 - [DEPLOY_PRODUCAO.md](./DEPLOY_PRODUCAO.md)
 - [DEPLOYMENT_DETAILED.md](./DEPLOYMENT_DETAILED.md)
+- [GO_LIVE_RUNBOOK.md](./GO_LIVE_RUNBOOK.md)
 
 ### Operacao
 
@@ -326,9 +334,10 @@ Executar healthcheck:
 
 Workflows incluidos em [`.github/workflows`](./.github/workflows):
 
-- `test.yml`: executa a suite Laravel
+- `test.yml`: executa PHPUnit, build Vite, valida Compose e build da imagem Docker do ERP Core
 - `lint.yml`: valida Pint, `php -l` e a collection Postman
-- `deploy.yml`: base para deploy manual por ambiente
+- `deploy.yml`: valida o bundle e prepara deploy manual por ambiente
+- `deploy-k8s.yml`: aplica manifests Kubernetes por ambiente com smoke test
 
 ## Estrutura do Monorepo
 
