@@ -36,17 +36,25 @@ return [
     ],
 
     'ms_fiscal' => [
-        'url' => env('MS_FISCAL_URL', 'http://localhost:8001'),
+        'url' => env('MS_FISCAL_URL', env('MS001_BASE_URL', 'http://localhost:8001')),
         'api_key' => env('MS_FISCAL_API_KEY'), // Chave central opcional, prioriza chave por filial
     ],
 
     'ms_bancario' => [
-        'url' => env('MS_BANCARIO_URL', 'http://localhost:8002'),
+        'url' => env('MS_BANCARIO_URL', env('MS002_BASE_URL', 'http://localhost:8002')),
         'api_key' => env('MS_BANCARIO_API_KEY'),
     ],
 
     'ms_whatsapp' => [
-        'url' => env('MS_WHATSAPP_URL', 'http://localhost:8003'),
+        'url' => env('MS_WHATSAPP_URL', env('MS003_BASE_URL', 'http://localhost:8003')),
+    ],
+
+    'ms_openfinance' => [
+        'url' => env('MS_OPENFINANCE_URL', env('MS004_BASE_URL', 'http://localhost:8004')),
+    ],
+
+    'ms_geocoding' => [
+        'url' => env('MS_GEOCODING_URL', env('MS005_BASE_URL', 'http://localhost:8005')),
     ],
 
     'suporte' => [
@@ -55,6 +63,8 @@ return [
     ],
 
     'platform' => [
+        'super_admin_email' => env('SUPER_ADMIN_EMAIL', 'admin@bateriaexpert.com'),
+        'super_admin_password' => env('SUPER_ADMIN_PASSWORD'),
         'maintenance_mode' => env('MAINTENANCE_MODE', false),
         'maintenance_allowed_ips' => array_values(array_filter(array_map('trim', explode(',', (string) env('MAINTENANCE_ALLOWED_IPS', ''))))),
         'cors_allowed_origins' => array_values(array_filter(array_map('trim', explode(',', (string) env('CORS_ALLOWED_ORIGINS', '*'))))),

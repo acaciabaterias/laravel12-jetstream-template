@@ -1,11 +1,13 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-136%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-188%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
-[![PHP Version](https://img.shields.io/badge/php-8.4-777bb4)](#stack)
+[![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./composer.json)
 [![Docker Ready](https://img.shields.io/badge/docker-ready-2496ed)](#rodando-com-docker)
+[![Kubernetes Ready](https://img.shields.io/badge/kubernetes-ready-326ce5)](#kubernetes-deploy-checklist)
+[![GitHub Stars](https://img.shields.io/github/stars/acaciabaterias/laravel12-jetstream-template?style=social)](https://github.com/acaciabaterias/laravel12-jetstream-template)
 
 ERP especializado para distribuidores, revendas e operacoes de baterias automotivas, com arquitetura `database-per-client`, backoffice SaaS central e microservicos dedicados para fiscal, bancario, notificacoes, Open Finance e geocoding.
 
@@ -207,6 +209,48 @@ Formatacao:
 ```bash
 vendor/bin/pint --dirty --format agent
 ```
+
+### Testes de carga com K6
+
+Os cenarios K6 ficam em `tests/k6/`:
+
+- `load-test-create-vale.js`: autentica na aplicacao, abre o `dashboard`, executa `createVale` e `addItem` via `POST /livewire/update`
+- `load-test-concurrent-users.js`: simula `100` usuarios simultaneos navegando por home, login e dashboard autenticado
+- `smoke-test.js`: valida rapidamente home, login e dashboard; opcionalmente cria um vale simples
+
+Variaveis de ambiente suportadas:
+
+```bash
+export BASE_URL=http://127.0.0.1:8000
+export USER_EMAIL=vendedor.demo@bateriaexpert.test
+export USER_PASSWORD=password
+```
+
+Executar o smoke test:
+
+```bash
+k6 run tests/k6/smoke-test.js
+```
+
+Executar o smoke test com criacao de vale:
+
+```bash
+SMOKE_CREATE_VALE=true k6 run tests/k6/smoke-test.js
+```
+
+Executar o teste de carga de criacao de vales:
+
+```bash
+k6 run tests/k6/load-test-create-vale.js
+```
+
+Executar o teste de concorrencia com `100` usuarios:
+
+```bash
+k6 run tests/k6/load-test-concurrent-users.js
+```
+
+Se a aplicacao estiver servindo frontend e backend separadamente, garanta que `php artisan serve` e `npm run dev` ou `composer run dev` estejam ativos antes de rodar os cenarios.
 
 ## Rodando com Docker
 

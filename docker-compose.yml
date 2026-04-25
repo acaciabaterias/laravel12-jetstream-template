@@ -21,11 +21,11 @@ services:
       SESSION_DRIVER: database
       QUEUE_CONNECTION: redis
       RUN_MIGRATIONS: "true"
-      MS001_BASE_URL: http://ms_001_fiscal_api:8001
-      MS002_BASE_URL: http://ms_002_banking_api:8002
-      MS003_BASE_URL: http://ms_003_notification_api:8003
-      MS004_BASE_URL: http://ms_004_openfinance_api:8004
-      MS005_BASE_URL: http://ms_005_geocoding_api:8005
+      MS_FISCAL_URL: http://ms_001_fiscal_api:8001
+      MS_BANCARIO_URL: http://ms_002_banking_api:8002
+      MS_WHATSAPP_URL: http://ms_003_notification_api:8003
+      MS_OPENFINANCE_URL: http://ms_004_openfinance_api:8004
+      MS_GEOCODING_URL: http://ms_005_geocoding_api:8005
     ports:
       - "8000:80"
     depends_on:
