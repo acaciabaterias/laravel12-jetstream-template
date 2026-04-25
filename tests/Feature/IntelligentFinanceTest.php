@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Jobs\SyncBankTransactionsJob;
 use App\Livewire\CashFlowPanel;
+use App\Livewire\FinanceDashboard;
 use App\Livewire\MarginAnalysisGrid;
 use App\Models\Bateria;
 use App\Models\ContaBancaria;
@@ -218,5 +219,47 @@ class IntelligentFinanceTest extends TestCase
             ->assertDontSeeLivewire('finance-dashboard')
             ->assertDontSeeLivewire('cash-flow-panel')
             ->assertDontSeeLivewire('margin-analysis-grid');
+    }
+
+    public function test_finance_dashboard_renders_cards_chart_and_latest_transactions(): void
+    {
+        $user = User::factory()->withPersonalTeam()->create(['papel' => 'gestor', 'ativo' => true]);
+        $this->actingAs($user);
+
+        $conta = ContaBancaria::query()->create([
+            'banco' => 'Banco Fluxo',
+            'agencia' => '0101',
+            'conta' => '99887-0',
+            'tipo' => 'corrente',
+            'status' => 'ativa',
+        ]);
+
+        TransacaoFinanceira::query()->create([
+            'conta_bancaria_id' => $conta->id,
+            'tipo' => 'receita',
+            'valor' => 1200,
+            'data_transacao' => now(),
+            'status_conciliado' => true,
+            'descricao' => 'Recebimento em balcão',
+            'identificador_externo' => 'finance-dashboard-1',
+        ]);
+
+        TransacaoFinanceira::query()->create([
+            'conta_bancaria_id' => $conta->id,
+            'tipo' => 'despesa',
+            'valor' => 300,
+            'data_transacao' => now()->subDay(),
+            'status_conciliado' => false,
+            'descricao' => 'Pagamento fornecedor',
+            'identificador_externo' => 'finance-dashboard-2',
+        ]);
+
+        Livewire::test(FinanceDashboard::class)
+            ->assertSee('Receitas registradas no tenant.')
+            ->assertSee('Despesas e compromissos lançados.')
+            ->assertSee('Fluxo de caixa')
+            ->assertSee('Últimas transações')
+            ->assertSee('Recebimento em balcão')
+            ->assertSee('Pagamento fornecedor');
     }
 }

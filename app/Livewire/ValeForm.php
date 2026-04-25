@@ -9,10 +9,16 @@ use App\Models\Vale;
 use App\Services\NetPriceCalculator;
 use App\Services\ReservaEstoqueService;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class ValeForm extends Component
 {
+    protected $listeners = [
+        'vale-selected' => 'loadVale',
+        'vale-updated' => '$refresh',
+    ];
+
     public ?int $valeId = null;
 
     public ?int $clienteId = null;
@@ -25,24 +31,41 @@ class ValeForm extends Component
 
     public bool $devolveuSucata = true;
 
+    public string $buscaBateria = '';
+
     public string $observacaoItem = '';
 
     public ?float $previewPrecoFinal = null;
+
+    public ?float $previewPrecoOriginal = null;
+
+    public ?float $previewAcrescimoSucata = null;
 
     public function mount(): void
     {
         Gate::authorize('acesso-vendas');
     }
 
-    public function updated($propertyName, NetPriceCalculator $netPriceCalculator): void
+    public function updated(string $propertyName, NetPriceCalculator $netPriceCalculator): void
     {
-        if (in_array($propertyName, ['bateriaId', 'devolveuSucata'], true) && $this->bateriaId) {
-            $bateria = Bateria::query()->find($this->bateriaId);
-
-            if ($bateria) {
-                $this->previewPrecoFinal = $netPriceCalculator->calculate($bateria, $this->devolveuSucata)['preco_unitario_final'];
-            }
+        if (in_array($propertyName, ['bateriaId', 'devolveuSucata', 'quantidade'], true)) {
+            $this->updatePreviewPrice($netPriceCalculator);
         }
+    }
+
+    public function loadVale(int $valeId): void
+    {
+        $vale = Vale::query()->with('cliente')->findOrFail($valeId);
+
+        $this->valeId = $vale->id;
+        $this->clienteId = $vale->cliente_id;
+        $this->observacoes = (string) ($vale->observacoes ?? '');
+    }
+
+    public function selectBateria(int $bateriaId, NetPriceCalculator $netPriceCalculator): void
+    {
+        $this->bateriaId = $bateriaId;
+        $this->updatePreviewPrice($netPriceCalculator);
     }
 
     public function createVale(): void
@@ -99,23 +122,64 @@ class ValeForm extends Component
 
         $reservaEstoqueService->reservar($vale, $itemVale, auth()->user());
 
-        $this->reset(['bateriaId', 'quantidade', 'devolveuSucata', 'observacaoItem']);
+        $this->reset(['bateriaId', 'quantidade', 'devolveuSucata', 'observacaoItem', 'buscaBateria']);
         $this->quantidade = 1;
         $this->devolveuSucata = true;
         $this->previewPrecoFinal = null;
+        $this->previewPrecoOriginal = null;
+        $this->previewAcrescimoSucata = null;
 
         $this->dispatch('vale-updated');
     }
 
-    public function render()
+    protected function updatePreviewPrice(NetPriceCalculator $netPriceCalculator): void
+    {
+        if (! $this->bateriaId) {
+            $this->previewPrecoFinal = null;
+            $this->previewPrecoOriginal = null;
+            $this->previewAcrescimoSucata = null;
+
+            return;
+        }
+
+        $bateria = Bateria::query()->find($this->bateriaId);
+
+        if (! $bateria) {
+            $this->previewPrecoFinal = null;
+            $this->previewPrecoOriginal = null;
+            $this->previewAcrescimoSucata = null;
+
+            return;
+        }
+
+        $pricing = $netPriceCalculator->calculate($bateria, $this->devolveuSucata);
+
+        $this->previewPrecoOriginal = $pricing['preco_unitario_original'];
+        $this->previewPrecoFinal = $pricing['preco_unitario_final'];
+        $this->previewAcrescimoSucata = $pricing['acrescimo_sucata'];
+    }
+
+    public function render(): View
     {
         $vale = $this->valeId
             ? Vale::query()->with(['itens.bateria', 'cliente'])->find($this->valeId)
             : null;
 
+        $baterias = Bateria::query()
+            ->when($this->buscaBateria !== '', function ($query): void {
+                $query->where(function ($batteryQuery): void {
+                    $batteryQuery->where('sku', 'like', '%'.$this->buscaBateria.'%')
+                        ->orWhere('marca', 'like', '%'.$this->buscaBateria.'%');
+                });
+            })
+            ->orderBy('sku')
+            ->limit(8)
+            ->get();
+
         return view('livewire.vale-form', [
             'clientes' => Cliente::query()->orderBy('razao_social')->get(),
-            'baterias' => Bateria::query()->orderBy('sku')->get(),
+            'baterias' => $baterias,
+            'selectedBateria' => $this->bateriaId ? Bateria::query()->find($this->bateriaId) : null,
             'vale' => $vale,
         ]);
     }

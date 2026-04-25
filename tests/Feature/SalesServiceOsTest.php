@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Jobs\ConvertValeToOsJob;
 use App\Jobs\ConvertValeToPedidoJob;
 use App\Livewire\ValeForm;
+use App\Livewire\ValeList;
 use App\Models\Bateria;
 use App\Models\Cliente;
 use App\Models\Deposito;
@@ -56,6 +57,11 @@ class SalesServiceOsTest extends TestCase
             ->set('bateriaId', $bateria->id)
             ->set('quantidade', 1)
             ->set('devolveuSucata', false)
+            ->assertSet('previewPrecoOriginal', 500.0)
+            ->assertSet('previewAcrescimoSucata', 25.0)
+            ->assertSet('previewPrecoFinal', 525.0)
+            ->assertSee('Preço base')
+            ->assertSee('Acréscimo sucata')
             ->call('addItem')
             ->assertHasNoErrors();
 
@@ -208,5 +214,144 @@ class SalesServiceOsTest extends TestCase
             ->assertDontSeeLivewire('vale-form')
             ->assertDontSeeLivewire('vale-list')
             ->assertDontSeeLivewire('vale-conversion-actions');
+    }
+
+    public function test_vale_form_filters_batteries_with_dynamic_search(): void
+    {
+        $user = User::factory()->withPersonalTeam()->create(['papel' => 'vendedor', 'ativo' => true]);
+        $this->actingAs($user);
+
+        Bateria::query()->create([
+            'sku' => 'BAT-ALFA',
+            'marca' => 'Moura',
+            'preco_venda' => 500,
+        ]);
+
+        Bateria::query()->create([
+            'sku' => 'BAT-BETA',
+            'marca' => 'Heliar',
+            'preco_venda' => 420,
+        ]);
+
+        $bateriaAlfaId = (int) Bateria::query()->where('sku', 'BAT-ALFA')->value('id');
+
+        Livewire::test(ValeForm::class)
+            ->set('buscaBateria', 'ALFA')
+            ->assertSee('BAT-ALFA')
+            ->assertDontSee('BAT-BETA')
+            ->call('selectBateria', $bateriaAlfaId)
+            ->set('buscaBateria', 'BETA')
+            ->assertSet('bateriaId', $bateriaAlfaId)
+            ->assertSee('BAT-ALFA · Moura');
+    }
+
+    public function test_vale_list_can_cancel_an_open_vale(): void
+    {
+        $user = User::factory()->withPersonalTeam()->create(['papel' => 'vendedor', 'ativo' => true]);
+        $this->actingAs($user);
+
+        $cliente = Cliente::factory()->create();
+        $bateria = Bateria::query()->create([
+            'sku' => 'SALE-004',
+            'marca' => 'Moura',
+            'preco_venda' => 380,
+        ]);
+        $deposito = $this->seedInventory($bateria, 2);
+
+        $vale = Vale::query()->create([
+            'cliente_id' => $cliente->id,
+            'vendedor_id' => $user->id,
+            'status' => 'aberto',
+            'data_criacao' => now(),
+            'observacoes' => 'Cancelar atendimento',
+            'created_by' => $user->id,
+        ]);
+
+        $item = $vale->itens()->create([
+            'bateria_id' => $bateria->id,
+            'quantidade' => 1,
+            'preco_unitario_original' => 380,
+            'preco_unitario_final' => 380,
+            'flag_devolveu_sucata' => true,
+        ]);
+
+        ReservaEstoque::query()->create([
+            'vale_id' => $vale->id,
+            'item_vale_id' => $item->id,
+            'bateria_id' => $bateria->id,
+            'deposito_id' => $deposito->id,
+            'quantidade' => 1,
+            'status' => 'reservada',
+        ]);
+
+        Livewire::test(ValeList::class)
+            ->call('cancelVale', $vale->id)
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('vales', [
+            'id' => $vale->id,
+            'status' => 'cancelado',
+        ]);
+
+        $this->assertDatabaseHas('reservas_estoque', [
+            'vale_id' => $vale->id,
+            'status' => 'estornada',
+        ]);
+    }
+
+    public function test_vale_list_can_faturar_an_open_vale(): void
+    {
+        $user = User::factory()->withPersonalTeam()->create(['papel' => 'vendedor', 'ativo' => true]);
+        $this->actingAs($user);
+
+        $cliente = Cliente::factory()->create();
+        $bateria = Bateria::query()->create([
+            'sku' => 'SALE-005',
+            'marca' => 'Bosch',
+            'preco_venda' => 430,
+            'peso_sucata_kg' => 6,
+            'valor_base_sucata_kg' => 2.5,
+        ]);
+        $deposito = $this->seedInventory($bateria, 3);
+
+        $vale = Vale::query()->create([
+            'cliente_id' => $cliente->id,
+            'vendedor_id' => $user->id,
+            'status' => 'aberto',
+            'data_criacao' => now(),
+            'observacoes' => 'Faturar atendimento',
+            'created_by' => $user->id,
+        ]);
+
+        $item = $vale->itens()->create([
+            'bateria_id' => $bateria->id,
+            'quantidade' => 1,
+            'preco_unitario_original' => 430,
+            'preco_unitario_final' => 430,
+            'flag_devolveu_sucata' => true,
+        ]);
+
+        ReservaEstoque::query()->create([
+            'vale_id' => $vale->id,
+            'item_vale_id' => $item->id,
+            'bateria_id' => $bateria->id,
+            'deposito_id' => $deposito->id,
+            'quantidade' => 1,
+            'status' => 'reservada',
+        ]);
+
+        Livewire::test(ValeList::class)
+            ->call('faturarVale', $vale->id)
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('vales', [
+            'id' => $vale->id,
+            'status' => 'faturado',
+        ]);
+
+        $this->assertDatabaseHas('pedidos_venda', [
+            'vale_id' => $vale->id,
+            'status' => 'faturado',
+        ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Livewire\ContaSucataDashboard;
+use App\Livewire\EstoqueDashboard;
 use App\Livewire\XmlImportForm;
 use App\Models\Bateria;
 use App\Models\ContaSucataMovimentacao;
@@ -130,5 +131,51 @@ class InventoryReverseLogisticsTest extends TestCase
             ->assertSeeLivewire('estoque-adjustment-form')
             ->assertSeeLivewire('xml-import-form')
             ->assertSeeLivewire('conta-sucata-dashboard');
+    }
+
+    public function test_estoque_dashboard_renders_cards_chart_and_top_sellers(): void
+    {
+        $user = User::factory()->withPersonalTeam()->create(['papel' => 'estoquista', 'ativo' => true]);
+        $this->actingAs($user);
+
+        $bateria = Bateria::query()->create([
+            'sku' => 'INV-004',
+            'marca' => 'Moura',
+            'preco_venda' => 450,
+        ]);
+
+        $deposito = Deposito::query()->create([
+            'nome' => 'Loja 01',
+            'tipo' => 'principal',
+            'status' => 'ativo',
+        ]);
+
+        app(EstoqueSaldoService::class)->registrarMovimentacao($bateria, $deposito, 12, 'entrada', $user, 'compra_xml');
+        app(EstoqueSaldoService::class)->registrarMovimentacao($bateria, $deposito, 3, 'saida', $user, 'pedido_venda');
+
+        $cliente = \App\Models\Cliente::factory()->create();
+        $vale = \App\Models\Vale::query()->create([
+            'cliente_id' => $cliente->id,
+            'vendedor_id' => $user->id,
+            'status' => 'faturado',
+            'data_criacao' => now(),
+            'created_by' => $user->id,
+        ]);
+
+        $vale->itens()->create([
+            'bateria_id' => $bateria->id,
+            'quantidade' => 3,
+            'preco_unitario_original' => 450,
+            'preco_unitario_final' => 450,
+            'flag_devolveu_sucata' => true,
+        ]);
+
+        Livewire::test(EstoqueDashboard::class)
+            ->assertSee('Itens com saldo igual ou abaixo de 5.')
+            ->assertSee('Soma dos saldos disponíveis.')
+            ->assertSee('Produtos mais vendidos')
+            ->assertSee('Saídas por período')
+            ->assertSee('INV-004')
+            ->assertSee('Loja 01');
     }
 }
