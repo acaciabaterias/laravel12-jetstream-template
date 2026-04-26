@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
     container_name: erp_core_app
     env_file:
       - path: ./.env.example
@@ -37,6 +38,8 @@ services:
     volumes:
       - .:/var/www/html
       - erp_core_storage:/var/www/html/storage
+      - erp_core_vendor:/var/www/html/vendor
+      - erp_core_public_build:/var/www/html/public/build
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "http://localhost/up"]
       interval: 30s
@@ -47,6 +50,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
     container_name: erp_core_queue
     env_file:
       - path: ./.env.example
@@ -74,12 +78,15 @@ services:
     volumes:
       - .:/var/www/html
       - erp_core_storage:/var/www/html/storage
+      - erp_core_vendor:/var/www/html/vendor
+      - erp_core_public_build:/var/www/html/public/build
     command: ["php", "artisan", "queue:work", "--verbose", "--tries=3", "--timeout=120"]
 
   erp_core_scheduler:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
     container_name: erp_core_scheduler
     env_file:
       - path: ./.env.example
@@ -107,6 +114,8 @@ services:
     volumes:
       - .:/var/www/html
       - erp_core_storage:/var/www/html/storage
+      - erp_core_vendor:/var/www/html/vendor
+      - erp_core_public_build:/var/www/html/public/build
     command: ["sh", "-c", "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
 
   erp_core_db:
@@ -141,6 +150,7 @@ services:
     build:
       context: ./microservicos/ms-001-fiscal-acbr
       dockerfile: Dockerfile
+      network: host
     container_name: ms_001_fiscal_api
     env_file:
       - path: ./microservicos/ms-001-fiscal-acbr/.env.example
@@ -183,6 +193,7 @@ services:
     build:
       context: ./microservicos/ms-002-bancario
       dockerfile: Dockerfile
+      network: host
     container_name: ms_002_banking_api
     env_file:
       - path: ./microservicos/ms-002-bancario/.env.example
@@ -219,6 +230,7 @@ services:
     build:
       context: ./microservicos/ms-003-whatsapp-n8n
       dockerfile: Dockerfile
+      network: host
     container_name: ms_003_notification_api
     env_file:
       - path: ./microservicos/ms-003-whatsapp-n8n/.env.example
@@ -298,6 +310,7 @@ services:
     build:
       context: ./microservicos/ms-004-openfinance
       dockerfile: Dockerfile
+      network: host
     container_name: ms_004_openfinance_api
     env_file:
       - path: ./microservicos/ms-004-openfinance/.env.example
@@ -334,6 +347,7 @@ services:
     build:
       context: ./microservicos/ms-005-geocoding
       dockerfile: Dockerfile
+      network: host
     container_name: ms_005_geocoding_api
     env_file:
       - path: ./microservicos/ms-005-geocoding/.env.example
@@ -369,6 +383,8 @@ services:
 volumes:
   erp_core_db_data:
   erp_core_storage:
+  erp_core_vendor:
+  erp_core_public_build:
   ms_001_fiscal_db_data:
   ms_002_banking_db_data:
   ms_003_notification_db_data:

@@ -19,6 +19,26 @@ class DeploymentReadinessTest extends TestCase
         $this->assertStringContainsString('2025_08_29_233500_create_personal_access_tokens_table.php', $entrypoint);
     }
 
+    public function test_dockerfile_uses_stable_alpine_base_and_retries_package_install(): void
+    {
+        $dockerfile = file_get_contents(base_path('Dockerfile'));
+
+        $this->assertIsString($dockerfile);
+        $this->assertStringContainsString('FROM php:8.3-fpm-alpine3.22', $dockerfile);
+        $this->assertStringContainsString('for attempt in 1 2 3', $dockerfile);
+        $this->assertStringContainsString('apk add --no-cache', $dockerfile);
+        $this->assertStringContainsString('icu-dev', $dockerfile);
+        $this->assertStringContainsString('docker-php-ext-install pdo_pgsql bcmath intl mbstring xml zip pcntl', $dockerfile);
+    }
+
+    public function test_composer_platform_is_pinned_to_production_php_version(): void
+    {
+        $composer = json_decode((string) file_get_contents(base_path('composer.json')), true);
+
+        $this->assertIsArray($composer);
+        $this->assertSame('8.3.30', $composer['config']['platform']['php'] ?? null);
+    }
+
     public function test_microservice_urls_use_canonical_environment_variables_with_legacy_fallbacks(): void
     {
         $services = file_get_contents(base_path('config/services.php'));
@@ -67,6 +87,25 @@ class DeploymentReadinessTest extends TestCase
         $this->assertStringContainsString('path: ./microservicos/ms-001-fiscal-acbr/.env.example', $compose);
         $this->assertStringContainsString('path: ./microservicos/ms-005-geocoding/.env.example', $compose);
         $this->assertStringContainsString('required: false', $compose);
+    }
+
+    public function test_docker_compose_preserves_built_runtime_artifacts_when_mounting_source(): void
+    {
+        $compose = file_get_contents(base_path('docker-compose.yml'));
+
+        $this->assertIsString($compose);
+        $this->assertStringContainsString('erp_core_vendor:/var/www/html/vendor', $compose);
+        $this->assertStringContainsString('erp_core_public_build:/var/www/html/public/build', $compose);
+        $this->assertStringContainsString('erp_core_vendor:', $compose);
+        $this->assertStringContainsString('erp_core_public_build:', $compose);
+    }
+
+    public function test_docker_compose_builds_with_host_network_for_local_package_resolution(): void
+    {
+        $compose = file_get_contents(base_path('docker-compose.yml'));
+
+        $this->assertIsString($compose);
+        $this->assertGreaterThanOrEqual(8, substr_count($compose, 'network: host'));
     }
 
     public function test_super_admin_seeder_rejects_placeholder_passwords_in_production(): void

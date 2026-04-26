@@ -1,7 +1,9 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.3-fpm-alpine3.22
 
-RUN apk add --no-cache \
+RUN for attempt in 1 2 3; do \
+        apk add --no-cache \
     postgresql-dev \
+    icu-dev \
     nginx \
     supervisor \
     nodejs \
@@ -14,9 +16,13 @@ RUN apk add --no-cache \
     autoconf \
     g++ \
     make \
-    linux-headers
+    linux-headers \
+        && break; \
+        if [ "$attempt" = 3 ]; then exit 1; fi; \
+        sleep 5; \
+    done
 
-RUN docker-php-ext-install pdo_pgsql bcmath mbstring xml zip pcntl
+RUN docker-php-ext-install pdo_pgsql bcmath intl mbstring xml zip pcntl
 
 RUN pecl install redis \
     && docker-php-ext-enable redis
