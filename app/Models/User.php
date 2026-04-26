@@ -58,7 +58,6 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-
     /**
      * Get the attributes that should be cast.
      *

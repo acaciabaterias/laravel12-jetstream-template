@@ -9,8 +9,6 @@ class PlanoAssinatura extends Model
 {
     use HasFactory;
 
-    
-
     protected $table = 'planos';
 
     protected $fillable = [

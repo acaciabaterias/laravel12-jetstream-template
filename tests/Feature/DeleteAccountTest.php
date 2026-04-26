@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class DeleteAccountTest extends TestCase
 {
-
     public function test_user_accounts_can_be_deleted(): void
     {
         if (! Features::hasAccountDeletionFeatures()) {

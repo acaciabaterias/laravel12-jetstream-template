@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class FilialIsolationTest extends TestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();

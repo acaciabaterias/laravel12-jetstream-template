@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class DeleteTeamTest extends TestCase
 {
-
     public function test_teams_can_be_deleted(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());

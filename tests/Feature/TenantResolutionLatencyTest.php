@@ -32,12 +32,12 @@ class TenantResolutionLatencyTest extends TestCase
             'database' => 'postgres',
             'username' => 'postgres',
         ]]);
-        
+
         DB::purge('tenant');
-        
+
         // Verifica configuração
         $configHost = config('database.connections.tenant.host');
-        
+
         $end = microtime(true);
         $durationMs = ($end - $start) * 1000;
 

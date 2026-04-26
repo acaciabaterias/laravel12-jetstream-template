@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class LeaveTeamTest extends TestCase
 {
-
     public function test_users_can_leave_teams(): void
     {
         $user = User::factory()->withPersonalTeam()->create();

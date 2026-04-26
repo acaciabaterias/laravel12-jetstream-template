@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\PlanoAssinatura;
+use Illuminate\Database\Seeder;
 
 class PlanoAssinaturaSeeder extends Seeder
 {
@@ -41,7 +41,7 @@ class PlanoAssinaturaSeeder extends Seeder
                 'has_support_priority' => true,
             ],
         ];
-        
+
         foreach ($planos as $plano) {
             PlanoAssinatura::updateOrCreate(['slug' => $plano['slug']], $plano);
         }

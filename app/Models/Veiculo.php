@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Veiculo extends Model
@@ -27,12 +29,12 @@ class Veiculo extends Model
         ];
     }
 
-    public function fabricante()
+    public function fabricante(): BelongsTo
     {
         return $this->belongsTo(Fabricante::class);
     }
 
-    public function baterias()
+    public function baterias(): BelongsToMany
     {
         return $this->belongsToMany(Bateria::class, 'aplicacoes')
             ->withPivot('observacao')

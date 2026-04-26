@@ -5,7 +5,10 @@ services:
       dockerfile: Dockerfile
     container_name: erp_core_app
     env_file:
-      - ./.env
+      - path: ./.env.example
+        required: true
+      - path: ./.env
+        required: false
     environment:
       APP_URL: http://localhost:8000
       DB_CONNECTION: central
@@ -46,7 +49,10 @@ services:
       dockerfile: Dockerfile
     container_name: erp_core_queue
     env_file:
-      - ./.env
+      - path: ./.env.example
+        required: true
+      - path: ./.env
+        required: false
     environment:
       APP_URL: http://erp_core_app
       DB_CONNECTION: central
@@ -76,7 +82,10 @@ services:
       dockerfile: Dockerfile
     container_name: erp_core_scheduler
     env_file:
-      - ./.env
+      - path: ./.env.example
+        required: true
+      - path: ./.env
+        required: false
     environment:
       APP_URL: http://erp_core_app
       DB_CONNECTION: central
@@ -134,7 +143,10 @@ services:
       dockerfile: Dockerfile
     container_name: ms_001_fiscal_api
     env_file:
-      - ./microservicos/ms-001-fiscal-acbr/.env
+      - path: ./microservicos/ms-001-fiscal-acbr/.env.example
+        required: true
+      - path: ./microservicos/ms-001-fiscal-acbr/.env
+        required: false
     ports:
       - "8001:8001"
     depends_on:
@@ -173,7 +185,10 @@ services:
       dockerfile: Dockerfile
     container_name: ms_002_banking_api
     env_file:
-      - ./microservicos/ms-002-bancario/.env
+      - path: ./microservicos/ms-002-bancario/.env.example
+        required: true
+      - path: ./microservicos/ms-002-bancario/.env
+        required: false
     ports:
       - "8002:8002"
     depends_on:
@@ -206,7 +221,10 @@ services:
       dockerfile: Dockerfile
     container_name: ms_003_notification_api
     env_file:
-      - ./microservicos/ms-003-whatsapp-n8n/.env
+      - path: ./microservicos/ms-003-whatsapp-n8n/.env.example
+        required: true
+      - path: ./microservicos/ms-003-whatsapp-n8n/.env
+        required: false
     ports:
       - "8003:8003"
     depends_on:
@@ -282,7 +300,10 @@ services:
       dockerfile: Dockerfile
     container_name: ms_004_openfinance_api
     env_file:
-      - ./microservicos/ms-004-openfinance/.env
+      - path: ./microservicos/ms-004-openfinance/.env.example
+        required: true
+      - path: ./microservicos/ms-004-openfinance/.env
+        required: false
     ports:
       - "8004:8004"
     depends_on:
@@ -315,7 +336,10 @@ services:
       dockerfile: Dockerfile
     container_name: ms_005_geocoding_api
     env_file:
-      - ./microservicos/ms-005-geocoding/.env
+      - path: ./microservicos/ms-005-geocoding/.env.example
+        required: true
+      - path: ./microservicos/ms-005-geocoding/.env
+        required: false
     ports:
       - "8005:8005"
     depends_on:

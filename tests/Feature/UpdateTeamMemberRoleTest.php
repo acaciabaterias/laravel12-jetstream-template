@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class UpdateTeamMemberRoleTest extends TestCase
 {
-
     public function test_team_member_roles_can_be_updated(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());

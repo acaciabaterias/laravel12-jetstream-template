@@ -54,4 +54,21 @@ class CiWorkflowReadinessTest extends TestCase
             $this->assertStringContainsString("permissions:\n  contents: read", $workflow);
         }
     }
+
+    public function test_microservices_are_part_of_the_monorepo_tree(): void
+    {
+        $this->assertDirectoryDoesNotExist(base_path('microservicos/.git'));
+
+        foreach ([
+            'ms-001-fiscal-acbr',
+            'ms-002-bancario',
+            'ms-003-whatsapp-n8n',
+            'ms-004-openfinance',
+            'ms-005-geocoding',
+        ] as $service) {
+            $this->assertFileExists(base_path("microservicos/{$service}/composer.json"));
+            $this->assertFileExists(base_path("microservicos/{$service}/Dockerfile"));
+            $this->assertFileExists(base_path("microservicos/{$service}/routes/api.php"));
+        }
+    }
 }

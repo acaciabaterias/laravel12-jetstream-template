@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class ProfileInformationTest extends TestCase
 {
-
     public function test_current_profile_information_is_available(): void
     {
         $this->actingAs($user = User::factory()->create());

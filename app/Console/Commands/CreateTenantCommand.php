@@ -29,7 +29,7 @@ class CreateTenantCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $subdomain = $this->argument('subdomain');
         $this->info("Iniciando provisionamento para o tenant: {$subdomain}");
@@ -44,23 +44,21 @@ class CreateTenantCommand extends Command
 
         $this->info("Cliente localizado: {$cliente->razao_social}");
 
-        $token = env('SUPABASE_ACCESS_TOKEN');
-        $orgId = env('SUPABASE_ORG_ID');
+        $token = config('services.supabase.access_token');
+        $orgId = config('services.supabase.org_id');
 
-        // Se tivermos as credenciais do Supabase, criamos o projeto real
         if ($token && $orgId) {
             $this->info('Provisionando novo projeto físico no Supabase...');
 
             $dbPass = Str::password(16, true, true, false, false);
 
-            // 1. Criar Projeto no Supabase
             $response = Http::withToken($token)
                 ->post('https://api.supabase.com/v1/projects', [
                     'org_id' => $orgId,
                     'name' => 'bx-'.$cliente->subdominio,
                     'db_pass' => $dbPass,
-                    'region' => env('SUPABASE_REGION', 'sa-east-1'),
-                    'plan' => 'free', // Em produção dinâmico dependendo do plano do cliente
+                    'region' => config('services.supabase.region', 'sa-east-1'),
+                    'plan' => config('services.supabase.project_plan', 'free'),
                 ]);
 
             if ($response->failed()) {
@@ -71,9 +69,7 @@ class CreateTenantCommand extends Command
 
             $projectData = $response->json();
 
-            // 2. Salvar metadados no cliente
             $cliente->supabase_db_host = 'db.'.$projectData['id'].'.supabase.co';
-            // Nota: Numa aplicação real, criptografar e proteger bem esta senha
             $cliente->supabase_db_password = $dbPass;
             $cliente->save();
 
@@ -87,13 +83,12 @@ class CreateTenantCommand extends Command
         } else {
             $this->warn('Credenciais do Supabase não encontradas. Simulando provisionamento com banco local de testes (SQLite).');
 
-            // Fallback para testes/local
             $dbPath = database_path("tenant_{$cliente->subdominio}.sqlite");
             if (! file_exists($dbPath)) {
                 touch($dbPath);
             }
 
-            $cliente->supabase_db_host = $dbPath; // Para testes, vamos usar o host como o path
+            $cliente->supabase_db_host = $dbPath;
             $cliente->save();
 
             $dbName = 'sqlite';
@@ -102,7 +97,6 @@ class CreateTenantCommand extends Command
             $dbPassToUse = '';
         }
 
-        // 3. Rodar migrações do Tenant
         $this->info('Executando migrações do Tenant...');
 
         $env = app()->environment();
@@ -112,13 +106,13 @@ class CreateTenantCommand extends Command
                 'driver' => 'sqlite',
                 'database' => $cliente->supabase_db_host,
                 'prefix' => '',
-                'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+                'foreign_key_constraints' => config('database.connections.sqlite.foreign_key_constraints', true),
             ]);
         } else {
             Config::set('database.connections.tenant', [
                 'driver' => 'pgsql',
                 'host' => $dbHost,
-                'port' => 5432,
+                'port' => config('database.connections.tenant.port', 5432),
                 'database' => $dbName,
                 'username' => $dbUser,
                 'password' => $dbPassToUse,

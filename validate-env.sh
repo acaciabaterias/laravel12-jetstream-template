@@ -106,10 +106,15 @@ if [ "${APP_ENV:-}" = "production" ]; then
         echo "[PASS] SESSION_ENCRYPT production"
     fi
 
-    if [ "${CORS_ALLOWED_ORIGINS:-}" = "*" ]; then
+    case "${CORS_ALLOWED_ORIGINS:-}" in
+        ""|"*")
         echo "[FAIL] CORS_ALLOWED_ORIGINS nao deve ser * em producao."
         status=1
-    fi
+            ;;
+        *)
+            echo "[PASS] CORS_ALLOWED_ORIGINS production"
+            ;;
+    esac
 fi
 
 exit "$status"

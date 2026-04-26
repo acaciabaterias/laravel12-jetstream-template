@@ -13,7 +13,7 @@ class TenantMigrateAllCommand extends Command
 
     protected $description = 'Executa as migrações em todos os bancos de dados dos tenants';
 
-    public function handle()
+    public function handle(): int
     {
         $clientes = Cliente::whereIn('status', ['trial', 'active'])->get();
 
@@ -30,13 +30,12 @@ class TenantMigrateAllCommand extends Command
             $this->info("Migrando Tenant: {$cliente->subdominio} ({$cliente->razao_social})");
 
             try {
-                // Configura a conexão temporária
                 config(['database.connections.tenant' => [
                     'driver' => 'pgsql',
                     'host' => $cliente->supabase_db_host,
-                    'port' => env('DB_TENANT_PORT', '6543'),
-                    'database' => 'postgres',
-                    'username' => 'postgres',
+                    'port' => config('database.connections.tenant.port', '6543'),
+                    'database' => config('database.connections.tenant.database', 'postgres'),
+                    'username' => config('database.connections.tenant.username', 'postgres'),
                     'password' => $cliente->supabase_db_password,
                     'charset' => 'utf8',
                     'prefix' => '',

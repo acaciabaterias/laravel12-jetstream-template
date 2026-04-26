@@ -57,6 +57,13 @@ return [
         'url' => env('MS_GEOCODING_URL', env('MS005_BASE_URL', 'http://localhost:8005')),
     ],
 
+    'supabase' => [
+        'access_token' => env('SUPABASE_ACCESS_TOKEN'),
+        'org_id' => env('SUPABASE_ORG_ID'),
+        'region' => env('SUPABASE_REGION', 'sa-east-1'),
+        'project_plan' => env('SUPABASE_PROJECT_PLAN', 'free'),
+    ],
+
     'suporte' => [
         'whatsapp' => env('SUPPORT_WHATSAPP_NUMBER'),
         'compras_email' => env('COMPRAS_NOTIFICATION_TARGET', env('MAIL_FROM_ADDRESS', 'compras@example.com')),

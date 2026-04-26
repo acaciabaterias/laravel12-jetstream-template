@@ -17,6 +17,11 @@ TENANT_DB_PASSWORD="${TENANT_DB_PASSWORD:-}"
 
 mkdir -p "$BACKUP_DIR"
 
+if [[ -z "$DB_PASSWORD" ]]; then
+    echo "[FAIL] DB_CENTRAL_PASSWORD ou PGPASSWORD deve estar configurado para backup." >&2
+    exit 1
+fi
+
 if ! command -v pg_dump >/dev/null 2>&1; then
     echo "[FAIL] pg_dump nao encontrado." >&2
     exit 1
@@ -34,6 +39,11 @@ pg_dump \
 echo "[PASS] Backup central gerado em $BACKUP_DIR/central_${DB_NAME}_${TIMESTAMP}.dump"
 
 if [[ -n "$TENANT_DB_HOST" && -n "$TENANT_DB_NAME" ]]; then
+    if [[ -z "$TENANT_DB_PASSWORD" ]]; then
+        echo "[FAIL] TENANT_DB_PASSWORD deve estar configurado para backup de tenant." >&2
+        exit 1
+    fi
+
     export PGPASSWORD="$TENANT_DB_PASSWORD"
     pg_dump \
         --host="$TENANT_DB_HOST" \

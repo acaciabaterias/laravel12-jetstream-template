@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class WhiteLabelConfigTest extends TestCase
 {
-
     /**
      * Test if white label branding is correctly resolved from the database.
      * Note: Models now use the default connection refreshed by RefreshDatabase trait.
@@ -18,7 +17,7 @@ class WhiteLabelConfigTest extends TestCase
         // Setup base client (central)
         $cliente = Cliente::factory()->create([
             'subdominio' => 'tenant-brand',
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         // Create branding config (tenant/default connection)
@@ -28,7 +27,7 @@ class WhiteLabelConfigTest extends TestCase
         ]);
 
         $user = \App\Models\User::factory()->create();
-        
+
         $bladeSnippet = <<<BLADE
         @php
             \$whiteLabel = \App\Models\WhiteLabelConfig::first();
@@ -41,7 +40,7 @@ class WhiteLabelConfigTest extends TestCase
 BLADE;
 
         $bladeView = \Illuminate\Support\Facades\Blade::render($bladeSnippet);
-        
+
         $this->assertStringContainsString('--primary-color: #ff0000', $bladeView);
     }
 }

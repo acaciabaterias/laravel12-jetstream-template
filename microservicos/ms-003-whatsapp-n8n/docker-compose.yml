@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Base de dados para o microserviço e n8n
+  ms_whatsapp_db:
+    image: postgres:15
+    container_name: ms_whatsapp_db
+    environment:
+      POSTGRES_DB: ms_whatsapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - ms_whatsapp_db_data:/var/lib/postgresql/data
+
+  # Redis para Filas e Caching
+  ms_whatsapp_redis:
+    image: redis:alpine
+    container_name: ms_whatsapp_redis
+    ports:
+      - "6380:6379"
+
+  # n8n - Orquestrador Low-Code
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: ms_whatsapp_n8n
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=ms_whatsapp
+      - DB_POSTGRESDB_HOST=ms_whatsapp_db
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_PASSWORD=postgres
+      - N8N_EMAIL_MODE=smtp
+    ports:
+      - "5678:5678"
+    depends_on:
+      - ms_whatsapp_db
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  # Evolution API - Interface WhatsApp REST
+  evolution_api:
+    image: atendarevolution/evolution-api:latest
+    container_name: ms_whatsapp_evolution
+    environment:
+      - SERVER_TYPE=http
+      - SERVER_PORT=8080
+      - DATABASE_ENABLED=true
+      - DATABASE_CONNECTION_URI=postgres://postgres:postgres@ms_whatsapp_db:5432/ms_whatsapp
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://ms_whatsapp_redis:6379
+      - AUTHENTICATION_TYPE=apikey
+      - AUTHENTICATION_API_KEY=BateriaExpertSecretKey
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ms_whatsapp_db
+      - ms_whatsapp_redis
+
+volumes:
+  ms_whatsapp_db_data:
+  n8n_data:

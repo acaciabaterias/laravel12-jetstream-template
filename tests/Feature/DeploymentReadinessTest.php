@@ -57,6 +57,18 @@ class DeploymentReadinessTest extends TestCase
         $this->assertStringContainsString('${ERP_CORE_HTTP_PORT:-8000}:80', $compose);
     }
 
+    public function test_docker_compose_uses_versioned_env_examples_with_optional_local_overrides(): void
+    {
+        $compose = file_get_contents(base_path('docker-compose.yml'));
+
+        $this->assertIsString($compose);
+        $this->assertStringContainsString('path: ./.env.example', $compose);
+        $this->assertStringContainsString('path: ./.env', $compose);
+        $this->assertStringContainsString('path: ./microservicos/ms-001-fiscal-acbr/.env.example', $compose);
+        $this->assertStringContainsString('path: ./microservicos/ms-005-geocoding/.env.example', $compose);
+        $this->assertStringContainsString('required: false', $compose);
+    }
+
     public function test_super_admin_seeder_rejects_placeholder_passwords_in_production(): void
     {
         $seeder = file_get_contents(base_path('database/seeders/SuperAdminSeeder.php'));
@@ -104,6 +116,37 @@ class DeploymentReadinessTest extends TestCase
         $this->assertStringContainsString('CORS_ALLOWED_ORIGINS nao deve ser *', $process->getOutput());
     }
 
+    public function test_validate_env_rejects_missing_production_cors_origins(): void
+    {
+        $process = new Process(['./validate-env.sh'], base_path(), [
+            'APP_NAME' => 'BateriaExpert',
+            'APP_ENV' => 'production',
+            'APP_KEY' => 'base64:'.str_repeat('A', 44),
+            'APP_DEBUG' => 'false',
+            'APP_URL' => 'https://erp.example.com',
+            'DB_CONNECTION' => 'central',
+            'DB_CENTRAL_DRIVER' => 'pgsql',
+            'DB_CENTRAL_HOST' => 'postgres',
+            'DB_CENTRAL_PORT' => '5432',
+            'DB_CENTRAL_DATABASE' => 'erp_central',
+            'DB_CENTRAL_USERNAME' => 'erp',
+            'DB_CENTRAL_PASSWORD' => 'secret',
+            'REDIS_HOST' => 'redis',
+            'REDIS_PORT' => '6379',
+            'CACHE_STORE' => 'redis',
+            'SESSION_DRIVER' => 'database',
+            'SESSION_ENCRYPT' => 'true',
+            'SESSION_SECURE_COOKIE' => 'true',
+            'QUEUE_CONNECTION' => 'redis',
+            'SUPER_ADMIN_PASSWORD' => 'Senha-Forte-Para-Producao-2026',
+        ]);
+
+        $process->run();
+
+        $this->assertNotSame(0, $process->getExitCode());
+        $this->assertStringContainsString('CORS_ALLOWED_ORIGINS nao deve ser *', $process->getOutput());
+    }
+
     public function test_validate_env_accepts_hardened_production_values(): void
     {
         $process = new Process(['./validate-env.sh'], base_path(), [
@@ -134,5 +177,34 @@ class DeploymentReadinessTest extends TestCase
 
         $this->assertSame(0, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
         $this->assertStringContainsString('Validando guardrails de producao', $process->getOutput());
+    }
+
+    public function test_backup_and_restore_fail_fast_without_database_password(): void
+    {
+        $backup = new Process(['./backup.sh'], base_path(), [
+            'PATH' => getenv('PATH'),
+            'DB_CENTRAL_PASSWORD' => '',
+            'PGPASSWORD' => '',
+        ]);
+
+        $backup->run();
+
+        $this->assertNotSame(0, $backup->getExitCode());
+        $this->assertStringContainsString('DB_CENTRAL_PASSWORD ou PGPASSWORD deve estar configurado para backup', $backup->getErrorOutput());
+
+        $dump = tempnam(sys_get_temp_dir(), 'restore-test-');
+        $this->assertIsString($dump);
+
+        $restore = new Process(['./restore.sh', $dump], base_path(), [
+            'PATH' => getenv('PATH'),
+            'DB_CENTRAL_PASSWORD' => '',
+            'PGPASSWORD' => '',
+        ]);
+
+        $restore->run();
+        @unlink($dump);
+
+        $this->assertNotSame(0, $restore->getExitCode());
+        $this->assertStringContainsString('DB_CENTRAL_PASSWORD ou PGPASSWORD deve estar configurado para restore', $restore->getErrorOutput());
     }
 }

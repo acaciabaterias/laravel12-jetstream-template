@@ -14,13 +14,18 @@ DB_PORT="${DB_CENTRAL_PORT:-5432}"
 DB_USER="${DB_CENTRAL_USERNAME:-gil}"
 DB_PASSWORD="${DB_CENTRAL_PASSWORD:-${PGPASSWORD:-}}"
 
-if ! command -v pg_restore >/dev/null 2>&1; then
-    echo "[FAIL] pg_restore nao encontrado." >&2
+if [[ -z "$DB_PASSWORD" ]]; then
+    echo "[FAIL] DB_CENTRAL_PASSWORD ou PGPASSWORD deve estar configurado para restore." >&2
     exit 1
 fi
 
 if [[ ! -f "$DUMP_FILE" ]]; then
     echo "[FAIL] Arquivo de dump nao encontrado: $DUMP_FILE" >&2
+    exit 1
+fi
+
+if ! command -v pg_restore >/dev/null 2>&1; then
+    echo "[FAIL] pg_restore nao encontrado." >&2
     exit 1
 fi
 

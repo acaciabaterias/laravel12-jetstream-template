@@ -12,7 +12,6 @@ use Tests\TestCase;
 
 class InviteTeamMemberTest extends TestCase
 {
-
     public function test_team_members_can_be_invited_to_team(): void
     {
         if (! Features::sendsTeamInvitations()) {

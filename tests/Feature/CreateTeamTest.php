@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class CreateTeamTest extends TestCase
 {
-
     public function test_teams_can_be_created(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
