@@ -411,7 +411,7 @@ services:
     image: grafana/k6:latest
     container_name: k6_load_test
     environment:
-      - BASE_URL=http://erp_core_app:80
+      - BASE_URL=http://192.168.1.130:8500
       - INTERNAL_KEY=your-very-long-secret-key-here-1234567890abcdef
     volumes:
       - ./k6:/scripts

@@ -41,7 +41,11 @@ COPY . .
 
 RUN composer install --no-interaction --optimize-autoloader --no-dev \
     && npm install \
-    && npm run build
+    && npm run build \
+    && php artisan config:clear \
+    && php artisan route:clear \
+    && php artisan view:clear \
+    && rm -f bootstrap/cache/*.php
 
 RUN chmod +x /usr/local/bin/entrypoint \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

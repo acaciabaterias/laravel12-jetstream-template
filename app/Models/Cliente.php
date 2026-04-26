@@ -44,4 +44,13 @@ class Cliente extends Model
             && $this->trial_ends_at
             && $this->trial_ends_at->isFuture();
     }
+
+    public function getRateLimitPerMinute(): int
+    {
+        return match ($this->plano) {
+            'pro' => 600,
+            'enterprise' => 6000,
+            default => 60, // free
+        };
+    }
 }

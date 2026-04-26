@@ -1,5 +1,7 @@
 <?php
 
+use App\Jobs\AtualizarIndiceRetornoJob;
+use App\Jobs\SincronizarEstoqueComSucataJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -27,10 +29,15 @@ Schedule::command('tenant:backup --all')
     ->withoutOverlapping()
     ->runInBackground();
 
-Schedule::job(new \App\Jobs\AtualizarIndiceRetornoJob)
+Schedule::job(new AtualizarIndiceRetornoJob)
     ->dailyAt('01:30')
     ->withoutOverlapping();
 
-Schedule::job(new \App\Jobs\SincronizarEstoqueComSucataJob)
+Schedule::job(new SincronizarEstoqueComSucataJob)
     ->everyThirtyMinutes()
     ->withoutOverlapping();
+
+Schedule::command('audit:cleanup --days=90')
+    ->weeklyOn(0, '04:00') // Domingos às 04:00
+    ->withoutOverlapping()
+    ->onOneServer();

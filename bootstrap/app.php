@@ -1,5 +1,17 @@
 <?php
 
+use App\Http\Middleware\AuditAccess;
+use App\Http\Middleware\AuditMiddleware;
+use App\Http\Middleware\CorsMiddleware;
+use App\Http\Middleware\FilialIsolation;
+use App\Http\Middleware\InternalServiceAuthentication;
+use App\Http\Middleware\MaintenanceModeMiddleware;
+use App\Http\Middleware\PrometheusMetrics;
+use App\Http\Middleware\RateLimitByRoleMiddleware;
+use App\Http\Middleware\RateLimitByTenant;
+use App\Http\Middleware\SecurityHeadersMiddleware;
+use App\Http\Middleware\TenantConnectionMiddleware;
+use App\Http\Middleware\VerifyHmacSignature;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -32,23 +44,28 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'tenant' => \App\Http\Middleware\TenantConnectionMiddleware::class,
-            'filial.isolation' => \App\Http\Middleware\FilialIsolation::class,
-            'cors.custom' => \App\Http\Middleware\CorsMiddleware::class,
-            'security.headers' => \App\Http\Middleware\SecurityHeadersMiddleware::class,
-            'rate.role' => \App\Http\Middleware\RateLimitByRoleMiddleware::class,
-            'audit.requests' => \App\Http\Middleware\AuditMiddleware::class,
-            'maintenance.allowlist' => \App\Http\Middleware\MaintenanceModeMiddleware::class,
-            'internal.auth' => \App\Http\Middleware\InternalServiceAuthentication::class,
+            'tenant' => TenantConnectionMiddleware::class,
+            'filial.isolation' => FilialIsolation::class,
+            'cors.custom' => CorsMiddleware::class,
+            'security.headers' => SecurityHeadersMiddleware::class,
+            'rate.role' => RateLimitByRoleMiddleware::class,
+            'audit.requests' => AuditMiddleware::class,
+            'maintenance.allowlist' => MaintenanceModeMiddleware::class,
+            'internal.auth' => InternalServiceAuthentication::class,
+            'rate_limit.tenant' => RateLimitByTenant::class,
+            'internal.hmac' => VerifyHmacSignature::class,
+            'audit' => AuditAccess::class,
         ]);
 
         $middleware->web(append: [
-            \App\Http\Middleware\TenantConnectionMiddleware::class,
-            \App\Http\Middleware\PrometheusMetrics::class,
+            TenantConnectionMiddleware::class,
+            PrometheusMetrics::class,
         ]);
 
         $middleware->api(append: [
-            \App\Http\Middleware\PrometheusMetrics::class,
+            TenantConnectionMiddleware::class,
+            PrometheusMetrics::class,
+            RateLimitByTenant::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

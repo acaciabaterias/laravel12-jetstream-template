@@ -3,10 +3,18 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
+  # Produção: container Docker (nginx + php-fpm)
   - job_name: 'erp_core_app'
     metrics_path: '/api/metrics'
     scheme: 'http'
     static_configs:
       - targets: ['erp_core_app:80']
-    # Usando a INTERNAL_SERVICE_KEY como Bearer Token
+    bearer_token: 'your-very-long-secret-key-here-1234567890abcdef'
+
+  # Desenvolvimento: php artisan serve (VM local)
+  - job_name: 'erp_core_dev'
+    metrics_path: '/api/metrics'
+    scheme: 'http'
+    static_configs:
+      - targets: ['192.168.1.130:8500']
     bearer_token: 'your-very-long-secret-key-here-1234567890abcdef'

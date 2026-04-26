@@ -212,7 +212,11 @@ Formatacao:
 vendor/bin/pint --dirty --format agent
 ```
 
-### Testes de carga com K6
+### Documentação da API (OpenAPI/Swagger)
+
+A documentação interativa da API está disponível em [/api/docs](/api/docs) (requer autenticação).
+
+## Testes de carga com K6
 
 Os cenarios K6 ficam em `tests/k6/`:
 
@@ -253,6 +257,35 @@ k6 run tests/k6/load-test-concurrent-users.js
 ```
 
 Se a aplicacao estiver servindo frontend e backend separadamente, garanta que `php artisan serve` e `npm run dev` ou `composer run dev` estejam ativos antes de rodar os cenarios.
+
+### Rate Limiting Multi-tenant
+
+O sistema aplica limites de requisições baseados no plano do cliente para garantir estabilidade e previsibilidade.
+
+| Plano | Limite (Req/min) |
+| :--- | :--- |
+| **Free** | 60 |
+| **Pro** | 600 |
+| **Enterprise** | 6000 |
+
+#### Cabeçalhos HTTP
+As requisições retornam cabeçalhos informativos:
+- `X-RateLimit-Limit`: Limite total permitido.
+- `X-RateLimit-Remaining`: Requisições restantes na janela atual.
+- `X-RateLimit-Reset`: Timestamp Unix de quando o limite será resetado.
+
+#### Tratamento de Erros
+Quando o limite é excedido, a API retorna `HTTP 429 Too Many Requests`. O cliente deve aguardar o tempo indicado no cabeçalho `Retry-After` (segundos) antes de tentar novamente.
+
+#### Reset Manual
+Administradores podem resetar os limites via Artisan:
+```bash
+# Reset para um tenant específico
+php artisan tenant:ratelimit-reset --tenant=subdominio
+
+# Reset global
+php artisan tenant:ratelimit-reset --all
+```
 
 ## Rodando com Docker
 

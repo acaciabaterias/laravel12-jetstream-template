@@ -17,6 +17,7 @@ use App\Models\PedidoVenda;
 use App\Models\ReservaEstoque;
 use App\Models\TransacaoFinanceira;
 use App\Models\User;
+use App\Models\UsuarioPlataforma;
 use App\Models\Vale;
 use App\Policies\BoletoOrquestradoPolicy;
 use App\Policies\CnabRemessaPolicy;
@@ -36,7 +37,11 @@ use App\Policies\UserPolicy;
 use App\Policies\ValePolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use OpenApi\Attributes as OA;
+use Spatie\Prometheus\Facades\Prometheus;
 
+#[OA\Info(title: 'BateriaExpert ERP API', version: '1.0.0', description: 'API central do ERP BateriaExpert com suporte a multi-tenancy e microserviços.')]
+#[OA\Server(url: '/api', description: 'Servidor de API Principal')]
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -85,25 +90,25 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-platform-dashboard', function ($user) {
-            return $user instanceof \App\Models\UsuarioPlataforma
+            return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'support', 'billing']);
         });
 
         Gate::define('manage-tenants', function ($user) {
-            return $user instanceof \App\Models\UsuarioPlataforma
+            return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->isSuperAdmin();
         });
 
         Gate::define('manage-platform-billing', function ($user) {
-            return $user instanceof \App\Models\UsuarioPlataforma
+            return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'billing']);
         });
 
         Gate::define('manage-platform-support', function ($user) {
-            return $user instanceof \App\Models\UsuarioPlataforma
+            return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'support']);
         });
@@ -163,5 +168,17 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('gerenciar-contingencia', function (User $user) {
             return $user->isSuperAdmin() || $user->hasRole(['dono', 'gestor']);
         });
+
+        // Registro de métricas do Circuit Breaker
+        Prometheus::addCounter('circuit_breaker_events_total')
+            ->label('service')
+            ->label('event');
+
+        Prometheus::addCounter('circuit_breaker_rejected_calls_total')
+            ->label('service');
+
+        Prometheus::addCounter('circuit_breaker_fallback_executions_total')
+            ->label('service')
+            ->label('reason');
     }
 }

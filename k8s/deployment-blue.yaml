@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: erp-multi-tenant-blue
+  namespace: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: erp-multi-tenant
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: erp-multi-tenant
+        version: blue
+    spec:
+      containers:
+      - name: app
+        image: ${AWS_ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/erp-multi-tenant:latest
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: erp-config
+        - secretRef:
+            name: erp-secrets
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10

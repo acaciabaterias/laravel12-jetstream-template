@@ -107,6 +107,7 @@ cd "$PROJECT_DIR"
 
 set +e
 docker compose run --rm \
+  -e BASE_URL="${BASE_URL:-http://192.168.1.130:8500}" \
   -e INTERNAL_KEY="${INTERNAL_SERVICE_KEY:-your-very-long-secret-key-here-1234567890abcdef}" \
   k6 run $K6_EXTRA_ARGS /scripts/load-test.js 2>&1 | tee "$K6_LOG"
 K6_EXIT=${PIPESTATUS[0]}

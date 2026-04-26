@@ -131,5 +131,11 @@
                 </div>
             </section>
         </div>
+
+        <div class="grid gap-8">
+            <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                @livewire('admin.audit-log-widget')
+            </section>
+        </div>
     </div>
 </x-admin-layout>

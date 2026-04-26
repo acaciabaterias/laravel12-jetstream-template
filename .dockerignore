@@ -1,8 +1,11 @@
+vendor/
+bootstrap/cache/*.php
+storage/*.key
+.env
+.phpunit.result.cache
 node_modules/
 .git/
 Dockerfile*
 .dockerignore
 *.log*
-.env*
 coverage/
-vendor/
