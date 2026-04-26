@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      network: host
     container_name: erp_core_app
     env_file:
       - path: ./.env.example
@@ -38,7 +37,7 @@ services:
     volumes:
       - .:/var/www/html
       - erp_core_storage:/var/www/html/storage
-      - erp_core_vendor:/var/www/html/vendor
+      # - erp_core_vendor:/var/www/html/vendor
       - erp_core_public_build:/var/www/html/public/build
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "http://localhost/up"]
@@ -50,7 +49,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      network: host
     container_name: erp_core_queue
     env_file:
       - path: ./.env.example
@@ -78,15 +76,14 @@ services:
     volumes:
       - .:/var/www/html
       - erp_core_storage:/var/www/html/storage
-      - erp_core_vendor:/var/www/html/vendor
+      # - erp_core_vendor:/var/www/html/vendor
       - erp_core_public_build:/var/www/html/public/build
-    command: ["php", "artisan", "queue:work", "--verbose", "--tries=3", "--timeout=120"]
+    command: ["php", "artisan", "queue:work", "--queue=audit,default", "--verbose", "--tries=3", "--timeout=120"]
 
   erp_core_scheduler:
     build:
       context: .
       dockerfile: Dockerfile
-      network: host
     container_name: erp_core_scheduler
     env_file:
       - path: ./.env.example
@@ -114,7 +111,7 @@ services:
     volumes:
       - .:/var/www/html
       - erp_core_storage:/var/www/html/storage
-      - erp_core_vendor:/var/www/html/vendor
+      # - erp_core_vendor:/var/www/html/vendor
       - erp_core_public_build:/var/www/html/public/build
     command: ["sh", "-c", "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
 
