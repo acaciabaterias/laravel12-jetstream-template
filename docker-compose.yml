@@ -407,6 +407,17 @@ services:
     depends_on:
       - prometheus
 
+  k6:
+    image: grafana/k6:latest
+    container_name: k6_load_test
+    environment:
+      - BASE_URL=http://erp_core_app:80
+      - INTERNAL_KEY=your-very-long-secret-key-here-1234567890abcdef
+    volumes:
+      - ./k6:/scripts
+    depends_on:
+      - erp_core_app
+
 volumes:
   erp_core_db_data:
   erp_core_storage:

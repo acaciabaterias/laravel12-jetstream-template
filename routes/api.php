@@ -24,3 +24,7 @@ Route::middleware(['internal.auth'])->get('/metrics', function () {
     $result = $renderer->render($registry->getMetricFamilySamples());
     return response($result, 200)->header('Content-Type', \Prometheus\RenderTextFormat::MIME_TYPE);
 });
+
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok']);
+});
