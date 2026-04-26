@@ -12,9 +12,9 @@
 
 ## Fase 1: Estabilização e Produção (v1.1.0)
 
-- [ ] Subir ambiente com Docker e validar integração ponta a ponta
-- [ ] Configurar Supabase para tenants reais
-- [ ] Implementar autenticação real entre ERP Core e microserviços
+- [x] Subir ambiente com Docker e validar integração ponta a ponta
+- [x] Configurar Supabase para tenants reais
+- [x] Implementar autenticação real entre ERP Core e microserviços
 - [ ] Adicionar monitoramento com Prometheus e Grafana
 - [ ] Executar teste de carga e otimização de queries
 

@@ -64,6 +64,8 @@ return [
         'project_plan' => env('SUPABASE_PROJECT_PLAN', 'free'),
     ],
 
+    'internal_key' => env('INTERNAL_SERVICE_KEY'),
+
     'suporte' => [
         'whatsapp' => env('SUPPORT_WHATSAPP_NUMBER'),
         'compras_email' => env('COMPRAS_NOTIFICATION_TARGET', env('MAIL_FROM_ADDRESS', 'compras@example.com')),

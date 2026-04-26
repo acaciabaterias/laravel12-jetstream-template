@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Prometheus\CollectorRegistry;
 
 class CreateTenantCommand extends Command
 {
@@ -38,6 +39,7 @@ class CreateTenantCommand extends Command
 
         if (! $cliente) {
             $this->error("Cliente não encontrado com o subdomínio: {$subdomain}");
+            $this->recordTenantCreationMetric(false);
 
             return Command::FAILURE;
         }
@@ -49,6 +51,8 @@ class CreateTenantCommand extends Command
 
         if ($token && $orgId) {
             $this->info('Provisionando novo projeto físico no Supabase...');
+            $provider = 'supabase';
+            $startTime = microtime(true);
 
             $dbPass = Str::password(16, true, true, false, false);
 
@@ -63,14 +67,37 @@ class CreateTenantCommand extends Command
 
             if ($response->failed()) {
                 $this->error('Falha ao provisionar projeto no Supabase: '.$response->body());
+                $this->recordTenantCreationMetric(false, $provider, $startTime);
 
                 return Command::FAILURE;
             }
 
             $projectData = $response->json();
+            $projectRef = $projectData['id'];
 
-            $cliente->supabase_db_host = 'db.'.$projectData['id'].'.supabase.co';
+            $cliente->supabase_project_ref = $projectRef;
+            $cliente->supabase_url = "https://{$projectRef}.supabase.co";
+            $cliente->supabase_db_host = "db.{$projectRef}.supabase.co";
             $cliente->supabase_db_password = $dbPass;
+            
+            // Aguardar alguns segundos antes de buscar as chaves para dar tempo do projeto inicializar (Opcional na v1, mas recomendado)
+            $this->info("Buscando chaves de API do projeto {$projectRef}...");
+            $keysResponse = Http::withToken($token)
+                ->get("https://api.supabase.com/v1/projects/{$projectRef}/api-keys");
+
+            if ($keysResponse->successful()) {
+                $keys = $keysResponse->json();
+                foreach ($keys as $key) {
+                    if ($key['name'] === 'anon') {
+                        $cliente->supabase_anon_key = $key['api_key'];
+                    } elseif ($key['name'] === 'service_role') {
+                        $cliente->supabase_service_role_key = $key['api_key'];
+                    }
+                }
+            } else {
+                $this->warn('Não foi possível buscar as chaves de API do Supabase automaticamente.');
+            }
+
             $cliente->save();
 
             $this->info("Projeto Supabase criado com sucesso! Host: {$cliente->supabase_db_host}");
@@ -80,8 +107,11 @@ class CreateTenantCommand extends Command
             $dbHost = $cliente->supabase_db_host;
             $dbPassToUse = $dbPass;
 
+            $this->recordTenantCreationMetric(true, $provider, $startTime);
         } else {
             $this->warn('Credenciais do Supabase não encontradas. Simulando provisionamento com banco local de testes (SQLite).');
+            $provider = 'sqlite';
+            $startTime = microtime(true);
 
             $dbPath = database_path("tenant_{$cliente->subdominio}.sqlite");
             if (! file_exists($dbPath)) {
@@ -95,6 +125,8 @@ class CreateTenantCommand extends Command
             $dbUser = '';
             $dbHost = '';
             $dbPassToUse = '';
+            
+            $this->recordTenantCreationMetric(true, $provider, $startTime);
         }
 
         $this->info('Executando migrações do Tenant...');
@@ -129,6 +161,9 @@ class CreateTenantCommand extends Command
             $this->warn('Fallback SQLite detectado. As migrations canônicas do tenant exigem PostgreSQL e foram simuladas neste provisionamento local.');
         } else {
             try {
+                $this->info('Aguardando 10 segundos antes de tentar rodar as migrations (tempo do Supabase provisionar o banco)...');
+                sleep(10);
+                
                 Artisan::call('migrate', [
                     '--database' => 'tenant',
                     '--path' => 'database/migrations/tenant',
@@ -136,7 +171,8 @@ class CreateTenantCommand extends Command
                 ]);
                 $this->info(Artisan::output());
             } catch (\Exception $e) {
-                $this->error('Erro ao executar migrações: '.$e->getMessage());
+                $this->error('Erro ao executar migrações. O banco do Supabase pode ainda estar inicializando. Execute: php artisan migrate --database=tenant --path=database/migrations/tenant');
+                $this->error('Detalhe do erro: '.$e->getMessage());
 
                 return Command::FAILURE;
             }
@@ -145,5 +181,34 @@ class CreateTenantCommand extends Command
         $this->info('Tenant provisionado com sucesso!');
 
         return Command::SUCCESS;
+    }
+
+    protected function recordTenantCreationMetric(bool $success, string $provider = 'unknown', ?float $startTime = null): void
+    {
+        try {
+            $registry = CollectorRegistry::getDefault();
+            
+            $status = $success ? 'success' : 'failed';
+            $counter = $registry->getOrRegisterCounter(
+                'app',
+                'tenants_created_total',
+                'Total de tenants criados',
+                ['status', 'provider']
+            );
+            $counter->inc([$status, $provider]);
+
+            if ($startTime) {
+                $duration = microtime(true) - $startTime;
+                $histogram = $registry->getOrRegisterHistogram(
+                    'app',
+                    'tenant_creation_duration_seconds',
+                    'Duração da criação do tenant (API ou Local)',
+                    ['provider']
+                );
+                $histogram->observe($duration, [$provider]);
+            }
+        } catch (\Exception $e) {
+            // Ignorar erro do prometheus na CLI
+        }
     }
 }

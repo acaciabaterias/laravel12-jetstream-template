@@ -39,10 +39,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'rate.role' => \App\Http\Middleware\RateLimitByRoleMiddleware::class,
             'audit.requests' => \App\Http\Middleware\AuditMiddleware::class,
             'maintenance.allowlist' => \App\Http\Middleware\MaintenanceModeMiddleware::class,
+            'internal.auth' => \App\Http\Middleware\InternalServiceAuthentication::class,
         ]);
 
         $middleware->web(append: [
             \App\Http\Middleware\TenantConnectionMiddleware::class,
+            \App\Http\Middleware\PrometheusMetrics::class,
+        ]);
+
+        $middleware->api(append: [
+            \App\Http\Middleware\PrometheusMetrics::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

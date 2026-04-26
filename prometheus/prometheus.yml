@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'erp_core_app'
+    metrics_path: '/api/metrics'
+    scheme: 'http'
+    static_configs:
+      - targets: ['erp_core_app:80']
+    # Usando a INTERNAL_SERVICE_KEY como Bearer Token
+    bearer_token: 'your-very-long-secret-key-here-1234567890abcdef'
