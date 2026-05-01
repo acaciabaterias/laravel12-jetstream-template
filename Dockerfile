@@ -32,6 +32,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN mkdir -p /var/www/html
 
 COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
+COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY entrypoint.sh /usr/local/bin/entrypoint
 

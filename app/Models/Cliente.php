@@ -6,9 +6,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use Illuminate\Support\Facades\Cache;
+
 class Cliente extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::updated(function ($cliente) {
+            Cache::forget("tenant:{$cliente->subdominio}");
+        });
+
+        static::deleted(function ($cliente) {
+            Cache::forget("tenant:{$cliente->subdominio}");
+        });
+    }
 
     protected $table = 'clientes';
 

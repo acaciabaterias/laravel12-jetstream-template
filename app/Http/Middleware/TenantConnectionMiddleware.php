@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Cliente;
+use Illuminate\Support\Facades\Cache;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -25,8 +26,10 @@ class TenantConnectionMiddleware
             return $next($request);
         }
 
-        // Busca cliente no banco central
-        $cliente = Cliente::where('subdominio', $subdominio)->first();
+        // Busca cliente no banco central com cache de 1 hora
+        $cliente = Cache::remember("tenant:{$subdominio}", 3600, function () use ($subdominio) {
+            return Cliente::where('subdominio', $subdominio)->first();
+        });
 
         if (! $cliente) {
             abort(404, 'Empresa não encontrada');
