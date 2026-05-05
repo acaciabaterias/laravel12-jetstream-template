@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\AuditLog;
+use App\Jobs\LogAuditJob;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +21,7 @@ class AuditAccess
 
         // Somente loga se for bem-sucedido e houver usuário autenticado
         if ($response->isSuccessful() && Auth::check()) {
-            AuditLog::create([
+            LogAuditJob::dispatch([
                 'user_id' => Auth::id(),
                 'action' => 'access',
                 'table_name' => $label ?? 'route',

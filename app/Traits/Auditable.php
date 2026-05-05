@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\Models\AuditLog;
+use App\Jobs\LogAuditJob;
 use Illuminate\Support\Facades\Auth;
 
 trait Auditable
@@ -36,7 +36,7 @@ trait Auditable
             $newValues = array_diff_key($newValues, array_flip($exclude));
         }
 
-        AuditLog::create([
+        LogAuditJob::dispatch([
             'user_id' => Auth::id(),
             'action' => $action,
             'table_name' => $this->getTable(),
