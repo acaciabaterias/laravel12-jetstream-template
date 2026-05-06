@@ -26,6 +26,8 @@
         <title>{{ $brandTitle }} - BateriaExpert</title>
 
         <link rel="icon" href="{{ $whiteLabel?->favicon_url ?? asset('favicon.ico') }}">
+        <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+        <meta name="theme-color" content="{{ $brandPrimary }}">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -178,5 +180,23 @@
         @if ($whiteLabel?->custom_js)
             <script>{!! $whiteLabel->custom_js !!}</script>
         @endif
+
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js');
+                });
+            }
+
+            if ('indexedDB' in window) {
+                const request = indexedDB.open('bx-logistics-offline', 1);
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains('delivery_events')) {
+                        db.createObjectStore('delivery_events', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+            }
+        </script>
     </body>
 </html>
