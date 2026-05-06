@@ -8,6 +8,7 @@ use App\Models\Veiculo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class MobileSyncController extends Controller
 {
@@ -17,20 +18,33 @@ class MobileSyncController extends Controller
      */
     public function sync(Request $request): JsonResponse
     {
-        $fabricantes = Fabricante::select('id', 'nome')->orderBy('nome')->get();
+        $cacheKey = sprintf(
+            'mobile-sync:%s:%s',
+            config('database.connections.tenant.host', 'default-tenant'),
+            md5((string) $request->header('User-Agent', 'unknown'))
+        );
 
-        $veiculos = Veiculo::with([
-            'baterias' => function (BelongsToMany $query): void {
-                $query->select('baterias.id', 'sku', 'marca', 'tecnologia', 'polo');
-            },
-        ])
-            ->select('id', 'fabricante_id', 'modelo', 'motorizacao', 'ano_inicio', 'ano_fim')
-            ->orderBy('modelo')
-            ->get();
+        $payload = Cache::remember($cacheKey, 300, function (): array {
+            $fabricantes = Fabricante::select('id', 'nome')->orderBy('nome')->get();
+
+            $veiculos = Veiculo::with([
+                'baterias' => function (BelongsToMany $query): void {
+                    $query->select('baterias.id', 'sku', 'marca', 'tecnologia', 'polo');
+                },
+            ])
+                ->select('id', 'fabricante_id', 'modelo', 'motorizacao', 'ano_inicio', 'ano_fim')
+                ->orderBy('modelo')
+                ->get();
+
+            return [
+                'fabricantes' => $fabricantes,
+                'veiculos' => $veiculos,
+            ];
+        });
 
         return response()->json([
-            'fabricantes' => $fabricantes,
-            'veiculos' => $veiculos,
+            'fabricantes' => $payload['fabricantes'],
+            'veiculos' => $payload['veiculos'],
             'timestamp' => now()->toIso8601String(),
         ]);
     }

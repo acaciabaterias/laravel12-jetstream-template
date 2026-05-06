@@ -2,15 +2,30 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\FilialIsolation;
+use App\Http\Middleware\PrometheusMetrics;
+use App\Http\Middleware\TenantConnectionMiddleware;
 use App\Models\Bateria;
 use App\Models\Fabricante;
 use App\Models\User;
 use App\Models\Veiculo;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class MobileSyncApiTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMiddleware([
+            FilialIsolation::class,
+            PrometheusMetrics::class,
+            TenantConnectionMiddleware::class,
+        ]);
+    }
+
     public function test_mobile_sync_returns_offline_catalog_payload(): void
     {
         Sanctum::actingAs(User::factory()->create([
@@ -65,5 +80,14 @@ class MobileSyncApiTest extends TestCase
                 ],
                 'timestamp',
             ]);
+
+        $cacheKey = sprintf(
+            'mobile-sync:%s:%s',
+            config('database.connections.tenant.host', 'default-tenant'),
+            md5('OfflineMobile/1.0')
+        );
+
+        $this->withHeader('User-Agent', 'OfflineMobile/1.0')->getJson('/api/sync/mobile')->assertOk();
+        $this->assertTrue(Cache::has($cacheKey));
     }
 }

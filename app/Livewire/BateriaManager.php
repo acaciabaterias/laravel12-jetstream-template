@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Bateria;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -38,7 +39,7 @@ class BateriaManager extends Component
 
     public $search = '';
 
-    protected $rules = [
+    protected array $rules = [
         'sku' => 'required|string|max:50',
         'marca' => 'required|string|max:100',
         'tecnologia' => 'nullable|string|max:50',
@@ -84,7 +85,7 @@ class BateriaManager extends Component
 
     public function store(): void
     {
-        $this->validate();
+        $this->validate($this->rulesForPersist());
 
         $atributos = null;
         if (! empty($this->atributos_dinamicos)) {
@@ -157,5 +158,18 @@ class BateriaManager extends Component
         return view('livewire.bateria-manager', [
             'baterias' => $query->latest()->paginate(10),
         ]);
+    }
+
+    protected function rulesForPersist(): array
+    {
+        return [
+            ...$this->rules,
+            'sku' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('baterias', 'sku')->ignore($this->bateriaId),
+            ],
+        ];
     }
 }

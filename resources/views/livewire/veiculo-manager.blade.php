@@ -8,6 +8,7 @@
                     <option value="{{ $fab->id }}">{{ $fab->nome }}</option>
                 @endforeach
             </select>
+            <input type="number" wire:model.live.debounce.300ms="anoFilter" placeholder="Ano" class="w-28 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
             <input type="text" wire:model.live.debounce.300ms="search" placeholder="Buscar veículo..." class="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
             <x-button wire:click="create">Novo Veículo</x-button>
         </div>
@@ -143,62 +144,13 @@
                 @endif
 
                 @if($currentTab === 'aplicacoes')
-                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
-                        <h4 class="text-sm font-medium text-gray-700 mb-2">Vincular Nova Bateria</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 relative">
-                            <div class="md:col-span-5 relative">
-                                <x-input type="text" wire:model.live.debounce.300ms="searchBateria" class="w-full text-sm" placeholder="Buscar por SKU ou Marca da Bateria..." />
-                                
-                                <!-- Search Results Dropdown -->
-                                @if(count($bateriasResults) > 0 && !$bateriaSelecionada)
-                                    <div class="absolute z-10 w-full mt-1 bg-white shadow-lg rounded-md border border-gray-200 px-0 py-1">
-                                        @foreach($bateriasResults as $bat)
-                                            <div wire:click="selectBateria({{ $bat->id }})" class="px-4 py-2 hover:bg-indigo-50 cursor-pointer text-sm">
-                                                <span class="font-bold">{{ $bat->sku }}</span> - {{ $bat->marca }} <span class="text-xs text-gray-500">({{ $bat->tecnologia }})</span>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                                @error('bateria_duplicada') <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="md:col-span-5">
-                                <x-input type="text" wire:model="novaObservacao" class="w-full text-sm" placeholder="Observação.. Ex: Apenas Start-Stop" />
-                            </div>
-                            <div class="md:col-span-2">
-                                <x-button type="button" wire:click="addAplicacao" class="w-full justify-center h-full" :disabled="!$bateriaSelecionada">
-                                    Vincular
-                                </x-button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- App List -->
-                    <table class="min-w-full divide-y divide-gray-200 border">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">SKU / Marca</th>
-                                <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tecnologia</th>
-                                <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Observação</th>
-                                <th scope="col" class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse($aplicacoes as $index => $app)
-                                <tr>
-                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-indigo-600">{{ $app['sku'] }} / {{ $app['marca'] }}</td>
-                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{{ $app['tecnologia'] ?: '-' }}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-500">{{ $app['observacao'] ?: '-' }}</td>
-                                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                                        <button type="button" wire:click="removeAplicacao({{ $index }})" class="text-red-500 hover:text-red-700">Remover</button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">Nenhuma bateria vinculada a este veículo.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                    @if($isEditMode && $veiculoId)
+                        <livewire:application-manager :vehicle-id="$veiculoId" :key="'application-manager-'.$veiculoId" />
+                    @else
+                        <p class="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                            Salve o veículo primeiro para gerenciar aplicações na aba dedicada.
+                        </p>
+                    @endif
                 @endif
             </div>
         </x-slot>
@@ -216,4 +168,3 @@
 
     <livewire:aplicacao-cloner />
 </div>
-
