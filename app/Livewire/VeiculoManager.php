@@ -36,6 +36,8 @@ class VeiculoManager extends Component
 
     public $fabricanteFilter = '';
 
+    public $anoFilter = '';
+
     public $currentTab = 'basico'; // basico | aplicacoes
 
     // Applications State
@@ -67,6 +69,11 @@ class VeiculoManager extends Component
     }
 
     public function updatingFabricanteFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingAnoFilter(): void
     {
         $this->resetPage();
     }
@@ -243,6 +250,26 @@ class VeiculoManager extends Component
 
         if (! empty($this->fabricanteFilter)) {
             $query->where('fabricante_id', $this->fabricanteFilter);
+        }
+
+        if (! empty($this->anoFilter) && is_numeric($this->anoFilter)) {
+            $ano = (int) $this->anoFilter;
+            $query->where(function ($yearQuery) use ($ano): void {
+                $yearQuery
+                    ->where(function ($openEnded) use ($ano): void {
+                        $openEnded->whereNotNull('ano_inicio')
+                            ->where('ano_inicio', '<=', $ano)
+                            ->whereNull('ano_fim');
+                    })
+                    ->orWhere(function ($range) use ($ano): void {
+                        $range->whereNotNull('ano_inicio')
+                            ->whereNotNull('ano_fim')
+                            ->where('ano_inicio', '<=', $ano)
+                            ->where('ano_fim', '>=', $ano);
+                    })
+                    ->orWhere('ano_inicio', $ano)
+                    ->orWhere('ano_fim', $ano);
+            });
         }
 
         return view('livewire.veiculo-manager', [
