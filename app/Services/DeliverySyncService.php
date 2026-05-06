@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\ContaSucataMovimentacao;
 use App\Models\GeolocalizacaoEvento;
+use App\Models\ItemVale;
 use App\Models\PontoEntrega;
 use App\Models\RecebimentoMovel;
 use App\Models\SyncEvento;
@@ -10,6 +12,18 @@ use Illuminate\Support\Facades\DB;
 
 class DeliverySyncService
 {
+    /**
+     * Eventos com valor operacional para persistência.
+     *
+     * @var string[]
+     */
+    protected array $relevantGeoEventTypes = [
+        'checkin',
+        'checkout',
+        'entrega_realizada',
+        'ocorrencia',
+    ];
+
     public function sync(array $payload): SyncEvento
     {
         return DB::transaction(function () use ($payload): SyncEvento {
@@ -47,6 +61,15 @@ class DeliverySyncService
             }
 
             if ($payload['entidade_tipo'] === GeolocalizacaoEvento::class) {
+                if (! in_array((string) ($payload['tipo_evento'] ?? ''), $this->relevantGeoEventTypes, true)) {
+                    $syncEvento->update([
+                        'status' => 'processado',
+                        'processed_at' => now(),
+                    ]);
+
+                    return $syncEvento->fresh();
+                }
+
                 GeolocalizacaoEvento::query()->firstOrCreate(
                     [
                         'rota_entrega_id' => $payload['rota_entrega_id'] ?? null,
@@ -62,11 +85,32 @@ class DeliverySyncService
             }
 
             if ($payload['entidade_tipo'] === PontoEntrega::class && isset($payload['peso_sucata_coletado'])) {
-                PontoEntrega::query()->findOrFail($payload['entidade_id'])->update([
+                $ponto = PontoEntrega::query()->with('vale')->findOrFail($payload['entidade_id']);
+
+                $ponto->update([
                     'peso_sucata_coletado' => $payload['peso_sucata_coletado'],
                     'status' => $payload['status'] ?? 'em_andamento',
                     'observacao' => $payload['observacao'] ?? null,
                 ]);
+
+                $pesoColetadoKg = round((float) $payload['peso_sucata_coletado'], 2);
+                $valorUnitario = $this->resolveSucataUnitValue($ponto->vale_id);
+                $valorMovimentado = round($pesoColetadoKg * $valorUnitario, 2);
+                $saldoAnterior = (float) (ContaSucataMovimentacao::query()->latest('id')->value('saldo_resultante') ?? 0.0);
+
+                ContaSucataMovimentacao::query()->updateOrCreate(
+                    [
+                        'entidade_tipo' => PontoEntrega::class,
+                        'entidade_id' => $ponto->id,
+                        'origem' => 'logistica_sucata',
+                    ],
+                    [
+                        'tipo_movimento' => 'credito',
+                        'quantidade_kg' => $pesoColetadoKg,
+                        'valor_unitario' => $valorUnitario,
+                        'saldo_resultante' => round($saldoAnterior + $valorMovimentado, 2),
+                    ],
+                );
             }
 
             $syncEvento->update([
@@ -76,5 +120,28 @@ class DeliverySyncService
 
             return $syncEvento->fresh();
         });
+    }
+
+    protected function resolveSucataUnitValue(?int $valeId): float
+    {
+        if (! $valeId) {
+            return 0.0;
+        }
+
+        $itens = ItemVale::query()
+            ->with('bateria')
+            ->where('vale_id', $valeId)
+            ->get();
+
+        if ($itens->isEmpty()) {
+            return 0.0;
+        }
+
+        $weightedValue = $itens->sum(function (ItemVale $item): float {
+            return (float) ($item->bateria?->valor_base_sucata_kg ?? 0) * (int) $item->quantidade;
+        });
+        $totalQuantity = max(1, (int) $itens->sum('quantidade'));
+
+        return round($weightedValue / $totalQuantity, 2);
     }
 }
