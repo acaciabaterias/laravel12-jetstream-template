@@ -9,12 +9,18 @@ Este arquivo foi consolidado a partir do historico recente de commits e segue o 
 ### Added
 
 - documentacao expandida de arquitetura, microservicos, API, deploy, troubleshooting, performance e templates de colaboracao
+- especificacao inicial do modulo `010` para backbone de integracao e observabilidade
+
+### Changed
+
+- roadmap consolidado para refletir a conclusao real dos modulos `001` a `009`
+- baseline de testes atualizado para `264` testes passando (`1313` assertions)
+- endurecimento de middlewares e comandos para tolerar ambientes sem extensao Redis durante validacao automatizada
 
 ### Planned
 
-- validacao completa do stack Docker em ambiente integrado
-- endurecimento final de producao para ERP Core e microservicos
-- ajustes operacionais para rollout inicial
+- planejamento detalhado e implementacao do backbone de integracao assíncrona
+- consolidacao de observabilidade ponta a ponta entre ERP e microservicos
 
 ## [0.9.0] - 2026-04-23
 

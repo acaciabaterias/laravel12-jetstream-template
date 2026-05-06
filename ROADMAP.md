@@ -1,22 +1,30 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v1.0.0 - pronto para lançamento)
+## Status Atual (v1.0.0 - pronto para lançamento assistido)
 
 ✅ 9 módulos core implementados (`001` a `009`)
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ 136 testes passando (`345 assertions`)
+✅ suíte principal estabilizada com `264` testes passando e `1313` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
 ✅ Seeders de demonstração
+
+## Próximo eixo confirmado (v1.1.0)
+
+- [ ] Módulo `010` de backbone de integração e observabilidade
+- [ ] Contratos de eventos versionados entre ERP e microserviços
+- [ ] Outbox/inbox, replay e dead-letter operacional
+- [ ] API Gateway para chamadas síncronas controladas
+- [ ] Dashboards e métricas ponta a ponta para integrações críticas
 
 ## Fase 1: Estabilização e Produção (v1.1.0)
 
 - [x] Subir ambiente com Docker e validar integração ponta a ponta
 - [x] Configurar Supabase para tenants reais
 - [x] Implementar autenticação real entre ERP Core e microserviços
-- [ ] Adicionar monitoramento com Prometheus e Grafana
-- [ ] Executar teste de carga e otimização de queries
+- [ ] Consolidar monitoramento com Prometheus e Grafana no backbone `010`
+- [ ] Executar teste de carga e otimização de queries nas integrações críticas
 
 ## Fase 2: Expansão Comercial (v1.2.0)
 

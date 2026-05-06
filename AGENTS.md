@@ -268,3 +268,9 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 ## Recent Changes
 - 001-multi-filial-tenant: Added PHP 8.3 / Laravel 12 + `livewire/livewire`, `laravel/jetstream`, `laravel/fortify`, `supabase/postgrest-php` (CLI tools)
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan:
+`specs/010-integration-backbone/plan.md`
+<!-- SPECKIT END -->

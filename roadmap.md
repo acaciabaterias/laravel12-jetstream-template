@@ -1,26 +1,37 @@
 # Roadmap de Implementação - ERP Baterias
 
-## Sprint 1: Fundação e Estrutura (Semanas 1-2)
-- [ ] Implementação do Core Multi-filial.
-- [ ] Sistema de Autenticação e Perfis (RBAC).
-- [ ] Cadastro de Produtos com Atributos Dinâmicos e Tabela de Peso (Sucata).
+## Status consolidado
 
-## Sprint 2: Operação de Inventário e Vendas (Semanas 3-4)
-- [ ] Módulo de Estoque (Novo/Usado/Sucata) e Kardex.
-- [ ] Módulo de Vales (Pedidos) com Reserva Imediata.
-- [ ] Lógica de Cálculo Net Price (Preço Dinâmico com Sucata).
+- [x] `001` Multi-Tenancy isolado
+- [x] `002` Usuários e perfis / RBAC
+- [x] `003` Cadastros estruturais
+- [x] `004` Estoque e logística reversa
+- [x] `005` Vendas, vales e OS
+- [x] `006` Logística e app do entregador
+- [x] `007` Garantias e feedback
+- [x] `008` Financeiro inteligente
+- [x] `009` Orquestração fiscal e bancária
 
-## Sprint 3: Logística e Assistência (Semanas 5-6)
-- [ ] App do Entregador (Rastreio e Ajuste de Sucata na Entrega).
-- [ ] Fluxo Base de Ordem de Serviço (Garantia).
-- [ ] Módulo de Empréstimo de Ativos (Baterias de Reserva).
+## Lacuna transversal identificada
 
-## Sprint 4: Inteligência e Comunicação (Semanas 7-8)
-- [ ] Notificações WhatsApp (Status de O.S.).
-- [ ] Painel de Qualidade (Índice de Retorno por Marca/Produto).
-- [ ] Relatórios de Desempenho de Vendas.
+- [ ] `010` Backbone de integração e observabilidade
 
-## Sprint 5: Compliance e Tesouraria (Semanas 9-10)
-- [ ] Módulo Fiscal (NFC-e / NF-e).
-- [ ] Módulo Financeiro (Margem Real e Fluxo de Caixa).
-- [ ] Conciliação Bancária Automática via API.
+Este bloco passa a concentrar o que ficou fora dos módulos funcionais `001-009`:
+
+- contratos canônicos de eventos entre ERP e microserviços
+- publicação e consumo confiável via broker com rastreabilidade
+- outbox/inbox, retries, replay e dead-letter operacional
+- API Gateway para integrações síncronas controladas
+- métricas, dashboards e trilha operacional ponta a ponta
+
+## Próxima sequência sugerida
+
+### Fase 1: Backbone de integração
+- [ ] Especificar `010-integration-backbone`
+- [ ] Planejar contratos de eventos, gateway e observabilidade
+- [ ] Gerar tarefas e executar a implementação incremental
+
+### Fase 2: Produção assistida
+- [ ] Validar monitoramento Prometheus/Grafana com cenários reais
+- [ ] Executar testes de carga nas integrações críticas
+- [ ] Formalizar runbooks de replay, contingência e recuperação
