@@ -79,7 +79,7 @@ class ResetTenantRateLimit extends Command
             $count = count($keys);
             $target = $subdominio ? "tenant '{$subdominio}'" : 'todos os tenants';
             $this->info("Sucesso: {$count} chaves de rate limit resetadas para {$target}.");
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->error('Erro ao acessar Redis: '.$e->getMessage());
         }
     }

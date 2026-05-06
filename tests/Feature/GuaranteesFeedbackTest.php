@@ -2,21 +2,40 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\PrometheusMetrics;
+use App\Http\Middleware\TenantConnectionMiddleware;
 use App\Jobs\SendGuaranteeWhatsAppNotificationJob;
+use App\Livewire\GarantiaBoard;
 use App\Livewire\GarantiaForm;
 use App\Livewire\GarantiaLaudoForm;
 use App\Models\Bateria;
 use App\Models\BateriaEmprestimo;
 use App\Models\Cliente;
+use App\Models\Filial;
 use App\Models\NotificacaoWhatsApp;
 use App\Models\OrdemServicoGarantia;
 use App\Models\User;
 use App\Models\Vale;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class GuaranteesFeedbackTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(PrometheusMetrics::class);
+
+        Route::middleware('web')->get('/guarantees/tenant-probe', function (Request $request) {
+            return response()->json([
+                'tenant_host' => config('database.connections.tenant.host'),
+                'cliente_id' => optional($request->attributes->get('cliente'))->id,
+            ]);
+        });
+    }
+
     public function test_opening_guarantee_with_loan_battery_generates_term_reference(): void
     {
         $tecnico = User::factory()->withPersonalTeam()->create(['papel' => 'tecnico', 'ativo' => true]);
@@ -151,7 +170,7 @@ class GuaranteesFeedbackTest extends TestCase
 
     public function test_dashboard_renders_guarantee_components_for_technical_roles(): void
     {
-        $filial = \App\Models\Filial::factory()->create();
+        $filial = Filial::factory()->create();
         $tecnico = User::factory()->withPersonalTeam()->create([
             'papel' => 'tecnico',
             'ativo' => true,
@@ -159,7 +178,9 @@ class GuaranteesFeedbackTest extends TestCase
         ]);
         $this->actingAs($tecnico);
 
-        $response = $this->get(route('dashboard'));
+        $this->withoutMiddleware(TenantConnectionMiddleware::class);
+
+        $response = $this->get('/dashboard');
 
         $response->assertOk()
             ->assertSeeLivewire('garantia-board')
@@ -169,7 +190,7 @@ class GuaranteesFeedbackTest extends TestCase
 
     public function test_dashboard_hides_guarantee_components_for_non_technical_roles(): void
     {
-        $filial = \App\Models\Filial::factory()->create();
+        $filial = Filial::factory()->create();
         $user = User::factory()->withPersonalTeam()->create([
             'papel' => 'vendedor',
             'ativo' => true,
@@ -177,11 +198,72 @@ class GuaranteesFeedbackTest extends TestCase
         ]);
         $this->actingAs($user);
 
-        $response = $this->get(route('dashboard'));
+        $this->withoutMiddleware(TenantConnectionMiddleware::class);
+
+        $response = $this->get('/dashboard');
 
         $response->assertOk()
             ->assertDontSeeLivewire('garantia-board')
             ->assertDontSeeLivewire('garantia-form')
             ->assertDontSeeLivewire('garantia-laudo-form');
+    }
+
+    public function test_dashboard_shows_alert_for_overdue_loan_batteries(): void
+    {
+        $tecnico = User::factory()->withPersonalTeam()->create(['papel' => 'tecnico', 'ativo' => true]);
+        $cliente = Cliente::factory()->create();
+        $bateriaAnalise = Bateria::create(['sku' => 'GAR-005', 'marca' => 'Moura']);
+        $bateriaEmprestimo = Bateria::create(['sku' => 'GAR-LOAN-2', 'marca' => 'Heliar']);
+        $garantia = OrdemServicoGarantia::query()->create([
+            'cliente_id' => $cliente->id,
+            'bateria_id' => $bateriaAnalise->id,
+            'data_abertura' => now()->subDays(10),
+            'status' => 'aberta',
+        ]);
+
+        BateriaEmprestimo::query()->create([
+            'os_garantia_id' => $garantia->id,
+            'bateria_usada_id' => $bateriaEmprestimo->id,
+            'data_retirada' => now()->subDays(8),
+            'data_devolucao_prevista' => now()->subDay(),
+            'data_devolucao_real' => null,
+            'termo_arquivo_path' => 'generated://loan-term/teste',
+        ]);
+
+        $this->actingAs($tecnico);
+
+        Livewire::test(GarantiaBoard::class)
+            ->assertSee('Alerta:')
+            ->assertSee('empréstimo(s) com devolução vencida');
+    }
+
+    public function test_guarantees_operations_are_isolated_between_tenants_without_cross_access(): void
+    {
+        $this->withoutMiddleware(PrometheusMetrics::class);
+
+        $tenantA = Cliente::factory()->create([
+            'subdominio' => 'gar-a',
+            'status' => 'active',
+            'supabase_db_host' => 'db-gar-a.supabase.co',
+        ]);
+
+        $tenantB = Cliente::factory()->create([
+            'subdominio' => 'gar-b',
+            'status' => 'active',
+            'supabase_db_host' => 'db-gar-b.supabase.co',
+        ]);
+
+        $responseA = $this->get('http://gar-a.erp.com/guarantees/tenant-probe');
+        $responseB = $this->get('http://gar-b.erp.com/guarantees/tenant-probe');
+
+        $responseA->assertOk()->assertJson([
+            'tenant_host' => 'db-gar-a.supabase.co',
+            'cliente_id' => $tenantA->id,
+        ]);
+
+        $responseB->assertOk()->assertJson([
+            'tenant_host' => 'db-gar-b.supabase.co',
+            'cliente_id' => $tenantB->id,
+        ]);
     }
 }

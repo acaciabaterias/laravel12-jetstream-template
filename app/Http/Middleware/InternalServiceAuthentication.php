@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Prometheus\CollectorRegistry;
+use Symfony\Component\HttpFoundation\Response;
 
 class InternalServiceAuthentication
 {
@@ -19,7 +19,7 @@ class InternalServiceAuthentication
         try {
             $registry = CollectorRegistry::getDefault();
             $path = $request->route() ? $request->route()->uri() : $request->path();
-            
+
             $reqCounter = $registry->getOrRegisterCounter(
                 'app',
                 'internal_requests_total',
@@ -27,12 +27,14 @@ class InternalServiceAuthentication
                 ['method', 'path']
             );
             $reqCounter->inc([$request->method(), $path]);
-        } catch (\Exception $e) {}
+        } catch (\Throwable $e) {
+        }
 
         $expectedKey = config('services.internal_key');
 
         if (empty($expectedKey)) {
             $this->recordFailure('missing_server_key');
+
             return response()->json(['message' => 'Configuração de autenticação interna ausente.'], 500);
         }
 
@@ -40,11 +42,13 @@ class InternalServiceAuthentication
 
         if (empty($providedKey)) {
             $this->recordFailure('missing_client_key');
+
             return response()->json(['message' => 'Unauthorized service request.'], 401);
         }
 
         if (! hash_equals($expectedKey, (string) $providedKey)) {
             $this->recordFailure('invalid_key');
+
             return response()->json(['message' => 'Unauthorized service request.'], 401);
         }
 
@@ -62,6 +66,7 @@ class InternalServiceAuthentication
                 ['reason']
             );
             $counter->inc([$reason]);
-        } catch (\Exception $e) {}
+        } catch (\Throwable $e) {
+        }
     }
 }

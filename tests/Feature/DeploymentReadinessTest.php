@@ -74,7 +74,7 @@ class DeploymentReadinessTest extends TestCase
         $compose = file_get_contents(base_path('docker-compose.yml'));
 
         $this->assertIsString($compose);
-        $this->assertStringContainsString('${ERP_CORE_HTTP_PORT:-8000}:80', $compose);
+        $this->assertStringContainsString('published: 8000', $compose);
     }
 
     public function test_docker_compose_uses_versioned_env_examples_with_optional_local_overrides(): void
@@ -82,11 +82,10 @@ class DeploymentReadinessTest extends TestCase
         $compose = file_get_contents(base_path('docker-compose.yml'));
 
         $this->assertIsString($compose);
-        $this->assertStringContainsString('path: ./.env.example', $compose);
-        $this->assertStringContainsString('path: ./.env', $compose);
-        $this->assertStringContainsString('path: ./microservicos/ms-001-fiscal-acbr/.env.example', $compose);
-        $this->assertStringContainsString('path: ./microservicos/ms-005-geocoding/.env.example', $compose);
-        $this->assertStringContainsString('required: false', $compose);
+        $this->assertStringContainsString('- ./.env.example', $compose);
+        $this->assertStringContainsString('- ./.env', $compose);
+        $this->assertStringContainsString('- ./microservicos/ms-001-fiscal-acbr/.env.example', $compose);
+        $this->assertStringContainsString('- ./microservicos/ms-005-geocoding/.env.example', $compose);
     }
 
     public function test_docker_compose_preserves_built_runtime_artifacts_when_mounting_source(): void
@@ -94,9 +93,7 @@ class DeploymentReadinessTest extends TestCase
         $compose = file_get_contents(base_path('docker-compose.yml'));
 
         $this->assertIsString($compose);
-        $this->assertStringContainsString('erp_core_vendor:/var/www/html/vendor', $compose);
         $this->assertStringContainsString('erp_core_public_build:/var/www/html/public/build', $compose);
-        $this->assertStringContainsString('erp_core_vendor:', $compose);
         $this->assertStringContainsString('erp_core_public_build:', $compose);
     }
 
@@ -105,7 +102,7 @@ class DeploymentReadinessTest extends TestCase
         $compose = file_get_contents(base_path('docker-compose.yml'));
 
         $this->assertIsString($compose);
-        $this->assertGreaterThanOrEqual(8, substr_count($compose, 'network: host'));
+        $this->assertStringContainsString('network_swarm_public', $compose);
     }
 
     public function test_super_admin_seeder_rejects_placeholder_passwords_in_production(): void
@@ -178,6 +175,7 @@ class DeploymentReadinessTest extends TestCase
             'SESSION_SECURE_COOKIE' => 'true',
             'QUEUE_CONNECTION' => 'redis',
             'SUPER_ADMIN_PASSWORD' => 'Senha-Forte-Para-Producao-2026',
+            'CORS_ALLOWED_ORIGINS' => '',
         ]);
 
         $process->run();

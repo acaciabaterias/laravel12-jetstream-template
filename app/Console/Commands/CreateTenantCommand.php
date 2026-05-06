@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Prometheus\CollectorRegistry;
 
@@ -45,6 +46,7 @@ class CreateTenantCommand extends Command
         }
 
         $this->info("Cliente localizado: {$cliente->razao_social}");
+        $this->updateProvisioningStatus($cliente, 'provisioning');
 
         $token = config('services.supabase.access_token');
         $orgId = config('services.supabase.org_id');
@@ -66,8 +68,10 @@ class CreateTenantCommand extends Command
                 ]);
 
             if ($response->failed()) {
-                $this->error('Falha ao provisionar projeto no Supabase: '.$response->body());
+                $safeErrorBody = $this->sanitizeProvisioningError($response->body(), $cliente);
+                $this->error('Falha ao provisionar projeto no Supabase: '.$safeErrorBody);
                 $this->recordTenantCreationMetric(false, $provider, $startTime);
+                $this->markProvisioningFailed($cliente);
 
                 return Command::FAILURE;
             }
@@ -79,7 +83,7 @@ class CreateTenantCommand extends Command
             $cliente->supabase_url = "https://{$projectRef}.supabase.co";
             $cliente->supabase_db_host = "db.{$projectRef}.supabase.co";
             $cliente->supabase_db_password = $dbPass;
-            
+
             // Aguardar alguns segundos antes de buscar as chaves para dar tempo do projeto inicializar (Opcional na v1, mas recomendado)
             $this->info("Buscando chaves de API do projeto {$projectRef}...");
             $keysResponse = Http::withToken($token)
@@ -125,7 +129,7 @@ class CreateTenantCommand extends Command
             $dbUser = '';
             $dbHost = '';
             $dbPassToUse = '';
-            
+
             $this->recordTenantCreationMetric(true, $provider, $startTime);
         }
 
@@ -163,7 +167,7 @@ class CreateTenantCommand extends Command
             try {
                 $this->info('Aguardando 10 segundos antes de tentar rodar as migrations (tempo do Supabase provisionar o banco)...');
                 sleep(10);
-                
+
                 Artisan::call('migrate', [
                     '--database' => 'tenant',
                     '--path' => 'database/migrations/tenant',
@@ -173,11 +177,13 @@ class CreateTenantCommand extends Command
             } catch (\Exception $e) {
                 $this->error('Erro ao executar migrações. O banco do Supabase pode ainda estar inicializando. Execute: php artisan migrate --database=tenant --path=database/migrations/tenant');
                 $this->error('Detalhe do erro: '.$e->getMessage());
+                $this->markProvisioningFailed($cliente);
 
                 return Command::FAILURE;
             }
         }
 
+        $this->updateProvisioningStatus($cliente, 'ready');
         $this->info('Tenant provisionado com sucesso!');
 
         return Command::SUCCESS;
@@ -187,7 +193,7 @@ class CreateTenantCommand extends Command
     {
         try {
             $registry = CollectorRegistry::getDefault();
-            
+
             $status = $success ? 'success' : 'failed';
             $counter = $registry->getOrRegisterCounter(
                 'app',
@@ -207,8 +213,44 @@ class CreateTenantCommand extends Command
                 );
                 $histogram->observe($duration, [$provider]);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Ignorar erro do prometheus na CLI
         }
+    }
+
+    protected function markProvisioningFailed(Cliente $cliente): void
+    {
+        try {
+            $this->updateProvisioningStatus($cliente, 'failed');
+        } catch (\Exception) {
+        }
+    }
+
+    protected function updateProvisioningStatus(Cliente $cliente, string $status): void
+    {
+        if (! Schema::connection('central')->hasColumn('clientes', 'provisioning_status')) {
+            return;
+        }
+
+        $cliente->provisioning_status = $status;
+        $cliente->save();
+    }
+
+    protected function sanitizeProvisioningError(string $errorBody, Cliente $cliente): string
+    {
+        $sanitized = $errorBody;
+
+        $sensitiveValues = array_filter([
+            $cliente->supabase_db_password,
+            $cliente->supabase_anon_key,
+            $cliente->supabase_service_role_key,
+            config('services.supabase.access_token'),
+        ]);
+
+        foreach ($sensitiveValues as $sensitiveValue) {
+            $sanitized = str_replace((string) $sensitiveValue, '[REDACTED]', $sanitized);
+        }
+
+        return $sanitized;
     }
 }

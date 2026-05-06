@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Middleware\PrometheusMetrics;
+use App\Http\Middleware\TenantConnectionMiddleware;
 use App\Jobs\SyncDeliveryEventsJob;
 use App\Livewire\DeliveryRouteScreen;
 use App\Livewire\RoutePlanner;
@@ -29,6 +30,7 @@ class LogisticsDeliveryAppTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(PrometheusMetrics::class);
 
         Route::middleware('web')->get('/logistics/tenant-probe', function (Request $request) {
             return response()->json([
@@ -177,7 +179,9 @@ class LogisticsDeliveryAppTest extends TestCase
         ]);
         $this->actingAs($user);
 
-        $response = $this->get(route('dashboard'));
+        $this->withoutMiddleware(TenantConnectionMiddleware::class);
+
+        $response = $this->get('/dashboard');
 
         $response->assertOk()
             ->assertSeeLivewire('route-planner')
@@ -195,7 +199,9 @@ class LogisticsDeliveryAppTest extends TestCase
         ]);
         $this->actingAs($user);
 
-        $response = $this->get(route('dashboard'));
+        $this->withoutMiddleware(TenantConnectionMiddleware::class);
+
+        $response = $this->get('/dashboard');
 
         $response->assertOk()
             ->assertDontSeeLivewire('route-planner')

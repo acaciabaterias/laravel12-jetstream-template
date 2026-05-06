@@ -2,30 +2,51 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\PrometheusMetrics;
+use App\Http\Middleware\TenantConnectionMiddleware;
 use App\Jobs\SyncBankTransactionsJob;
 use App\Livewire\CashFlowPanel;
 use App\Livewire\FinanceDashboard;
 use App\Livewire\MarginAnalysisGrid;
 use App\Models\Bateria;
+use App\Models\Cliente;
 use App\Models\ContaBancaria;
 use App\Models\FechamentoContabil;
+use App\Models\Filial;
 use App\Models\OrdemServicoGarantia;
 use App\Models\PedidoVenda;
 use App\Models\TransacaoFinanceira;
 use App\Models\User;
 use App\Models\Vale;
+use App\Services\BankApiClient;
 use App\Services\ClosingPeriodGuard;
 use App\Services\FinanceMatcherProcessor;
 use Carbon\CarbonImmutable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class IntelligentFinanceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(PrometheusMetrics::class);
+
+        Route::middleware('web')->get('/finance/tenant-probe', function (Request $request) {
+            return response()->json([
+                'tenant_host' => config('database.connections.tenant.host'),
+                'cliente_id' => optional($request->attributes->get('cliente'))->id,
+            ]);
+        });
+    }
+
     public function test_bank_sync_matches_simple_transactions(): void
     {
         $user = User::factory()->create(['papel' => 'gestor', 'ativo' => true]);
-        $cliente = \App\Models\Cliente::factory()->create();
+        $cliente = Cliente::factory()->create();
         $vale = Vale::query()->create([
             'cliente_id' => $cliente->id,
             'vendedor_id' => $user->id,
@@ -59,7 +80,7 @@ class IntelligentFinanceTest extends TestCase
             'status' => 'ativa',
         ]);
 
-        (new SyncBankTransactionsJob($conta->id))->handle(app(\App\Services\BankApiClient::class), app(FinanceMatcherProcessor::class));
+        (new SyncBankTransactionsJob($conta->id))->handle(app(BankApiClient::class), app(FinanceMatcherProcessor::class));
 
         $this->assertDatabaseHas('transacoes_financeiras', [
             'origem_tipo' => PedidoVenda::class,
@@ -82,7 +103,7 @@ class IntelligentFinanceTest extends TestCase
             'tipo' => 'corrente',
             'status' => 'ativa',
         ]);
-        $cliente = \App\Models\Cliente::factory()->create();
+        $cliente = Cliente::factory()->create();
         $user = User::factory()->create(['papel' => 'gestor', 'ativo' => true]);
 
         foreach ([1, 2] as $index) {
@@ -180,14 +201,14 @@ class IntelligentFinanceTest extends TestCase
             'fechado_por' => User::factory()->create()->id,
         ]);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         app(ClosingPeriodGuard::class)->ensureOpen($competencia);
     }
 
     public function test_dashboard_renders_finance_components_for_finance_roles(): void
     {
-        $filial = \App\Models\Filial::factory()->create();
+        $filial = Filial::factory()->create();
         $user = User::factory()->withPersonalTeam()->create([
             'papel' => 'gestor',
             'ativo' => true,
@@ -195,7 +216,9 @@ class IntelligentFinanceTest extends TestCase
         ]);
         $this->actingAs($user);
 
-        $response = $this->get(route('dashboard'));
+        $this->withoutMiddleware(TenantConnectionMiddleware::class);
+
+        $response = $this->get('/dashboard');
 
         $response->assertOk()
             ->assertSeeLivewire('finance-dashboard')
@@ -205,7 +228,7 @@ class IntelligentFinanceTest extends TestCase
 
     public function test_dashboard_hides_finance_components_for_non_finance_roles(): void
     {
-        $filial = \App\Models\Filial::factory()->create();
+        $filial = Filial::factory()->create();
         $user = User::factory()->withPersonalTeam()->create([
             'papel' => 'vendedor',
             'ativo' => true,
@@ -213,7 +236,9 @@ class IntelligentFinanceTest extends TestCase
         ]);
         $this->actingAs($user);
 
-        $response = $this->get(route('dashboard'));
+        $this->withoutMiddleware(TenantConnectionMiddleware::class);
+
+        $response = $this->get('/dashboard');
 
         $response->assertOk()
             ->assertDontSeeLivewire('finance-dashboard')
@@ -261,5 +286,78 @@ class IntelligentFinanceTest extends TestCase
             ->assertSee('Últimas transações')
             ->assertSee('Recebimento em balcão')
             ->assertSee('Pagamento fornecedor');
+    }
+
+    public function test_critical_financial_operations_are_audited(): void
+    {
+        $conta = ContaBancaria::query()->create([
+            'banco' => 'Banco Auditoria',
+            'agencia' => '0003',
+            'conta' => '45678-9',
+            'tipo' => 'corrente',
+            'status' => 'ativa',
+        ]);
+
+        $transacao = TransacaoFinanceira::query()->create([
+            'conta_bancaria_id' => $conta->id,
+            'tipo' => 'receita',
+            'valor' => 500,
+            'data_transacao' => now(),
+            'status_conciliado' => false,
+            'descricao' => 'Auditoria financeira',
+            'identificador_externo' => 'audit-finance-1',
+        ]);
+
+        $transacao->update([
+            'status_conciliado' => true,
+        ]);
+
+        FechamentoContabil::query()->create([
+            'competencia' => now()->format('Y-m'),
+            'status' => 'fechado',
+        ]);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'table_name' => 'transacoes_financeiras',
+            'action' => 'created',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'table_name' => 'transacoes_financeiras',
+            'action' => 'updated',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'table_name' => 'fechamentos_contabeis',
+            'action' => 'created',
+        ]);
+    }
+
+    public function test_finance_operations_are_isolated_between_tenants_without_cross_access(): void
+    {
+        $this->withoutMiddleware(PrometheusMetrics::class);
+
+        $tenantA = Cliente::factory()->create([
+            'subdominio' => 'fin-a',
+            'status' => 'active',
+            'supabase_db_host' => 'db-fin-a.supabase.co',
+        ]);
+
+        $tenantB = Cliente::factory()->create([
+            'subdominio' => 'fin-b',
+            'status' => 'active',
+            'supabase_db_host' => 'db-fin-b.supabase.co',
+        ]);
+
+        $responseA = $this->get('http://fin-a.erp.com/finance/tenant-probe');
+        $responseB = $this->get('http://fin-b.erp.com/finance/tenant-probe');
+
+        $responseA->assertOk()->assertJson([
+            'tenant_host' => 'db-fin-a.supabase.co',
+            'cliente_id' => $tenantA->id,
+        ]);
+
+        $responseB->assertOk()->assertJson([
+            'tenant_host' => 'db-fin-b.supabase.co',
+            'cliente_id' => $tenantB->id,
+        ]);
     }
 }

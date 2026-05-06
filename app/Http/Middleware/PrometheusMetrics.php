@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Prometheus\CollectorRegistry;
+use Symfony\Component\HttpFoundation\Response;
 
 class PrometheusMetrics
 {
@@ -24,7 +24,7 @@ class PrometheusMetrics
 
         try {
             $registry = CollectorRegistry::getDefault();
-            
+
             $counter = $registry->getOrRegisterCounter(
                 'app',
                 'http_requests_total',
@@ -40,7 +40,7 @@ class PrometheusMetrics
                 ['path']
             );
             $histogram->observe($durationMs, [$path]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Silently ignore prometheus errors in middleware
         }
 

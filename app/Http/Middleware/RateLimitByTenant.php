@@ -85,7 +85,7 @@ class RateLimitByTenant
                 (string) ($cliente->plano ?? 'free'),
                 $path,
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Silently ignore prometheus errors in middleware
         }
     }
