@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\UserForm;
 use App\Livewire\UserManager;
 use App\Models\Filial;
 use App\Models\User;
@@ -110,5 +111,32 @@ class UserManagementTest extends TestCase
         Livewire::test(UserManager::class)
             ->assertSee('Usuario A')
             ->assertDontSee('Usuario B');
+    }
+
+    public function test_user_form_component_creates_user_with_owner_permissions(): void
+    {
+        $filial = Filial::factory()->create();
+        $owner = User::factory()->withPersonalTeam()->create([
+            'papel' => 'dono',
+            'filial_id' => $filial->id,
+            'ativo' => true,
+        ]);
+
+        $this->actingAs($owner);
+
+        Livewire::test(UserForm::class)
+            ->set('name', 'Form User')
+            ->set('email', 'form-user@example.com')
+            ->set('password', 'password123')
+            ->set('papel', 'vendedor')
+            ->set('ativo', true)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'form-user@example.com',
+            'filial_id' => $filial->id,
+            'papel' => 'vendedor',
+        ]);
     }
 }
