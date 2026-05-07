@@ -137,7 +137,31 @@ probe_duration_seconds
 up
 container_memory_working_set_bytes
 rate(container_cpu_usage_seconds_total[5m])
+app_integration_events_total
+app_integration_replays_total
+app_integration_outbox_total
+app_integration_deliveries_total
+app_integration_delivery_latency_average_ms
 ```
+
+## Backbone de Integracao
+
+O modulo `010` adiciona supervisao operacional do backbone pelos seguintes sinais:
+
+- `app_integration_events_total{direction,event_type,status}`
+- `app_integration_replays_total{target,status}`
+- `app_integration_outbox_total{status}`
+- `app_integration_deliveries_total{direction,status}`
+- `app_integration_delivery_latency_average_ms{direction,target}`
+- `app_integration_contracts_catalog_total{status}`
+- `app_integration_gateway_endpoints_total{service_name,status}`
+
+Checklist de verificacao:
+
+- confirmar scrape autenticado em `GET /api/metrics`
+- validar backlog pendente e dead-letter por tenant no dashboard `/integration/backbone`
+- inspecionar `GET /api/integration/inspections` para contratos, entregas e endpoints
+- confirmar que replay operacional incrementa `app_integration_replays_total`
 
 ## Validando Grafana
 

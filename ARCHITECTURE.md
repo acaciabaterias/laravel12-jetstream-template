@@ -37,6 +37,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `007`: garantias e feedback
 - `008`: financeiro inteligente
 - `009`: orquestração fiscal e bancária
+- `010`: backbone de integração, contratos canônicos, replay operacional e observabilidade
 
 ## Integrações Externas
 
@@ -45,6 +46,15 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `MS-003`: WhatsApp e workflows
 - `MS-004`: Open Finance
 - `MS-005`: geocoding e rotas
+
+## Backbone de Integração
+
+- contratos versionados em `contratos_evento`
+- publicação confiável com `evento_outboxes`
+- consumo idempotente com `evento_inboxes`
+- rastreabilidade de entrega em `entregas_integracao`
+- catálogo síncrono controlado em `endpoints_integracao`
+- inspeção operacional via `/integration/backbone` e `/api/integration/inspections`
 
 ## Padrões Técnicos
 

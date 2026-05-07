@@ -2,6 +2,7 @@
 
 namespace App\Services\Integration;
 
+use App\Jobs\LogAuditJob;
 use App\Models\EntregaIntegracao;
 use App\Models\EventoInbox;
 use App\Models\EventoOutbox;
@@ -10,6 +11,7 @@ use App\Services\Contracts\Integration\IntegrationReplayServiceContract;
 use App\Support\Integration\IntegrationFlowStatus;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
 class IntegrationReplayService implements IntegrationReplayServiceContract
@@ -75,7 +77,39 @@ class IntegrationReplayService implements IntegrationReplayServiceContract
 
         $this->metrics->recordReplay($delivery->target, IntegrationFlowStatus::Replayed);
         $this->metrics->syncOperationalSnapshot();
+        $this->recordReplayAudit($delivery, $replayDelivery, $operator, $context);
 
         return $replayDelivery;
+    }
+
+    private function recordReplayAudit(
+        EntregaIntegracao $originalDelivery,
+        EntregaIntegracao $replayDelivery,
+        User $operator,
+        array $context
+    ): void {
+        if (! Schema::hasTable('audit_logs')) {
+            return;
+        }
+
+        LogAuditJob::dispatchSync([
+            'user_id' => $operator->id,
+            'action' => 'replayed',
+            'table_name' => 'entregas_integracao',
+            'record_id' => $originalDelivery->id,
+            'old_values' => [
+                'status' => $originalDelivery->status->value,
+                'attempt_number' => $originalDelivery->attempt_number,
+                'target' => $originalDelivery->target,
+            ],
+            'new_values' => [
+                'status' => $replayDelivery->status->value,
+                'replay_delivery_id' => $replayDelivery->id,
+                'replayed_from_entrega_id' => $originalDelivery->id,
+                'operator_id' => $operator->id,
+                'reason' => $context['reason'] ?? null,
+                'source' => $context['source'] ?? 'manual',
+            ],
+        ]);
     }
 }

@@ -91,6 +91,32 @@ No-go imediato se:
 - credenciais de restore nao estiverem disponiveis
 - nao houver responsavel autorizado para rollback
 
+### Evidencias Operacionais (US1 Tenant Resolution / US2 Provisioning)
+
+Preencher e versionar no mesmo PR/release:
+
+```text
+Data da evidencia:
+Responsavel:
+
+T038 - Backup pre-alteracao:
+- Central: <arquivo dump + hash + horario>
+- Tenant alvo/homolog: <arquivo dump + hash + horario>
+- Cobertura: 3 VMs (app, db, suporte) confirmada: sim/nao
+
+T039 - Restore rehearsal controlado:
+- Ambiente: <central-homolog ou tenant-homolog>
+- Inicio/fim:
+- Resultado: sucesso/falha
+- Validacoes: migrate:status, tenant:health, smoke minimo
+- Evidencia anexada (log/comando):
+```
+
+Registro inicial desta fase (2026-05-06):
+
+- Cobertura de backup das 3 VMs confirmada pelo responsavel da operacao.
+- Pendencia: anexar nomes de arquivos dump/hash e horario de teste de restore controlado no fechamento do go-live.
+
 ## 3. Publicacao
 
 ### Aplicacao sem Docker
@@ -160,6 +186,7 @@ curl -i "${APP_URL}/up"
 ./healthcheck.sh
 php artisan tenant:health --json
 php artisan queue:failed
+curl -H "X-Internal-Token: ${INTERNAL_API_TOKEN}" "${APP_URL}/api/metrics" | rg "integration_(events|replays|outbox|deliveries|gateway)"
 ```
 
 Valide fluxos manuais minimos:
@@ -171,6 +198,9 @@ Valide fluxos manuais minimos:
 - criacao de um Vale de teste em homologacao ou tenant controlado
 - consulta de estoque
 - dashboard financeiro
+- dashboard de backbone de integração em `/integration/backbone`
+- filtro da API operacional `GET /api/integration/inspections?status=dead_letter`
+- replay controlado de uma entrega com falha via `php artisan integration:replay <delivery_id> --operator=<user_id>`
 - logout
 
 Com K6, quando aplicavel:
@@ -191,6 +221,8 @@ Declare go quando:
 - login e dashboards principais funcionam
 - backup pre-deploy esta registrado
 - monitoramento esta recebendo dados
+- métricas `integration_outbox_total`, `integration_deliveries_total` e `integration_replays_total` aparecem no scrape interno
+- replay operacional gera registro em `audit_logs` para `action=replayed`
 
 Declare no-go e inicie rollback quando:
 
@@ -261,6 +293,23 @@ php artisan migrate:status
 php artisan tenant:health --json
 ./healthcheck.sh
 ```
+
+### Rollback Especifico: Tenant Resolution / Provisioning
+
+Use este fluxo quando a falha afetar resolucao por subdominio, bloqueio de billing ou `tenant:create`:
+
+1. Ativar manutencao (`php artisan down`) e congelar novos provisionamentos.
+2. Reverter codigo para o commit/tag anterior estavel.
+3. Executar somente migracoes de `central` necessarias ao rollback (ou restore completo se houve corrupcao/alteracao irreversivel).
+4. Restaurar dump do `central` pre-go-live se houver divergencia em `clientes`, `assinaturas` ou `faturas`.
+5. Para tenant impactado, restaurar dump especifico e validar conexao:
+   - `php artisan tenant:health --json`
+   - acesso por subdominio do tenant restaurado
+6. Validar que:
+   - tenant desconhecido retorna 404
+   - tenant inativo/expirado retorna bloqueio esperado
+   - tenant com billing vencido aplica negacao/redirect esperado
+7. Reabrir aplicacao (`php artisan up`) apenas com smoke e healthcheck verdes.
 
 ## 7. Registro Final
 

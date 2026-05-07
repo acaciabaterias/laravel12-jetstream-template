@@ -37,3 +37,37 @@ Validar localmente a base do backbone de integração antes de conectar todos os
 - replay manual validado em ambiente controlado
 - métricas básicas visíveis por tenant e por serviço
 - rollback operacional documentado para estados de outbox/inbox
+
+## Evidência de validação atual
+
+Validação automatizada confirmada neste ciclo:
+
+```bash
+php artisan test --compact tests/Feature/IntegrationBackboneFoundationTest.php \
+  tests/Feature/IntegrationBackbonePublicationTest.php \
+  tests/Feature/IntegrationBackboneRetryTest.php \
+  tests/Feature/IntegrationBackboneInboxTest.php \
+  tests/Feature/IntegrationBackboneReplayFlowTest.php \
+  tests/Feature/IntegrationBackboneDashboardTest.php \
+  tests/Feature/IntegrationGatewayInspectionTest.php \
+  tests/Unit/IntegrationEventEnvelopeTest.php \
+  tests/Unit/IntegrationReplayPolicyTest.php \
+  tests/Unit/IntegrationContractCatalogTest.php
+```
+
+Resultado observado:
+
+- `24 passed`
+- `95 assertions`
+
+Validação de regressão global após integração do módulo:
+
+```bash
+php artisan test --compact
+```
+
+Resultado observado:
+
+- `288 passed`
+- `1 skipped`
+- `1422 assertions`

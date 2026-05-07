@@ -13,6 +13,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
 class DispatchOutboxEventJob implements ShouldQueue
@@ -50,7 +51,7 @@ class DispatchOutboxEventJob implements ShouldQueue
             $finishedAt = now();
             $latencyMs = (int) $startedAt->diffInMilliseconds($finishedAt);
 
-            EntregaIntegracao::query()->create([
+            $delivery = EntregaIntegracao::query()->create([
                 'entregavel_type' => EventoOutbox::class,
                 'entregavel_id' => $event->id,
                 'direction' => IntegrationDirection::Outbound,
@@ -84,7 +85,7 @@ class DispatchOutboxEventJob implements ShouldQueue
                 ? IntegrationFlowStatus::DeadLetter
                 : IntegrationFlowStatus::Pending;
 
-            EntregaIntegracao::query()->create([
+            $delivery = EntregaIntegracao::query()->create([
                 'entregavel_type' => EventoOutbox::class,
                 'entregavel_id' => $event->id,
                 'direction' => IntegrationDirection::Outbound,
@@ -110,6 +111,37 @@ class DispatchOutboxEventJob implements ShouldQueue
 
             $metrics->recordEvent(IntegrationDirection::Outbound, $event->event_type, $nextStatus);
             $metrics->syncOperationalSnapshot();
+
+            if ($nextStatus === IntegrationFlowStatus::DeadLetter) {
+                $this->recordDeadLetterAudit($event, $delivery, $exception->getMessage());
+            }
         }
+    }
+
+    private function recordDeadLetterAudit(EventoOutbox $event, EntregaIntegracao $delivery, string $errorMessage): void
+    {
+        if (! Schema::hasTable('audit_logs')) {
+            return;
+        }
+
+        LogAuditJob::dispatchSync([
+            'user_id' => null,
+            'action' => 'dead_letter',
+            'table_name' => 'entregas_integracao',
+            'record_id' => $delivery->id,
+            'old_values' => [
+                'outbox_status' => IntegrationFlowStatus::Processing->value,
+                'attempts' => max(0, $event->attempts - 1),
+            ],
+            'new_values' => [
+                'outbox_id' => $event->id,
+                'outbox_status' => $event->status->value,
+                'delivery_status' => $delivery->status->value,
+                'attempts' => $event->attempts,
+                'event_type' => $event->event_type,
+                'target' => $delivery->target,
+                'error_message' => $errorMessage,
+            ],
+        ]);
     }
 }

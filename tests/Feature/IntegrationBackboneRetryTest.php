@@ -101,5 +101,9 @@ class IntegrationBackboneRetryTest extends TestCase
             'status' => IntegrationFlowStatus::DeadLetter->value,
         ], 'tenant');
         $this->assertSame(2, EntregaIntegracao::query()->where('entregavel_id', $event->id)->count());
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'dead_letter',
+            'table_name' => 'entregas_integracao',
+        ]);
     }
 }

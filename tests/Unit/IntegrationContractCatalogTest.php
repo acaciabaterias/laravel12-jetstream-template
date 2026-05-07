@@ -7,6 +7,7 @@ use App\Models\EndpointIntegracao;
 use App\Models\EntregaIntegracao;
 use App\Models\EventoOutbox;
 use App\Services\Integration\EventContractCatalogService;
+use App\Services\Integration\EventContractRegistry;
 use App\Services\Integration\IntegrationGatewayRegistry;
 use App\Services\Integration\IntegrationMetrics;
 use App\Services\Integration\OutboxEventFactory;
@@ -56,6 +57,38 @@ class IntegrationContractCatalogTest extends TestCase
 
         $this->assertCount(1, $contracts);
         $this->assertSame('VALE_FATURADO', $contracts->first()->event_type);
+    }
+
+    public function test_contract_registry_updates_same_contract_version_without_duplication(): void
+    {
+        $registry = app(EventContractRegistry::class);
+
+        $registry->register(
+            eventType: 'VALE_FATURADO',
+            eventVersion: 'v1',
+            producer: 'sales',
+            consumers: ['ms-001'],
+            schemaDefinition: ['required' => ['vale_id']],
+            compatibilityNotes: 'initial version'
+        );
+
+        $registry->register(
+            eventType: 'VALE_FATURADO',
+            eventVersion: 'v1',
+            producer: 'sales',
+            consumers: ['ms-001', 'ms-003'],
+            schemaDefinition: ['required' => ['vale_id', 'pedido_venda_id']],
+            compatibilityNotes: 'expanded payload'
+        );
+
+        $contracts = ContratoEvento::query()
+            ->where('event_type', 'VALE_FATURADO')
+            ->where('event_version', 'v1')
+            ->get();
+
+        $this->assertCount(1, $contracts);
+        $this->assertSame(['ms-001', 'ms-003'], $contracts->first()->consumers);
+        $this->assertSame('expanded payload', $contracts->first()->compatibility_notes);
     }
 
     public function test_gateway_registry_returns_registered_endpoints(): void
@@ -132,5 +165,24 @@ class IntegrationContractCatalogTest extends TestCase
         $this->assertContains('app_integration_outbox_total', $metricNames);
         $this->assertContains('app_integration_deliveries_total', $metricNames);
         $this->assertContains('app_integration_delivery_latency_average_ms', $metricNames);
+    }
+
+    public function test_metrics_snapshot_returns_empty_state_when_backbone_tables_are_unavailable(): void
+    {
+        Schema::connection('tenant')->dropIfExists('endpoints_integracao');
+        Schema::connection('tenant')->dropIfExists('contratos_evento');
+        Schema::connection('tenant')->dropIfExists('entregas_integracao');
+        Schema::connection('tenant')->dropIfExists('evento_inboxes');
+        Schema::connection('tenant')->dropIfExists('evento_outboxes');
+
+        $snapshot = app(IntegrationMetrics::class)->snapshot();
+
+        $this->assertSame([
+            'outboxes' => [],
+            'deliveries' => [],
+            'latency' => [],
+            'contracts' => [],
+            'endpoints' => [],
+        ], $snapshot);
     }
 }

@@ -74,6 +74,12 @@ class IntegrationBackboneReplayFlowTest extends TestCase
             'replayed_from_entrega_id' => $delivery->id,
             'status' => 'replayed',
         ], 'tenant');
+        $this->assertDatabaseHas('audit_logs', [
+            'user_id' => $operator->id,
+            'action' => 'replayed',
+            'table_name' => 'entregas_integracao',
+            'record_id' => $delivery->id,
+        ]);
     }
 
     public function test_replay_command_requeues_delivery(): void

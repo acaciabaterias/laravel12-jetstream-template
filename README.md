@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-206%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-288%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -32,6 +32,7 @@ Os modulos core cobrem:
 - garantias e feedback
 - financeiro inteligente
 - orquestracao fiscal e bancaria
+- backbone de integracao e observabilidade
 
 ## Arquitetura
 
@@ -69,6 +70,16 @@ flowchart LR
     MS4 --> R
     MS5 --> R
 ```
+
+## Backbone de Integracao
+
+O modulo `010` adiciona a espinha dorsal assíncrona entre ERP e microservicos:
+
+- `evento_outboxes` para publicação confiável
+- `evento_inboxes` para consumo idempotente
+- `entregas_integracao` para retries, dead-letter e replay
+- `contratos_evento` e `endpoints_integracao` para governança operacional
+- dashboard `/integration/backbone` e API `/api/integration/inspections` para operação
 
 ## Stack
 
