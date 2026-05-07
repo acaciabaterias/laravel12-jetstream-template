@@ -63,16 +63,16 @@
 ### Tests for User Story 1
 
 - [x] T011 [P] [US1] Integration test for tenant resolution and database switching in `tests/Feature/TenantResolutionTest.php`
-- [ ] T011A [P] [US1] Add failure test for unknown subdomain in `tests/Feature/TenantResolutionTest.php`
-- [ ] T011B [P] [US1] Add failure test for inactive or expired tenant in `tests/Feature/TenantResolutionTest.php`
+- [x] T011A [P] [US1] Add failure test for unknown subdomain in `tests/Feature/TenantResolutionTest.php`
+- [x] T011B [P] [US1] Add failure test for inactive or expired tenant in `tests/Feature/TenantResolutionTest.php`
 - [x] T012 [P] [US1] Performance test verifying tenant resolution latency (<50ms) in tests.
-- [ ] T013A [P] [US1] Add failure test for overdue tenant access denial in `tests/Feature/TenantResolutionTest.php`
+- [x] T013A [P] [US1] Add failure test for overdue tenant access denial in `tests/Feature/TenantResolutionTest.php` (depends on T013B and T013C)
 
 ### Implementation for User Story 1
 
 - [x] T013 [US1] Implement `TenantConnectionMiddleware` in `app/Http/Middleware/TenantConnectionMiddleware.php`
-- [ ] T013B [US1] Update `TenantConnectionMiddleware` in `app/Http/Middleware/TenantConnectionMiddleware.php` to validate billing status from `central`
-- [ ] T013C [US1] Define denial response or redirect for overdue tenants in the web flow
+- [x] T013B [US1] Update `TenantConnectionMiddleware` in `app/Http/Middleware/TenantConnectionMiddleware.php` to validate billing status from `central` (precondition for T013C and T013A)
+- [x] T013C [US1] Define denial response or redirect for overdue tenants in the web flow (HTTP status/redirect and default message)
 - [x] T014 [US1] Register `TenantConnectionMiddleware` globally for web routes in `bootstrap/app.php`
 - [x] T015 [P] [US1] Modify `app/Models/User.php` to use `tenant` connection and remove `filial_id`.
 - [x] T016 [P] [US1] Modify `app/Models/Post.php` to use `tenant` connection and remove `filial_id`.
@@ -91,7 +91,7 @@
 ### Tests for User Story 2
 
 - [x] T018 [P] [US2] Integration test for tenant provisioning CLI command.
-- [ ] T018A [P] [US2] Add failure test for partial provisioning error and incomplete tenant status handling in provisioning tests
+- [x] T018A [P] [US2] Add failure test for partial provisioning error and incomplete tenant status handling in provisioning tests
 
 ### Implementation for User Story 2
 
@@ -137,7 +137,10 @@
 - [x] T035 [P] Remove `app/Http/Middleware/TenantResolver.php`
 - [x] T036 Code cleanup and refactoring (Laravel Pint)
 - [x] T037 Security hardening regarding Supabase connection string storage
-- [ ] T037A [P] Add test or assertion to ensure tenant credentials are not leaked in logs or exceptions
+- [x] T037A [P] Add test or assertion in `tests/Feature/TenantProvisioningTest.php` to ensure tenant credentials are not leaked in logs or exceptions
+- [x] T038 [US1] Register pre-change backup evidence for `central` and target tenant (timestamp and owner) in operational runbook/checklist.
+- [x] T039 [US1] Execute and register a controlled restore rehearsal (central or homolog tenant) with timestamp and outcome.
+- [x] T040 [US1] Document rollback path for tenant resolution/provisioning changes in `GO_LIVE_RUNBOOK.md`.
 
 ---
 

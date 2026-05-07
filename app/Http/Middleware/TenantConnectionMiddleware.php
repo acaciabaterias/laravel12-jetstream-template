@@ -3,15 +3,18 @@
 namespace App\Http\Middleware;
 
 use App\Models\Cliente;
-use Illuminate\Support\Facades\Cache;
+use App\Services\BillingAccessGuard;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class TenantConnectionMiddleware
 {
+    public function __construct(private BillingAccessGuard $billingAccessGuard) {}
+
     public function handle(Request $request, Closure $next): Response
     {
         if ($this->shouldBypassTenantResolution($request)) {
@@ -20,13 +23,10 @@ class TenantConnectionMiddleware
 
         $subdominio = $this->getSubdominio($request);
 
-        // Se não houver subdomínio identificado (ex: domínio principal ou localhost),
-        // permitimos que a requisição siga para a aplicação central.
         if (! $subdominio) {
             return $next($request);
         }
 
-        // Busca cliente no banco central com cache de 1 hora
         $cliente = Cache::remember("tenant:{$subdominio}", 3600, function () use ($subdominio) {
             return Cliente::where('subdominio', $subdominio)->first();
         });
@@ -47,6 +47,10 @@ class TenantConnectionMiddleware
         if ($cliente->status === 'active' && $cliente->subscription_ends_at && $cliente->subscription_ends_at->isPast()) {
             $cliente->update(['status' => 'expired']);
             abort(402, 'Assinatura expirada. Renove para continuar.');
+        }
+
+        if ($this->billingAccessGuard->shouldBlockClienteAccess($cliente->id)) {
+            return $this->denyOverdueAccess($request);
         }
 
         if (app()->environment('testing')) {
@@ -122,5 +126,20 @@ class TenantConnectionMiddleware
         }
 
         return $subdominio;
+    }
+
+    private function denyOverdueAccess(Request $request): Response
+    {
+        $message = 'Acesso bloqueado por inadimplência. Regularize sua assinatura para continuar.';
+
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return response()->json([
+                'message' => $message,
+            ], 402);
+        }
+
+        return redirect()
+            ->route('login')
+            ->with('error', $message);
     }
 }

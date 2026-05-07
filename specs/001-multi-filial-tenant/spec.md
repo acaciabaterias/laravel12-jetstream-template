@@ -33,6 +33,7 @@ Implementação do suporte a múltiplos clientes (Assinantes) utilizando a arqui
 - **FR04 - Conexão Dinâmica**: Middleware `TenantConnectionMiddleware` resolve o tenant pelo subdomínio e reconfigura a conexão `tenant` em runtime.
 - **FR05 - Provisionamento Automático**: Comando CLI/Interface para criação automática de projetos no Supabase e execução de migrações.
 - **FR06 - Bloqueio por Inadimplência**: O acesso ao tenant deve ser negado quando o cliente possuir assinatura vencida ou faturas em atraso registradas na base `central`.
+- **FR07 - Repositório de Certificados por Assinante**: A base `central` deve manter um repositório versionável de certificados digitais por assinante (A1/A3 e variações de formato) com finalidade (`fiscal`, `bancario`, `openfinance`, `geral`), validade e estado para consumo seguro pelos fluxos de emissão.
 
 ## User Scenarios
 1. **Given** um acesso via subdomínio `cliente.erp.com`, **When** o middleware processa a requisição, **Then** as queries subsequentes são direcionadas para o banco específico do cliente no Supabase.

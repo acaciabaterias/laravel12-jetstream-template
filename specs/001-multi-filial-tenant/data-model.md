@@ -39,6 +39,23 @@ Representa um assinante do ERP.
 - `status` (String: pending, paid, overdue)
 - Timestamps
 
+### Certificado Digital (`certificados_digitais`)
+- `id` (Integer, PK)
+- `cliente_id` (Integer, FK -> clientes)
+- `nome_referencia` (String)
+- `finalidade` (Enum: fiscal, bancario, openfinance, geral)
+- `modelo` (Enum: a1, a3, token, hsm, outro)
+- `formato` (Enum: pfx, p12, pem, cer, key, remote)
+- `conteudo_certificado` (Text, encrypted, nullable)
+- `senha_certificado` (Text, encrypted, nullable)
+- `validade_inicio` (Date, nullable)
+- `validade_fim` (Date, nullable)
+- `status` (Enum: active, inactive, expired, revoked)
+- `prioridade` (TinyInt)
+- `revoked_at` (Timestamp, nullable)
+- `metadata` (JSONB)
+- Timestamps + Soft Deletes
+
 ---
 
 ## Tenant Database (Client ERP Instances)

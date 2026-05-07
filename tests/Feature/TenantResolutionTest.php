@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Cliente;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class TenantResolutionTest extends TestCase
@@ -41,5 +42,35 @@ class TenantResolutionTest extends TestCase
         $response = $this->get('http://expired-tenant.erp.com/');
 
         $response->assertStatus(402);
+    }
+
+    public function test_cancelled_client_returns_402(): void
+    {
+        Cliente::factory()->create([
+            'subdominio' => 'cancelled-tenant',
+            'status' => 'cancelled',
+        ]);
+
+        $response = $this->get('http://cancelled-tenant.erp.com/');
+
+        $response->assertStatus(402);
+    }
+
+    public function test_overdue_client_returns_402(): void
+    {
+        if (! Schema::connection('central')->hasColumn('clientes', 'billing_blocked')) {
+            $this->markTestSkipped('Tabela central de clientes sem coluna billing_blocked neste ambiente de teste.');
+        }
+
+        $cliente = Cliente::factory()->create([
+            'subdominio' => 'overdue-tenant',
+            'status' => 'active',
+            'billing_blocked' => true,
+        ]);
+
+        $response = $this->get('http://overdue-tenant.erp.com/');
+
+        $response->assertRedirect(route('login', absolute: false));
+        $response->assertSessionHas('error');
     }
 }
