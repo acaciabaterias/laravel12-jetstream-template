@@ -12,11 +12,19 @@
 
 ## Próximo eixo confirmado (v1.1.0)
 
-- [ ] Módulo `010` de backbone de integração e observabilidade
-- [ ] Contratos de eventos versionados entre ERP e microserviços
-- [ ] Outbox/inbox, replay e dead-letter operacional
-- [ ] API Gateway para chamadas síncronas controladas
-- [ ] Dashboards e métricas ponta a ponta para integrações críticas
+- [x] Módulo `010` de backbone de integração e observabilidade
+- [x] Contratos de eventos versionados entre ERP e microserviços
+- [x] Outbox/inbox, replay e dead-letter operacional
+- [x] API Gateway para chamadas síncronas controladas
+- [x] Dashboards e métricas ponta a ponta para integrações críticas
+
+## Próximo módulo sugerido (v1.2.0)
+
+- [ ] Módulo `011` de platform billing control plane
+- [ ] Catálogo de planos, assinaturas e faturas SaaS
+- [ ] Política central de grace period, bloqueio e reativação
+- [ ] Painel super admin de saúde comercial dos assinantes
+- [ ] Eventos comerciais integrados ao backbone `010`
 
 ## Fase 1: Estabilização e Produção (v1.1.0)
 

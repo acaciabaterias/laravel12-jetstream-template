@@ -12,11 +12,11 @@
 - [x] `008` Financeiro inteligente
 - [x] `009` Orquestração fiscal e bancária
 
-## Lacuna transversal identificada
+## Lacuna transversal fechada
 
-- [ ] `010` Backbone de integração e observabilidade
+- [x] `010` Backbone de integração e observabilidade
 
-Este bloco passa a concentrar o que ficou fora dos módulos funcionais `001-009`:
+Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 
 - contratos canônicos de eventos entre ERP e microserviços
 - publicação e consumo confiável via broker com rastreabilidade
@@ -26,9 +26,9 @@ Este bloco passa a concentrar o que ficou fora dos módulos funcionais `001-009`
 
 ## Próxima sequência sugerida
 
-### Fase 1: Backbone de integração
-- [ ] Especificar `010-integration-backbone`
-- [ ] Planejar contratos de eventos, gateway e observabilidade
+### Fase 1: Billing control plane
+- [ ] Especificar `011-platform-billing-control-plane`
+- [ ] Planejar catálogo de planos, assinaturas, faturas SaaS e política de bloqueio
 - [ ] Gerar tarefas e executar a implementação incremental
 
 ### Fase 2: Produção assistida
