@@ -15,4 +15,10 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::get('/integration/backbone', function () {
+        abort_unless(auth()->user()->can('view-integration-operations'), 403);
+
+        return view('integration.backbone');
+    })->name('integration.backbone');
 });

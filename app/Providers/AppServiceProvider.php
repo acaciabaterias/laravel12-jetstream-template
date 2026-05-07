@@ -8,6 +8,7 @@ use App\Models\CnabRemessa;
 use App\Models\CnabRetornoUpload;
 use App\Models\ContaBancaria;
 use App\Models\Deposito;
+use App\Models\EntregaIntegracao;
 use App\Models\EstoqueMovimentacao;
 use App\Models\FilaContingencia;
 use App\Models\NotaFiscalOrquestrada;
@@ -26,6 +27,7 @@ use App\Policies\ContaBancariaPolicy;
 use App\Policies\DepositoPolicy;
 use App\Policies\EstoqueMovimentacaoPolicy;
 use App\Policies\FilaContingenciaPolicy;
+use App\Policies\IntegrationBackbonePolicy;
 use App\Policies\NotaFiscalOrquestradaPolicy;
 use App\Policies\OrdemServicoGarantiaPolicy;
 use App\Policies\OrdemServicoPolicy;
@@ -35,6 +37,14 @@ use App\Policies\TenantPolicy;
 use App\Policies\TransacaoFinanceiraPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\ValePolicy;
+use App\Services\Contracts\Integration\EventContractRegistryContract;
+use App\Services\Contracts\Integration\EventPublisherContract;
+use App\Services\Contracts\Integration\InboundEventConsumerContract;
+use App\Services\Contracts\Integration\IntegrationReplayServiceContract;
+use App\Services\Integration\EventContractRegistry;
+use App\Services\Integration\EventPublisher;
+use App\Services\Integration\InboundEventConsumer;
+use App\Services\Integration\IntegrationReplayService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use OpenApi\Attributes as OA;
@@ -49,7 +59,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(EventContractRegistryContract::class, EventContractRegistry::class);
+        $this->app->bind(EventPublisherContract::class, EventPublisher::class);
+        $this->app->bind(InboundEventConsumerContract::class, InboundEventConsumer::class);
+        $this->app->bind(IntegrationReplayServiceContract::class, IntegrationReplayService::class);
     }
 
     /**
@@ -73,6 +86,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(CnabRemessa::class, CnabRemessaPolicy::class);
         Gate::policy(CnabRetornoUpload::class, CnabRetornoUploadPolicy::class);
         Gate::policy(FilaContingencia::class, FilaContingenciaPolicy::class);
+        Gate::policy(EntregaIntegracao::class, IntegrationBackbonePolicy::class);
 
         // Configurações Globais de SEO
         seo()
@@ -169,6 +183,14 @@ class AppServiceProvider extends ServiceProvider
             return $user->isSuperAdmin() || $user->hasRole(['dono', 'gestor']);
         });
 
+        Gate::define('view-integration-operations', function (User $user) {
+            return $user->isSuperAdmin() || $user->hasRole(['dono', 'gestor']);
+        });
+
+        Gate::define('replay-integration-events', function (User $user) {
+            return $user->isSuperAdmin() || $user->hasRole(['dono', 'gestor']);
+        });
+
         // Registro de métricas do Circuit Breaker
         Prometheus::addCounter('circuit_breaker_events_total')
             ->label('service')
@@ -180,5 +202,32 @@ class AppServiceProvider extends ServiceProvider
         Prometheus::addCounter('circuit_breaker_fallback_executions_total')
             ->label('service')
             ->label('reason');
+
+        Prometheus::addCounter('integration_events_total')
+            ->label('direction')
+            ->label('event_type')
+            ->label('status');
+
+        Prometheus::addCounter('integration_replays_total')
+            ->label('target')
+            ->label('status');
+
+        Prometheus::addGauge('integration_outbox_total')
+            ->label('status');
+
+        Prometheus::addGauge('integration_deliveries_total')
+            ->label('direction')
+            ->label('status');
+
+        Prometheus::addGauge('integration_delivery_latency_average_ms')
+            ->label('direction')
+            ->label('target');
+
+        Prometheus::addGauge('integration_contracts_catalog_total')
+            ->label('status');
+
+        Prometheus::addGauge('integration_gateway_endpoints_total')
+            ->label('service_name')
+            ->label('status');
     }
 }

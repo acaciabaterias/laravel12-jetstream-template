@@ -16,10 +16,14 @@ use App\Models\Filial;
 use App\Models\ReservaEstoque;
 use App\Models\User;
 use App\Models\Vale;
+use App\Services\Contracts\Integration\EventPublisherContract;
 use App\Services\EstoqueSaldoService;
+use App\Services\Integration\OutboxEventPayloads;
+use App\Services\Integration\TenantExternalRefResolver;
 use App\Services\ReservaEstoqueService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -29,6 +33,14 @@ class SalesServiceOsTest extends TestCase
     {
         parent::setUp();
         $this->withoutMiddleware(PrometheusMetrics::class);
+
+        if (! Schema::connection('tenant')->hasTable('evento_outboxes')) {
+            $this->artisan('migrate', [
+                '--database' => 'tenant',
+                '--path' => 'database/migrations/tenant/2026_05_06_204458_create_integration_backbone_tables.php',
+                '--realpath' => false,
+            ])->assertExitCode(0);
+        }
 
         Route::middleware('web')->get('/sales/tenant-probe', function (Request $request) {
             return response()->json([
@@ -158,7 +170,15 @@ class SalesServiceOsTest extends TestCase
             'status' => 'reservada',
         ]);
 
-        (new ConvertValeToPedidoJob($vale->id, $user->id))->handle(app(ReservaEstoqueService::class), app(EstoqueSaldoService::class));
+        request()->attributes->set('cliente', (object) ['subdominio' => 'sales-test']);
+
+        (new ConvertValeToPedidoJob($vale->id, $user->id))->handle(
+            app(ReservaEstoqueService::class),
+            app(EstoqueSaldoService::class),
+            app(EventPublisherContract::class),
+            app(OutboxEventPayloads::class),
+            app(TenantExternalRefResolver::class),
+        );
 
         $this->assertDatabaseHas('pedidos_venda', [
             'vale_id' => $vale->id,
@@ -174,6 +194,11 @@ class SalesServiceOsTest extends TestCase
             'entidade_id' => $cliente->id,
             'tipo_movimento' => 'debito',
         ]);
+        $this->assertDatabaseHas('evento_outboxes', [
+            'event_type' => 'VALE_FATURADO',
+            'tenant_external_ref' => 'sales-test',
+            'idempotency_key' => sha1('vale-faturado-'.$vale->id),
+        ], 'tenant');
     }
 
     public function test_converting_vale_to_service_order_creates_os(): void
@@ -484,7 +509,15 @@ class SalesServiceOsTest extends TestCase
 
         $this->assertDatabaseCount('conta_sucata_movimentacoes', 0);
 
-        (new ConvertValeToPedidoJob($vale->id, $user->id))->handle(app(ReservaEstoqueService::class), app(EstoqueSaldoService::class));
+        request()->attributes->set('cliente', (object) ['subdominio' => 'sales-test']);
+
+        (new ConvertValeToPedidoJob($vale->id, $user->id))->handle(
+            app(ReservaEstoqueService::class),
+            app(EstoqueSaldoService::class),
+            app(EventPublisherContract::class),
+            app(OutboxEventPayloads::class),
+            app(TenantExternalRefResolver::class),
+        );
 
         $this->assertDatabaseHas('conta_sucata_movimentacoes', [
             'entidade_tipo' => Cliente::class,

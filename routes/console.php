@@ -29,6 +29,11 @@ Schedule::command('tenant:backup --all')
     ->withoutOverlapping()
     ->runInBackground();
 
+Schedule::command('integration:dispatch-outbox --limit=200')
+    ->everyMinute()
+    ->withoutOverlapping()
+    ->runInBackground();
+
 Schedule::job(new AtualizarIndiceRetornoJob)
     ->dailyAt('01:30')
     ->withoutOverlapping();

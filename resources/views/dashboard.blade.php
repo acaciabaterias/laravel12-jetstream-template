@@ -190,6 +190,10 @@
                     <livewire:cnab-upload-panel />
                 </div>
             @endcan
+
+            @can('view-integration-operations')
+                <livewire:integration-backbone-dashboard />
+            @endcan
         </div>
     </div>
 </x-app-layout>

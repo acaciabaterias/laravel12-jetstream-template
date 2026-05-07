@@ -5,8 +5,12 @@ namespace App\Jobs;
 use App\Models\Cliente;
 use App\Models\ContaSucataMovimentacao;
 use App\Models\PedidoVenda;
+use App\Models\User;
 use App\Models\Vale;
+use App\Services\Contracts\Integration\EventPublisherContract;
 use App\Services\EstoqueSaldoService;
+use App\Services\Integration\OutboxEventPayloads;
+use App\Services\Integration\TenantExternalRefResolver;
 use App\Services\ReservaEstoqueService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -14,6 +18,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ConvertValeToPedidoJob implements ShouldQueue
@@ -22,9 +27,20 @@ class ConvertValeToPedidoJob implements ShouldQueue
 
     public function __construct(public int $valeId, public ?int $actorId = null) {}
 
-    public function handle(ReservaEstoqueService $reservaEstoqueService, EstoqueSaldoService $estoqueSaldoService): void
-    {
-        DB::transaction(function () use ($reservaEstoqueService, $estoqueSaldoService): void {
+    public function handle(
+        ReservaEstoqueService $reservaEstoqueService,
+        EstoqueSaldoService $estoqueSaldoService,
+        EventPublisherContract $eventPublisher,
+        OutboxEventPayloads $outboxEventPayloads,
+        TenantExternalRefResolver $tenantExternalRefResolver,
+    ): void {
+        DB::transaction(function () use (
+            $reservaEstoqueService,
+            $estoqueSaldoService,
+            $eventPublisher,
+            $outboxEventPayloads,
+            $tenantExternalRefResolver
+        ): void {
             $vale = Vale::query()
                 ->with(['itens.bateria', 'reservas.deposito'])
                 ->findOrFail($this->valeId);
@@ -35,11 +51,11 @@ class ConvertValeToPedidoJob implements ShouldQueue
                 ]);
             }
 
-            $actor = $this->actorId ? \App\Models\User::query()->find($this->actorId) : null;
+            $actor = $this->actorId ? User::query()->find($this->actorId) : null;
 
             $reservaEstoqueService->confirmarPorVale($vale, $estoqueSaldoService, $actor);
 
-            PedidoVenda::query()->create([
+            $pedidoVenda = PedidoVenda::query()->create([
                 'vale_id' => $vale->id,
                 'cliente_id' => $vale->cliente_id,
                 'data_emissao' => now(),
@@ -68,6 +84,23 @@ class ConvertValeToPedidoJob implements ShouldQueue
                 'status' => 'faturado',
                 'data_faturamento' => now(),
             ]);
+
+            $eventPublisher->publish(
+                eventType: 'VALE_FATURADO',
+                payload: $outboxEventPayloads->forValeFaturado($vale->fresh(['itens']), $pedidoVenda->id),
+                tenantExternalRef: $tenantExternalRefResolver->resolve(),
+                idempotencyKey: sha1('vale-faturado-'.$vale->id),
+                correlationId: (string) Str::uuid(),
+                originContext: 'sales',
+                metadata: [
+                    'consumers' => ['ms-001', 'ms-003'],
+                    'target' => 'broker:erp-backbone',
+                    'transport_kind' => 'broker',
+                    'schema_definition' => [
+                        'required' => ['vale_id', 'pedido_venda_id', 'cliente_id', 'valor_total', 'faturado_em', 'itens'],
+                    ],
+                ],
+            );
         });
     }
 }

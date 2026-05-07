@@ -57,6 +57,27 @@ return [
         'url' => env('MS_GEOCODING_URL', env('MS005_BASE_URL', 'http://localhost:8005')),
     ],
 
+    'integration_backbone' => [
+        'broker' => [
+            'connection' => env('INTEGRATION_BROKER_CONNECTION', env('QUEUE_CONNECTION', 'database')),
+            'outbox_queue' => env('INTEGRATION_OUTBOX_QUEUE', 'integration-outbox'),
+            'inbox_queue' => env('INTEGRATION_INBOX_QUEUE', 'integration-inbox'),
+            'replay_queue' => env('INTEGRATION_REPLAY_QUEUE', 'integration-replay'),
+        ],
+        'gateway' => [
+            'timeout_ms' => (int) env('INTEGRATION_GATEWAY_TIMEOUT_MS', 30000),
+            'rate_limit_per_minute' => (int) env('INTEGRATION_GATEWAY_RATE_LIMIT', 120),
+            'auth_mode' => env('INTEGRATION_GATEWAY_AUTH_MODE', 'internal_key'),
+        ],
+        'retry' => [
+            'max_attempts' => (int) env('INTEGRATION_RETRY_MAX_ATTEMPTS', 5),
+            'backoff_seconds' => array_map(
+                static fn (string $value): int => (int) trim($value),
+                explode(',', (string) env('INTEGRATION_RETRY_BACKOFF_SECONDS', '30,120,600,1800,3600'))
+            ),
+        ],
+    ],
+
     'supabase' => [
         'access_token' => env('SUPABASE_ACCESS_TOKEN'),
         'org_id' => env('SUPABASE_ORG_ID'),
