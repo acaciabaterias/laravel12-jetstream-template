@@ -6,6 +6,7 @@ use App\Jobs\DispatchOutboxEventJob;
 use App\Models\EntregaIntegracao;
 use App\Models\EventoOutbox;
 use App\Services\Integration\IntegrationMetrics;
+use App\Services\Integration\OutboundDeliveryTracker;
 use App\Services\Integration\OutboxEventFactory;
 use App\Support\Integration\IntegrationFlowStatus;
 use Illuminate\Support\Facades\Schema;
@@ -51,7 +52,7 @@ class IntegrationBackboneRetryTest extends TestCase
         );
 
         app(DispatchOutboxEventJob::class, ['eventoOutboxId' => $event->id])
-            ->handle(app(IntegrationMetrics::class));
+            ->handle(app(IntegrationMetrics::class), app(OutboundDeliveryTracker::class));
 
         $event->refresh();
 
@@ -87,8 +88,8 @@ class IntegrationBackboneRetryTest extends TestCase
         );
 
         $job = app(DispatchOutboxEventJob::class, ['eventoOutboxId' => $event->id]);
-        $job->handle(app(IntegrationMetrics::class));
-        $job->handle(app(IntegrationMetrics::class));
+        $job->handle(app(IntegrationMetrics::class), app(OutboundDeliveryTracker::class));
+        $job->handle(app(IntegrationMetrics::class), app(OutboundDeliveryTracker::class));
 
         $event->refresh();
 

@@ -67,7 +67,7 @@
 - [x] T015 [P] [US1] Implement `OutboxEventFactory` in `app/Services/Integration/OutboxEventFactory.php`
 - [x] T016 [US1] Implement transactional publisher `EventPublisher` in `app/Services/Integration/EventPublisher.php` (depends on T014, T015)
 - [x] T017 [US1] Implement broker dispatcher job `DispatchOutboxEventJob` in `app/Jobs/DispatchOutboxEventJob.php`
-- [ ] T018 [US1] Implement delivery tracking service `OutboundDeliveryTracker` in `app/Services/Integration/OutboundDeliveryTracker.php`
+- [x] T018 [US1] Implement delivery tracking service `OutboundDeliveryTracker` in `app/Services/Integration/OutboundDeliveryTracker.php`
 - [x] T019 [US1] Wire publication flow into at least one existing producer path from modules `005-009` in `app/Jobs/ConvertValeToPedidoJob.php`, `app/Jobs/RetryOrchestratorJob.php` or equivalent producer entrypoint
 - [x] T020 [US1] Register queue bindings and scheduling for outbox dispatch in `routes/console.php` or `app/Console/Commands/`
 

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\EntregaIntegracao;
 use App\Models\EventoOutbox;
 use App\Services\Integration\IntegrationMetrics;
+use App\Services\Integration\OutboundDeliveryTracker;
 use App\Support\Integration\IntegrationDirection;
 use App\Support\Integration\IntegrationFlowStatus;
 use App\Support\Integration\IntegrationTransportKind;
@@ -22,7 +23,7 @@ class DispatchOutboxEventJob implements ShouldQueue
 
     public function __construct(public int $eventoOutboxId) {}
 
-    public function handle(IntegrationMetrics $metrics): void
+    public function handle(IntegrationMetrics $metrics, OutboundDeliveryTracker $deliveryTracker): void
     {
         $event = EventoOutbox::query()->findOrFail($this->eventoOutboxId);
 
@@ -51,21 +52,15 @@ class DispatchOutboxEventJob implements ShouldQueue
             $finishedAt = now();
             $latencyMs = (int) $startedAt->diffInMilliseconds($finishedAt);
 
-            $delivery = EntregaIntegracao::query()->create([
-                'entregavel_type' => EventoOutbox::class,
-                'entregavel_id' => $event->id,
-                'direction' => IntegrationDirection::Outbound,
-                'transport_kind' => $transportKind,
-                'target' => $target,
-                'status' => IntegrationFlowStatus::Processed,
-                'attempt_number' => $attemptNumber,
-                'started_at' => $startedAt,
-                'finished_at' => $finishedAt,
-                'latency_ms' => $latencyMs,
-                'metadata' => [
-                    'correlation_id' => $event->correlation_id,
-                ],
-            ]);
+            $delivery = $deliveryTracker->recordProcessed(
+                event: $event,
+                transportKind: $transportKind,
+                target: $target,
+                attemptNumber: $attemptNumber,
+                startedAt: $startedAt,
+                finishedAt: $finishedAt,
+                latencyMs: $latencyMs,
+            );
 
             $event->update([
                 'status' => IntegrationFlowStatus::Processed,
@@ -85,23 +80,18 @@ class DispatchOutboxEventJob implements ShouldQueue
                 ? IntegrationFlowStatus::DeadLetter
                 : IntegrationFlowStatus::Pending;
 
-            $delivery = EntregaIntegracao::query()->create([
-                'entregavel_type' => EventoOutbox::class,
-                'entregavel_id' => $event->id,
-                'direction' => IntegrationDirection::Outbound,
-                'transport_kind' => $transportKind,
-                'target' => $target,
-                'status' => $nextStatus === IntegrationFlowStatus::DeadLetter
+            $delivery = $deliveryTracker->recordFailure(
+                event: $event,
+                transportKind: $transportKind,
+                target: $target,
+                status: $nextStatus === IntegrationFlowStatus::DeadLetter
                     ? IntegrationFlowStatus::DeadLetter
                     : IntegrationFlowStatus::Failed,
-                'attempt_number' => $attemptNumber,
-                'started_at' => $startedAt,
-                'finished_at' => now(),
-                'error_message' => $exception->getMessage(),
-                'metadata' => [
-                    'correlation_id' => $event->correlation_id,
-                ],
-            ]);
+                attemptNumber: $attemptNumber,
+                startedAt: $startedAt,
+                finishedAt: now(),
+                errorMessage: $exception->getMessage(),
+            );
 
             $event->update([
                 'status' => $nextStatus,
