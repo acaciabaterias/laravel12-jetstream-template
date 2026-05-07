@@ -73,6 +73,15 @@ Este MS **não reescreve** a lógica do ACBr. Ele recebe JSON do ERP, transforma
 - O MS DEVE aceitar solicitações de inutilização de faixas de numeração não utilizadas
 - A inutilização DEVE ser registrada e confirmada pela SEFAZ antes de retornar sucesso
 
+### FR-001-08: Compatibilidade com Backbone de Integração
+- Todo evento consumido ou publicado pelo MS DEVE usar envelope canônico compatível com o Módulo 010 contendo `event_type`, `event_version`, `tenant_external_ref`, `correlation_id`, `causation_id` quando aplicável, `idempotency_key` e `occurred_at`
+- O MS DEVE manter versionamento explícito de contratos no catálogo compartilhado e rejeitar mensagens sem versão suportada
+- O consumo de eventos DEVE ser idempotente e suportar retry, dead-letter e replay operacional sem reemitir NF-e em duplicidade
+
+### FR-001-09: Governança de Gateway e Observabilidade
+- Endpoints síncronos acionados pelo ERP DEVE estar registráveis no gateway do Módulo 010 com autenticação, timeout explícito, rate limit e logging estruturado
+- O MS DEVE expor métricas de entrega, rejeição, contingência, dead-letter e latência compatíveis com os painéis operacionais do backbone
+
 ---
 
 ## User Stories
@@ -114,6 +123,8 @@ Este MS **não reescreve** a lógica do ACBr. Ele recebe JSON do ERP, transforma
 ---
 
 ## Eventos
+
+Todos os eventos abaixo DEVEM ser registrados no catálogo do Módulo 010 com `event_version` explícita e envelope operacional padronizado.
 
 ### Eventos que o MS-001 **ESCUTA** (consome do broker):
 

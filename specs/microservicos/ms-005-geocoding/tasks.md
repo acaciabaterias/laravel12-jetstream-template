@@ -52,6 +52,8 @@
 - [ ] T023: Implementar `RotaCriadaConsumer.ts` — escuta `ROTA_CRIADA`, aciona geocodificação + otimização
 - [ ] T024: Implementar `LocalizacaoConsumer.ts` — escuta `LOCALIZACAO_ATUALIZADA`, aciona recálculo de ETA (com debounce de 30s por entregador)
 - [ ] T025: Implementar publicadores de eventos: `ROTA_OTIMIZADA`, `ETA_ATUALIZADO`, `GEOCODIFICACAO_BAIXA_CONFIANCA`, `LIMITE_API_ATINGINDO`
+- [ ] T025A: Adaptar consumers e publishers ao envelope canônico do Módulo 010 (`event_version`, `tenant_external_ref`, `correlation_id`, `causation_id`, `idempotency_key`)
+- [ ] T025B: Implementar dead-letter e replay operacional compatíveis com o backbone para rotas, localização e ETA
 
 ---
 
@@ -78,6 +80,7 @@
 - [ ] T039: Teste E2E — `ROTA_CRIADA` publicado → geocodificação → otimização → `ROTA_OTIMIZADA` publicado com paradas ordenadas
 - [ ] T040: Teste de deduplicação de localização — enviar 100 atualizações de posição rápidas → verificar que ETA não recalcula em cada uma (debounce)
 - [ ] T041: Teste de carga — 20 paradas otimizadas concorrentemente por 5 rotas simultâneas
+- [ ] T041A: Teste de contrato do envelope canônico e replay operacional contra o catálogo do Módulo 010
 
 ---
 
@@ -87,6 +90,7 @@
 - [ ] T043: Verificar que `docker-compose.yml` inclui inicialização do PostGIS e healthcheck do Postgres
 - [ ] T044: Configurar pipeline CI/CD com testes automatizados (mockar Google Maps API nos testes)
 - [ ] T045: Configurar métricas Prometheus: cache hit/miss, uso Google Maps API, latência de otimização
+- [ ] T045A: Registrar endpoints síncronos no gateway do Módulo 010 com timeout, autenticação e rastreio padronizado
 - [ ] T046: Criar Grafana dashboard para monitoramento de rotas (entregadores ativos, média de paradas, ETA accuracy)
 - [ ] T047: Documentar limites da Google Maps API e processo de aumento de cota
 - [ ] T048: Executar linting e formatação em todos os arquivos TypeScript modificados (ESLint + Prettier) antes de cada merge

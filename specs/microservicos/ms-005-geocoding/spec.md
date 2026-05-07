@@ -68,6 +68,15 @@ Uma loja de baterias que faz entregas precisa organizar a ordem das paradas do e
 - Endpoint de invalidação de cache por endereço específico (para correções)
 - Métricas de hit/miss do cache para monitoramento
 
+### FR-005-07: Compatibilidade com Backbone de Integração
+- Todo evento consumido ou publicado pelo MS DEVE usar envelope canônico compatível com o Módulo 010 contendo `event_type`, `event_version`, `tenant_external_ref`, `correlation_id`, `causation_id` quando aplicável, `idempotency_key` e `occurred_at`
+- O MS DEVE manter versionamento explícito de contratos no catálogo compartilhado e rejeitar mensagens sem versão suportada
+- O consumo de eventos do App Entregador e do ERP DEVE suportar retry, dead-letter e replay operacional sem reordenar rotas ou ETAs de forma indevida
+
+### FR-005-08: Governança de Gateway e Observabilidade
+- Endpoints síncronos acionados pelo ERP ou pelo App DEVE estar registráveis no gateway do Módulo 010 com autenticação, timeout explícito, rate limit e logging estruturado
+- O MS DEVE expor métricas de geocodificação, cache, replay, dead-letter e latência de otimização compatíveis com os painéis operacionais do backbone
+
 ---
 
 ## User Stories
@@ -121,6 +130,8 @@ Uma loja de baterias que faz entregas precisa organizar a ordem das paradas do e
 ---
 
 ## Eventos
+
+Todos os eventos abaixo DEVEM ser registrados no catálogo do Módulo 010 com `event_version` explícita e envelope operacional padronizado.
 
 ### Eventos que o MS-005 **ESCUTA**:
 

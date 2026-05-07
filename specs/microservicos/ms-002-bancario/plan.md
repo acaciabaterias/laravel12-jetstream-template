@@ -60,6 +60,12 @@ Bancos (externos)
     └── Webhook PUT/POST → MS-002 /api/v1/webhook/{banco}
 ```
 
+## Alinhamento com o Módulo 010
+
+- Eventos consumidos, publicados e webhooks internalizados por este MS devem usar o envelope canônico do backbone com `event_version`, `tenant_external_ref`, `correlation_id`, `causation_id`, `idempotency_key` e `occurred_at`
+- Retry, dead-letter e replay operacional devem ser compatíveis com a trilha de entregas do Módulo 010
+- Endpoints síncronos expostos ao ERP devem ser registráveis no gateway do backbone com autenticação, timeout e rastreio estruturado
+
 ---
 
 ## Integração com Bancos

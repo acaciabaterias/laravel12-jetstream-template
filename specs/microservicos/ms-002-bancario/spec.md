@@ -61,6 +61,15 @@ O MS-002 **não executa regras financeiras** do ERP (juros, multas, parcelamento
 - Toda requisição de criação de cobrança DEVE incluir `idempotency_key` (UUID da fatura do ERP)
 - Se a chave já existir com status `pendente` ou `pago`, retornar a cobrança existente sem duplicar
 
+### FR-002-08: Compatibilidade com Backbone de Integração
+- Todo evento consumido ou publicado pelo MS DEVE usar envelope canônico compatível com o Módulo 010 contendo `event_type`, `event_version`, `tenant_external_ref`, `correlation_id`, `causation_id` quando aplicável, `idempotency_key` e `occurred_at`
+- O MS DEVE manter versionamento explícito de contratos no catálogo compartilhado e rejeitar mensagens sem versão suportada
+- O consumo de eventos e webhooks bancários DEVE suportar retry, dead-letter e replay operacional sem gerar cobrança ou baixa duplicada
+
+### FR-002-09: Governança de Gateway e Observabilidade
+- Endpoints síncronos acionados pelo ERP DEVE estar registráveis no gateway do Módulo 010 com autenticação, timeout explícito, rate limit e logging estruturado
+- O MS DEVE expor métricas de entrega, webhook, replay, dead-letter e latência por banco compatíveis com os painéis operacionais do backbone
+
 ---
 
 ## User Stories
@@ -110,6 +119,8 @@ O MS-002 **não executa regras financeiras** do ERP (juros, multas, parcelamento
 ---
 
 ## Eventos
+
+Todos os eventos abaixo DEVEM ser registrados no catálogo do Módulo 010 com `event_version` explícita e envelope operacional padronizado.
 
 ### Eventos que o MS-002 **ESCUTA**:
 

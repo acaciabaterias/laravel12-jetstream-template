@@ -12,51 +12,51 @@
 
 ## Phase 1: Database Migrations (Tenant)
 
-- [ ] T001: Criar migration `create_contas_bancarias_table`
-- [ ] T002: Criar migration `create_transacoes_financeiras_table`
-- [ ] T003: Criar migration `create_fluxo_caixa_projetado_table`
-- [ ] T004: Criar migration `create_margens_lucro_reais_table`
-- [ ] T005: Criar migration `create_conciliacoes_pendentes_table`
-- [ ] T006: Criar migration `create_fechamentos_contabeis_table`
-- [ ] T007: Criar migration `create_audit_logs_table`
+- [x] T001: Criar migration `create_contas_bancarias_table`
+- [x] T002: Criar migration `create_transacoes_financeiras_table`
+- [x] T003: Criar migration `create_fluxo_caixa_projetado_table`
+- [x] T004: Criar migration `create_margens_lucro_reais_table`
+- [x] T005: Criar migration `create_conciliacoes_pendentes_table`
+- [x] T006: Criar migration `create_fechamentos_contabeis_table`
+- [x] T007: Criar migration `create_audit_logs_table`
 
 ## Phase 2: Models, Services e Jobs
 
-- [ ] T008: Criar Model `ContaBancaria`
-- [ ] T009: Criar Model `TransacaoFinanceira`
-- [ ] T010: Criar Model `FluxoCaixaProjetado`
-- [ ] T011: Criar Model `MargemLucroReal`
-- [ ] T012: Criar Model `ConciliacaoPendente`
-- [ ] T013: Criar Model `FechamentoContabil`
-- [ ] T014: Criar service `BankApiClient`
-- [ ] T015: Criar service `FinanceMatcherProcessor`
-- [ ] T016: Criar service `ClosingPeriodGuard`
-- [ ] T017: Criar Trait `Auditable`
-- [ ] T018: Criar job `SyncBankTransactionsJob`
+- [x] T008: Criar Model `ContaBancaria`
+- [x] T009: Criar Model `TransacaoFinanceira`
+- [x] T010: Criar Model `FluxoCaixaProjetado`
+- [x] T011: Criar Model `MargemLucroReal`
+- [x] T012: Criar Model `ConciliacaoPendente`
+- [x] T013: Criar Model `FechamentoContabil`
+- [x] T014: Criar service `BankApiClient`
+- [x] T015: Criar service `FinanceMatcherProcessor`
+- [x] T016: Criar service `ClosingPeriodGuard`
+- [x] T017: Criar Trait `Auditable`
+- [x] T018: Criar job `SyncBankTransactionsJob`
 
 ## Phase 3: Painéis e Fluxos Financeiros
 
-- [ ] T019: Criar Livewire component `FinanceDashboard`
-- [ ] T020: Criar Livewire component `CashFlowPanel`
-- [ ] T021: Criar Livewire component `MarginAnalysisGrid`
-- [ ] T022: Implementar lançamentos manuais com auditoria
-- [ ] T023: Implementar painel de pendências de conciliação
+- [x] T019: Criar Livewire component `FinanceDashboard`
+- [x] T020: Criar Livewire component `CashFlowPanel`
+- [x] T021: Criar Livewire component `MarginAnalysisGrid`
+- [x] T022: Implementar lançamentos manuais com auditoria
+- [x] T023: Implementar painel de pendências de conciliação
 
 ## Phase 4: Integrações e Gatilhos
 
-- [ ] T024: Implementar importação e matching de transações bancárias
-- [ ] T025: Implementar atualização do fluxo de caixa projetado
-- [ ] T026: Implementar apuração de margem de lucro real
-- [ ] T027: Implementar geração automática de cobrança para OS improcedente
-- [ ] T028: Implementar bloqueio de alterações em período contábil fechado
+- [x] T024: Implementar importação e matching de transações bancárias
+- [x] T025: Implementar atualização do fluxo de caixa projetado
+- [x] T026: Implementar apuração de margem de lucro real
+- [x] T027: Implementar geração automática de cobrança para OS improcedente
+- [x] T028: Implementar bloqueio de alterações em período contábil fechado
 
 ## Phase 5: Tests
 
-- [ ] T029: Testar conciliação automática com matches simples
-- [ ] T030: Testar transações ambíguas indo para pendência manual
-- [ ] T031: Testar fluxo de caixa projetado
-- [ ] T032: Testar margem de lucro real por produto
-- [ ] T033: Testar cobrança automática de improcedência
-- [ ] T034: Testar bloqueio de edição em competência fechada
-- [ ] T035: Testar auditoria financeira das operações críticas
-- [ ] T036: Testar isolamento entre tenants sem cross-access
+- [x] T029: Testar conciliação automática com matches simples
+- [x] T030: Testar transações ambíguas indo para pendência manual
+- [x] T031: Testar fluxo de caixa projetado
+- [x] T032: Testar margem de lucro real por produto
+- [x] T033: Testar cobrança automática de improcedência
+- [x] T034: Testar bloqueio de edição em competência fechada
+- [x] T035: Testar auditoria financeira das operações críticas
+- [x] T036: Testar isolamento entre tenants sem cross-access

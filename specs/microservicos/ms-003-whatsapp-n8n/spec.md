@@ -66,6 +66,15 @@ O MS-003 é o hub central de **comunicação automatizada com clientes** via Wha
 - Cliente pode responder "PARAR" ou "SAIR" → número adicionado à blacklist → mensagens futuras bloqueadas
 - Blacklist gerenciada e consultável via API interna
 
+### FR-003-08: Compatibilidade com Backbone de Integração
+- Todo evento consumido ou publicado pelo MS DEVE usar envelope canônico compatível com o Módulo 010 contendo `event_type`, `event_version`, `tenant_external_ref`, `correlation_id`, `causation_id` quando aplicável, `idempotency_key` e `occurred_at`
+- O MS DEVE manter versionamento explícito de contratos no catálogo compartilhado e rejeitar mensagens sem versão suportada
+- O consumo de eventos e webhooks da Evolution API DEVE suportar retry, dead-letter e replay operacional sem reenviar mensagens indevidas ao cliente
+
+### FR-003-09: Governança de Gateway e Observabilidade
+- Endpoints síncronos acionados pelo ERP DEVE estar registráveis no gateway do Módulo 010 com autenticação, timeout explícito, rate limit e logging estruturado
+- O MS DEVE expor métricas de fila, entrega, replay, dead-letter e latência por canal compatíveis com os painéis operacionais do backbone
+
 ---
 
 ## User Stories
@@ -116,6 +125,8 @@ O MS-003 é o hub central de **comunicação automatizada com clientes** via Wha
 ---
 
 ## Eventos
+
+Todos os eventos abaixo DEVEM ser registrados no catálogo do Módulo 010 com `event_version` explícita e envelope operacional padronizado.
 
 ### Eventos que o MS-003 **ESCUTA**:
 

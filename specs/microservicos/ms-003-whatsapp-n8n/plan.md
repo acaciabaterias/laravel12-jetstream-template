@@ -63,6 +63,12 @@ Evolution API
             └── Publica evento de volta ao Redis
 ```
 
+## Alinhamento com o Módulo 010
+
+- Triggers Redis, publicações de retorno e webhooks da Evolution API devem ser adaptados ao envelope canônico do backbone com `event_version`, `tenant_external_ref`, `correlation_id`, `causation_id`, `idempotency_key` e `occurred_at`
+- Retry, dead-letter e replay operacional devem ser compatíveis com a trilha de entregas do Módulo 010
+- Endpoints síncronos e webhooks expostos por este MS devem ser registráveis no gateway do backbone com autenticação, timeout e rastreio estruturado
+
 ---
 
 ## n8n — Configuração e Workflows

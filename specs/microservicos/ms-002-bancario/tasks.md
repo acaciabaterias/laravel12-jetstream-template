@@ -54,6 +54,8 @@
 - [ ] T025: Implementar `CobrancaCriarConsumer.ts` — escuta `COBRANCA_CRIAR_BOLETO` e `COBRANCA_CRIAR_PIX`
 - [ ] T026: Implementar `CnabRetConsumer.ts` — escuta `CNAB_RET_PROCESSAR`
 - [ ] T027: Implementar publicador de eventos de saída (`COBRANCA_CRIADA`, `COBRANCA_PAGA`, `COBRANCA_EXPIRADA`)
+- [ ] T027A: Adaptar consumers, publishers e webhooks ao envelope canônico do Módulo 010 (`event_version`, `tenant_external_ref`, `correlation_id`, `causation_id`, `idempotency_key`)
+- [ ] T027B: Implementar tratamento de retry, dead-letter e replay operacional compatível com o backbone para cobranças e webhooks
 
 ---
 
@@ -66,6 +68,7 @@
 - [ ] T032: Teste E2E — boleto criado → webhook de pagamento recebido → evento `COBRANCA_PAGA` publicado
 - [ ] T033: Teste de carga — 100 boletos gerados em paralelo sem falhas de idempotência
 - [ ] T033A: Teste de performance validando latência em < 3s (p95) para boletos e < 1s para PIX (simulando APIs externas)
+- [ ] T033B: Teste de contrato do envelope canônico e replay operacional contra o catálogo do Módulo 010
 
 ---
 
@@ -75,5 +78,6 @@
 - [ ] T035: Configurar pipeline CI/CD com testes automatizados em ambiente de homologação
 - [ ] T036: Configurar secrets de credenciais bancárias via Docker Secrets ou Vault
 - [ ] T037: Criar dashboard Grafana para métricas de cobranças (geradas, pagas, falhas por banco)
+- [ ] T037A: Registrar endpoints síncronos no gateway do Módulo 010 com timeout, autenticação e rastreio padronizado
 - [ ] T038: Documentar processo de onboarding de novos bancos (criação de adapter + configuração de webhook)
 - [ ] T039: Executar linting e formatação em todos os arquivos TypeScript modificados (ESLint + Prettier) antes de cada merge
