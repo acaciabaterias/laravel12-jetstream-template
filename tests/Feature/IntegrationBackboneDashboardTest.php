@@ -6,10 +6,14 @@ use App\Http\Middleware\PrometheusMetrics;
 use App\Http\Middleware\TenantConnectionMiddleware;
 use App\Livewire\IntegrationBackboneDashboard;
 use App\Models\ContratoEvento;
+use App\Models\EntregaIntegracao;
 use App\Models\EventoOutbox;
 use App\Models\Filial;
 use App\Models\User;
 use App\Services\Integration\OutboxEventFactory;
+use App\Support\Integration\IntegrationDirection;
+use App\Support\Integration\IntegrationFlowStatus;
+use App\Support\Integration\IntegrationTransportKind;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -116,5 +120,54 @@ class IntegrationBackboneDashboardTest extends TestCase
             ->set('eventTypeFilter', 'VALE_FATURADO')
             ->assertSee('VALE_FATURADO')
             ->assertDontSee('COBRANCA_CRIAR_BOLETO');
+    }
+
+    public function test_livewire_dashboard_can_replay_failed_delivery(): void
+    {
+        $filial = Filial::factory()->create();
+        $user = User::factory()->withPersonalTeam()->create([
+            'papel' => 'gestor',
+            'ativo' => true,
+            'filial_id' => $filial->id,
+        ]);
+        $this->actingAs($user);
+
+        $outbox = EventoOutbox::query()->create(
+            app(OutboxEventFactory::class)->make(
+                eventType: 'VALE_FATURADO',
+                payload: ['vale_id' => 55],
+                tenantExternalRef: 'tenant-a',
+                idempotencyKey: 'dashboard-replay-55',
+                correlationId: '20a68038-45c8-4b87-a61e-7897fa7c90a8',
+            )
+        );
+        $outbox->update([
+            'status' => IntegrationFlowStatus::DeadLetter,
+            'last_error' => 'broker offline',
+        ]);
+
+        $delivery = EntregaIntegracao::query()->create([
+            'entregavel_type' => EventoOutbox::class,
+            'entregavel_id' => $outbox->id,
+            'direction' => IntegrationDirection::Outbound,
+            'transport_kind' => IntegrationTransportKind::Broker,
+            'target' => 'broker:erp-backbone',
+            'status' => IntegrationFlowStatus::DeadLetter,
+            'attempt_number' => 2,
+        ]);
+
+        Livewire::test(IntegrationBackboneDashboard::class)
+            ->call('replayDelivery', $delivery->id)
+            ->assertSet('operationMessage', sprintf('Entrega %d reenfileirada com sucesso.', $delivery->id));
+
+        $outbox->refresh();
+
+        $this->assertSame(IntegrationFlowStatus::Pending, $outbox->status);
+        $this->assertDatabaseHas('audit_logs', [
+            'user_id' => $user->id,
+            'action' => 'replayed',
+            'table_name' => 'entregas_integracao',
+            'record_id' => $delivery->id,
+        ]);
     }
 }

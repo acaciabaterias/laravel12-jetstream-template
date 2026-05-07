@@ -93,7 +93,7 @@
 - [x] T025 [P] [US2] Implement inbox deduplication service `InboxDeduplicator` in `app/Services/Integration/InboxDeduplicator.php`
 - [x] T026 [US2] Implement replay service `IntegrationReplayService` in `app/Services/Integration/IntegrationReplayService.php`
 - [x] T027 [US2] Implement operator command for replaying dead-letter events in `app/Console/Commands/ReplayIntegrationEventCommand.php`
-- [ ] T028 [US2] Implement manual replay UI action and operational listing in `app/Livewire/IntegrationBackboneDashboard.php`
+- [x] T028 [US2] Implement manual replay UI action and operational listing in `app/Livewire/IntegrationBackboneDashboard.php`
 - [x] T029 [US2] Persist operator audit trail for replay and failure handling using `EntregaIntegracao` and existing audit infrastructure
 
 **Checkpoint**: User Story 2 should process inbound events and replay failures independently

@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\ContratoEvento;
 use App\Models\EntregaIntegracao;
 use App\Models\EventoOutbox;
+use App\Services\Contracts\Integration\IntegrationReplayServiceContract;
 use App\Services\Integration\IntegrationMetrics;
 use App\Support\Integration\IntegrationFlowStatus;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,9 +19,26 @@ class IntegrationBackboneDashboard extends Component
 
     public string $statusFilter = '';
 
+    public ?string $operationMessage = null;
+
     public function mount(): void
     {
         Gate::authorize('view-integration-operations');
+    }
+
+    public function replayDelivery(int $deliveryId): void
+    {
+        $delivery = EntregaIntegracao::query()->findOrFail($deliveryId);
+
+        Gate::authorize('replay', $delivery);
+
+        app(IntegrationReplayServiceContract::class)->replay($delivery, auth()->user(), [
+            'reason' => 'dashboard replay',
+            'source' => 'livewire-dashboard',
+        ]);
+
+        $this->operationMessage = sprintf('Entrega %d reenfileirada com sucesso.', $deliveryId);
+        $this->statusFilter = '';
     }
 
     public function render(): View
@@ -58,6 +76,7 @@ class IntegrationBackboneDashboard extends Component
             'contractsCount' => $contractsCount,
             'deliveries' => $deliveries,
             'metrics' => $metrics,
+            'operationMessage' => $this->operationMessage,
         ]);
     }
 }
