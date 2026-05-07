@@ -1,8 +1,8 @@
 # Feature Specification: Módulo 011 - Platform Billing Control Plane
 
-**Feature Branch**: `011-platform-billing-control-plane`  
-**Created**: 2026-05-07  
-**Status**: Draft  
+**Feature Branch**: `011-platform-billing-control-plane`
+**Created**: 2026-05-07
+**Status**: Draft
 **Input**: User description: "Definir o próximo módulo do roadmap após o backbone 010, formalizando a camada SaaS central de planos, assinaturas, cobrança, bloqueio e visão operacional do assinante."
 
 ## Contexto

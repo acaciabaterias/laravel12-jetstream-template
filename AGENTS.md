@@ -272,5 +272,5 @@ protected function isAccessible(User $user, ?string $path = null): bool
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
-`specs/010-integration-backbone/plan.md`
+`specs/011-platform-billing-control-plane/plan.md`
 <!-- SPECKIT END -->

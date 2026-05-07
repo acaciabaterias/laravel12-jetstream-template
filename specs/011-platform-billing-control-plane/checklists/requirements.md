@@ -1,7 +1,7 @@
 # Specification Quality Checklist: Módulo 011 - Platform Billing Control Plane
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning  
-**Created**: 2026-05-07  
+**Purpose**: Validate specification completeness and quality before proceeding to planning
+**Created**: 2026-05-07
 **Feature**: [spec.md](/home/gil/laravel12-jetstream-template/specs/011-platform-billing-control-plane/spec.md)
 
 ## Content Quality
