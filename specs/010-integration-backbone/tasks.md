@@ -25,9 +25,9 @@
 
 **Purpose**: Prepare feature scaffold and shared references
 
-- [ ] T001 Create integration service namespace scaffolding in `app/Services/Integration/` and contract namespace scaffolding in `app/Services/Contracts/`
-- [ ] T002 Create feature test namespace baseline for integration backbone in `tests/Feature/`
-- [ ] T003 [P] Create unit test namespace baseline for integration contracts in `tests/Unit/`
+- [x] T001 Create integration service namespace scaffolding in `app/Services/Integration/` and contract namespace scaffolding in `app/Services/Contracts/`
+- [x] T002 Create feature test namespace baseline for integration backbone in `tests/Feature/`
+- [x] T003 [P] Create unit test namespace baseline for integration contracts in `tests/Unit/`
 
 ---
 
@@ -37,13 +37,13 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete
 
-- [ ] T004 Create tenant migrations for `evento_outboxes`, `evento_inboxes`, `entregas_integracao`, `contratos_evento` and `endpoints_integracao` in `database/migrations/tenant/`
-- [ ] T005 [P] Create Eloquent models `EventoOutbox`, `EventoInbox`, `EntregaIntegracao`, `ContratoEvento` and `EndpointIntegracao` in `app/Models/`
-- [ ] T006 [P] Create shared enums/value objects for status, direction and transport kind in `app/Support/Integration/`
-- [ ] T007 Create base service contracts for publisher, consumer, replay and contract registry in `app/Services/Contracts/`
+- [x] T004 Create tenant migrations for `evento_outboxes`, `evento_inboxes`, `entregas_integracao`, `contratos_evento` and `endpoints_integracao` in `database/migrations/tenant/`
+- [x] T005 [P] Create Eloquent models `EventoOutbox`, `EventoInbox`, `EntregaIntegracao`, `ContratoEvento` and `EndpointIntegracao` in `app/Models/`
+- [x] T006 [P] Create shared enums/value objects for status, direction and transport kind in `app/Support/Integration/`
+- [x] T007 Create base service contracts for publisher, consumer, replay and contract registry in `app/Services/Contracts/`
 - [ ] T008 Create central integration configuration entries in `config/services.php` and `config/horizon.php` for broker/gateway/backbone queues
-- [ ] T009 Create foundational observability hooks and reusable metrics recorder in `app/Services/Integration/IntegrationMetrics.php`
-- [ ] T010 Create authorization policy/gate baseline for operational replay and inspection in `app/Policies/` and `app/Providers/AuthServiceProvider.php`
+- [x] T009 Create foundational observability hooks and reusable metrics recorder in `app/Services/Integration/IntegrationMetrics.php`
+- [x] T010 Create authorization policy/gate baseline for operational replay and inspection in `app/Policies/` and `app/Providers/AuthServiceProvider.php`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -57,19 +57,19 @@
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T011 [P] [US1] Create feature test for outbox persistence and tenant isolation in `tests/Feature/IntegrationBackbonePublicationTest.php`
-- [ ] T012 [P] [US1] Create feature test for retry and dead-letter transition in `tests/Feature/IntegrationBackboneRetryTest.php`
-- [ ] T013 [P] [US1] Create unit test for idempotency key generation and event envelope normalization in `tests/Unit/IntegrationEventEnvelopeTest.php`
+- [x] T011 [P] [US1] Create feature test for outbox persistence and tenant isolation in `tests/Feature/IntegrationBackbonePublicationTest.php`
+- [x] T012 [P] [US1] Create feature test for retry and dead-letter transition in `tests/Feature/IntegrationBackboneRetryTest.php`
+- [x] T013 [P] [US1] Create unit test for idempotency key generation and event envelope normalization in `tests/Unit/IntegrationEventEnvelopeTest.php`
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] Implement `EventContractRegistry` in `app/Services/Integration/EventContractRegistry.php`
-- [ ] T015 [P] [US1] Implement `OutboxEventFactory` in `app/Services/Integration/OutboxEventFactory.php`
-- [ ] T016 [US1] Implement transactional publisher `EventPublisher` in `app/Services/Integration/EventPublisher.php` (depends on T014, T015)
-- [ ] T017 [US1] Implement broker dispatcher job `DispatchOutboxEventJob` in `app/Jobs/DispatchOutboxEventJob.php`
+- [x] T014 [P] [US1] Implement `EventContractRegistry` in `app/Services/Integration/EventContractRegistry.php`
+- [x] T015 [P] [US1] Implement `OutboxEventFactory` in `app/Services/Integration/OutboxEventFactory.php`
+- [x] T016 [US1] Implement transactional publisher `EventPublisher` in `app/Services/Integration/EventPublisher.php` (depends on T014, T015)
+- [x] T017 [US1] Implement broker dispatcher job `DispatchOutboxEventJob` in `app/Jobs/DispatchOutboxEventJob.php`
 - [ ] T018 [US1] Implement delivery tracking service `OutboundDeliveryTracker` in `app/Services/Integration/OutboundDeliveryTracker.php`
-- [ ] T019 [US1] Wire publication flow into at least one existing producer path from modules `005-009` in `app/Jobs/ConvertValeToPedidoJob.php`, `app/Jobs/RetryOrchestratorJob.php` or equivalent producer entrypoint
-- [ ] T020 [US1] Register queue bindings and scheduling for outbox dispatch in `routes/console.php` or `app/Console/Commands/`
+- [x] T019 [US1] Wire publication flow into at least one existing producer path from modules `005-009` in `app/Jobs/ConvertValeToPedidoJob.php`, `app/Jobs/RetryOrchestratorJob.php` or equivalent producer entrypoint
+- [x] T020 [US1] Register queue bindings and scheduling for outbox dispatch in `routes/console.php` or `app/Console/Commands/`
 
 **Checkpoint**: User Story 1 should publish reliable events independently
 
@@ -83,18 +83,18 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T021 [P] [US2] Create feature test for inbound duplicate suppression in `tests/Feature/IntegrationBackboneInboxTest.php`
-- [ ] T022 [P] [US2] Create feature test for dead-letter replay flow in `tests/Feature/IntegrationBackboneReplayTest.php`
-- [ ] T023 [P] [US2] Create unit test for replay authorization and state transition rules in `tests/Unit/IntegrationReplayPolicyTest.php`
+- [x] T021 [P] [US2] Create feature test for inbound duplicate suppression in `tests/Feature/IntegrationBackboneInboxTest.php`
+- [x] T022 [P] [US2] Create feature test for dead-letter replay flow in `tests/Feature/IntegrationBackboneReplayTest.php`
+- [x] T023 [P] [US2] Create unit test for replay authorization and state transition rules in `tests/Unit/IntegrationReplayPolicyTest.php`
 
 ### Implementation for User Story 2
 
-- [ ] T024 [P] [US2] Implement inbound consumer service `InboundEventConsumer` in `app/Services/Integration/InboundEventConsumer.php`
-- [ ] T025 [P] [US2] Implement inbox deduplication service `InboxDeduplicator` in `app/Services/Integration/InboxDeduplicator.php`
-- [ ] T026 [US2] Implement replay service `IntegrationReplayService` in `app/Services/Integration/IntegrationReplayService.php`
-- [ ] T027 [US2] Implement operator command for replaying dead-letter events in `app/Console/Commands/ReplayIntegrationEventCommand.php`
+- [x] T024 [P] [US2] Implement inbound consumer service `InboundEventConsumer` in `app/Services/Integration/InboundEventConsumer.php`
+- [x] T025 [P] [US2] Implement inbox deduplication service `InboxDeduplicator` in `app/Services/Integration/InboxDeduplicator.php`
+- [x] T026 [US2] Implement replay service `IntegrationReplayService` in `app/Services/Integration/IntegrationReplayService.php`
+- [x] T027 [US2] Implement operator command for replaying dead-letter events in `app/Console/Commands/ReplayIntegrationEventCommand.php`
 - [ ] T028 [US2] Implement manual replay UI action and operational listing in `app/Livewire/IntegrationBackboneDashboard.php`
-- [ ] T029 [US2] Persist operator audit trail for replay and failure handling using `EntregaIntegracao` and existing audit infrastructure
+- [x] T029 [US2] Persist operator audit trail for replay and failure handling using `EntregaIntegracao` and existing audit infrastructure
 
 **Checkpoint**: User Story 2 should process inbound events and replay failures independently
 
@@ -108,19 +108,19 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T030 [P] [US3] Create feature test for operational dashboard visibility by role in `tests/Feature/IntegrationBackboneDashboardTest.php`
-- [ ] T031 [P] [US3] Create feature test for gateway inspection endpoint and filters in `tests/Feature/IntegrationGatewayInspectionTest.php`
-- [ ] T032 [P] [US3] Create unit test for metrics aggregation and contract catalog consistency in `tests/Unit/IntegrationContractCatalogTest.php`
+- [x] T030 [P] [US3] Create feature test for operational dashboard visibility by role in `tests/Feature/IntegrationBackboneDashboardTest.php`
+- [x] T031 [P] [US3] Create feature test for gateway inspection endpoint and filters in `tests/Feature/IntegrationGatewayInspectionTest.php`
+- [x] T032 [P] [US3] Create unit test for metrics aggregation and contract catalog consistency in `tests/Unit/IntegrationContractCatalogTest.php`
 
 ### Implementation for User Story 3
 
-- [ ] T033 [P] [US3] Implement contract catalog CRUD/read service in `app/Services/Integration/EventContractCatalogService.php`
-- [ ] T034 [P] [US3] Implement gateway registry service in `app/Services/Integration/IntegrationGatewayRegistry.php`
-- [ ] T035 [US3] Implement integration inspection controller in `app/Http/Controllers/Api/IntegrationInspectionController.php`
-- [ ] T036 [US3] Implement request validation for inspection filters and replay actions in `app/Http/Requests/IntegrationInspectionRequest.php` and `app/Http/Requests/ReplayIntegrationEventRequest.php`
-- [ ] T037 [US3] Register operational routes in `routes/api.php` and `routes/web.php`
-- [ ] T038 [US3] Implement Livewire operational dashboard in `app/Livewire/IntegrationBackboneDashboard.php`
-- [ ] T039 [US3] Expose Prometheus-compatible backbone metrics in `app/Services/Integration/IntegrationMetrics.php` and related middleware/hooks
+- [x] T033 [P] [US3] Implement contract catalog CRUD/read service in `app/Services/Integration/EventContractCatalogService.php`
+- [x] T034 [P] [US3] Implement gateway registry service in `app/Services/Integration/IntegrationGatewayRegistry.php`
+- [x] T035 [US3] Implement integration inspection controller in `app/Http/Controllers/Api/IntegrationInspectionController.php`
+- [x] T036 [US3] Implement request validation for inspection filters and replay actions in `app/Http/Requests/IntegrationInspectionRequest.php` and `app/Http/Requests/ReplayIntegrationEventRequest.php`
+- [x] T037 [US3] Register operational routes in `routes/api.php` and `routes/web.php`
+- [x] T038 [US3] Implement Livewire operational dashboard in `app/Livewire/IntegrationBackboneDashboard.php`
+- [x] T039 [US3] Expose Prometheus-compatible backbone metrics in `app/Services/Integration/IntegrationMetrics.php` and related middleware/hooks
 
 **Checkpoint**: User Story 3 should provide contract visibility and operational observability independently
 
@@ -130,11 +130,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T040 [P] Document backbone operational flows and replay process updates in `GO_LIVE_RUNBOOK.md` and `MONITORING_SETUP.md`
-- [ ] T041 Update integration architecture overview in `ARCHITECTURE.md` and `README.md`
-- [ ] T042 [P] Add additional unit coverage for envelope serialization, contract compatibility and metrics formatting in `tests/Unit/`
-- [ ] T043 Perform code cleanup and Laravel Pint on changed files
-- [ ] T044 Run `quickstart.md` validation and record evidence in the feature artifacts
+- [x] T040 [P] Document backbone operational flows and replay process updates in `GO_LIVE_RUNBOOK.md` and `MONITORING_SETUP.md`
+- [x] T041 Update integration architecture overview in `ARCHITECTURE.md` and `README.md`
+- [x] T042 [P] Add additional unit coverage for envelope serialization, contract compatibility and metrics formatting in `tests/Unit/`
+- [x] T043 Perform code cleanup and Laravel Pint on changed files
+- [x] T044 Run `quickstart.md` validation and record evidence in the feature artifacts
 
 ---
 
