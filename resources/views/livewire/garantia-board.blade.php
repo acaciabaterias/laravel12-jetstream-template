@@ -2,6 +2,11 @@
     <div class="mb-5">
         <h3 class="text-lg font-semibold text-slate-900">Painel de garantias</h3>
         <p class="mt-1 text-sm text-slate-500">Acompanhe o ciclo de garantia, empréstimos e notificações do pós-venda.</p>
+        @if($emprestimosVencidos > 0)
+            <p class="mt-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">
+                Alerta: {{ $emprestimosVencidos }} empréstimo(s) com devolução vencida.
+            </p>
+        @endif
     </div>
 
     <div class="space-y-3">

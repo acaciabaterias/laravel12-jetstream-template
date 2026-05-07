@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Jobs\ConvertValeToPedidoJob;
 use App\Models\Vale;
 use App\Services\ReservaEstoqueService;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -65,6 +67,26 @@ class ValeList extends Component
 
     public function render(): View
     {
+        $isMobile = str_contains(strtolower((string) request()->userAgent()), 'mobile');
+        $cacheKey = sprintf(
+            'vale-list:%s:%s:%s:%s',
+            auth()->id() ?? 'guest',
+            $this->status,
+            $this->periodo,
+            md5($this->search)
+        );
+
+        $vales = $isMobile
+            ? Cache::remember($cacheKey, 60, fn (): Collection => $this->queryVales())
+            : $this->queryVales();
+
+        return view('livewire.vale-list', [
+            'vales' => $vales,
+        ]);
+    }
+
+    protected function queryVales(): Collection
+    {
         $vales = Vale::query()
             ->with(['cliente', 'vendedor', 'itens'])
             ->when($this->status !== '', fn ($query) => $query->where('status', $this->status))
@@ -91,8 +113,6 @@ class ValeList extends Component
             ->limit(12)
             ->get();
 
-        return view('livewire.vale-list', [
-            'vales' => $vales,
-        ]);
+        return $vales;
     }
 }

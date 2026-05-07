@@ -68,6 +68,35 @@
         </div>
     </div>
 
+    <div class="mt-6 rounded-lg border border-slate-200 bg-white p-5">
+        <h4 class="text-lg font-semibold text-slate-950">Alertas de shelf life</h4>
+        <p class="mt-1 text-sm text-slate-500">Itens acima de {{ $limiteShelfLife }} dias desde a última entrada.</p>
+        <div class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Produto</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Depósito</th>
+                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Dias</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    @forelse ($alertasShelfLife as $alerta)
+                        <tr>
+                            <td class="px-4 py-4 text-sm text-slate-700">{{ $alerta['sku'] }} · {{ $alerta['marca'] }}</td>
+                            <td class="px-4 py-4 text-sm text-slate-600">{{ $alerta['deposito'] }}</td>
+                            <td class="px-4 py-4 text-right text-sm font-semibold text-amber-700">{{ $alerta['dias_em_estoque'] }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-4 py-8 text-center text-sm text-slate-500">Nenhum item acima do limite de shelf life.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="mt-6 overflow-x-auto rounded-lg border border-slate-200">
         <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">

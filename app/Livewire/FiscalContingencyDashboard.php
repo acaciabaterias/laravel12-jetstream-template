@@ -17,7 +17,7 @@ class FiscalContingencyDashboard extends Component
     {
         return view('livewire.fiscal-contingency-dashboard', [
             'contingencias' => FilaContingencia::query()->latest('id')->limit(10)->get(),
-            'criticas' => FilaContingencia::query()->where('tentativas', '>=', 3)->count(),
+            'criticas' => FilaContingencia::query()->where('tentativas', '>=', 10)->count(),
         ]);
     }
 }

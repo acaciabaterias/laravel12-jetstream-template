@@ -10,6 +10,10 @@ use Livewire\Component;
 
 class CnabUploadPanel extends Component
 {
+    public string $nomeRemessa = '';
+
+    public string $tipoArquivo = 'retorno';
+
     public string $nomeArquivo = '';
 
     public ?int $cnabRemessaId = null;
@@ -38,6 +42,26 @@ class CnabUploadPanel extends Component
         if ($upload->status_processamento === 'pendente') {
             DispatchCnabProcessingJob::dispatchSync($upload->id);
         }
+    }
+
+    public function registerRemessa(): void
+    {
+        Gate::authorize('acesso-financeiro');
+
+        $validated = $this->validate([
+            'nomeRemessa' => ['required', 'string', 'max:255'],
+            'tipoArquivo' => ['required', 'in:remessa,retorno'],
+        ]);
+
+        CnabRemessa::query()->create([
+            'tipo_arquivo' => $validated['tipoArquivo'],
+            'nome_arquivo' => $validated['nomeRemessa'],
+            'status' => 'gerada',
+            'arquivo_path' => '/storage/cnab/remessas/'.$validated['nomeRemessa'],
+        ]);
+
+        $this->reset(['nomeRemessa']);
+        $this->tipoArquivo = 'retorno';
     }
 
     public function render()

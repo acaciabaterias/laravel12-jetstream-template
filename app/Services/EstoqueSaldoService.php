@@ -22,6 +22,8 @@ class EstoqueSaldoService
         ?string $justificativa = null,
     ): EstoqueMovimentacao {
         return DB::transaction(function () use ($bateria, $deposito, $quantidade, $tipoOperacao, $user, $origem, $justificativa) {
+            $this->validarJustificativaParaAjusteManual($origem, $justificativa);
+
             $saldo = EstoqueSaldo::query()->firstOrCreate(
                 [
                     'bateria_id' => $bateria->id,
@@ -58,6 +60,48 @@ class EstoqueSaldoService
         });
     }
 
+    public function transferirEntreDepositos(
+        Bateria $bateria,
+        Deposito $depositoOrigem,
+        Deposito $depositoDestino,
+        int $quantidade,
+        ?User $user = null,
+        ?string $justificativa = null,
+    ): array {
+        if ($depositoOrigem->id === $depositoDestino->id) {
+            throw ValidationException::withMessages([
+                'deposito_destino_id' => 'O depósito de destino deve ser diferente do depósito de origem.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($bateria, $depositoOrigem, $depositoDestino, $quantidade, $user, $justificativa) {
+            $saida = $this->registrarMovimentacao(
+                bateria: $bateria,
+                deposito: $depositoOrigem,
+                quantidade: $quantidade,
+                tipoOperacao: 'saida',
+                user: $user,
+                origem: 'transferencia_estoque',
+                justificativa: $justificativa ?: 'Transferência entre depósitos',
+            );
+
+            $entrada = $this->registrarMovimentacao(
+                bateria: $bateria,
+                deposito: $depositoDestino,
+                quantidade: $quantidade,
+                tipoOperacao: 'entrada',
+                user: $user,
+                origem: 'transferencia_estoque',
+                justificativa: $justificativa ?: 'Transferência entre depósitos',
+            );
+
+            return [
+                'saida' => $saida,
+                'entrada' => $entrada,
+            ];
+        });
+    }
+
     protected function resolverDelta(string $tipoOperacao, int $quantidade): int
     {
         return match ($tipoOperacao) {
@@ -67,5 +111,18 @@ class EstoqueSaldoService
                 'tipo_operacao' => 'Tipo de operacao de estoque invalido.',
             ]),
         };
+    }
+
+    protected function validarJustificativaParaAjusteManual(?string $origem, ?string $justificativa): void
+    {
+        if ($origem !== 'ajuste_manual') {
+            return;
+        }
+
+        if (trim((string) $justificativa) === '') {
+            throw ValidationException::withMessages([
+                'justificativa' => 'A justificativa é obrigatória para ajustes manuais de estoque.',
+            ]);
+        }
     }
 }

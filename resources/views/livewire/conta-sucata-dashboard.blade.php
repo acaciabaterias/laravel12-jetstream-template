@@ -13,14 +13,32 @@
     <form wire:submit="registrarMovimento" class="space-y-5">
         <div class="grid gap-4 md:grid-cols-2">
             <div>
-                <label class="block text-sm font-semibold text-slate-700">Bateria</label>
-                <select wire:model.live="bateriaId" class="mt-2 block w-full rounded-2xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    <option value="">Selecione...</option>
-                    @foreach($baterias as $bateria)
-                        <option value="{{ $bateria->id }}">{{ $bateria->sku }} · {{ $bateria->marca }}</option>
-                    @endforeach
+                <label class="block text-sm font-semibold text-slate-700">Tipo de entidade</label>
+                <select wire:model.live="entidadeTipo" class="mt-2 block w-full rounded-2xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="bateria">Bateria</option>
+                    <option value="cliente">Cliente</option>
+                    <option value="fornecedor">Fornecedor</option>
                 </select>
-                @error('bateriaId') <span class="text-sm text-rose-600">{{ $message }}</span> @enderror
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700">Entidade</label>
+                <select wire:model.live="entidadeId" class="mt-2 block w-full rounded-2xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="">Selecione...</option>
+                    @if($entidadeTipo === 'bateria')
+                        @foreach($baterias as $bateria)
+                            <option value="{{ $bateria->id }}">{{ $bateria->sku }} · {{ $bateria->marca }}</option>
+                        @endforeach
+                    @elseif($entidadeTipo === 'cliente')
+                        @foreach($clientes as $cliente)
+                            <option value="{{ $cliente->id }}">{{ $cliente->nome }}</option>
+                        @endforeach
+                    @else
+                        @foreach($fornecedores as $fornecedor)
+                            <option value="{{ $fornecedor->id }}">{{ $fornecedor->nome }}</option>
+                        @endforeach
+                    @endif
+                </select>
+                @error('entidadeId') <span class="text-sm text-rose-600">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block text-sm font-semibold text-slate-700">Tipo</label>
@@ -56,6 +74,7 @@
         <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
                 <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Entidade</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Tipo</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Origem</th>
                     <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Saldo</th>
@@ -64,6 +83,7 @@
             <tbody class="divide-y divide-slate-100 bg-white">
                 @forelse($movimentacoes as $movimentacao)
                     <tr>
+                        <td class="px-4 py-3 text-sm text-slate-700">{{ class_basename($movimentacao->entidade_tipo) }}</td>
                         <td class="px-4 py-3 text-sm text-slate-700">{{ ucfirst($movimentacao->tipo_movimento) }}</td>
                         <td class="px-4 py-3 text-sm text-slate-600">{{ $movimentacao->origem }}</td>
                         <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">
@@ -72,7 +92,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="px-4 py-6 text-center text-sm text-slate-500">Nenhum movimento de sucata registrado.</td>
+                        <td colspan="4" class="px-4 py-6 text-center text-sm text-slate-500">Nenhum movimento de sucata registrado.</td>
                     </tr>
                 @endforelse
             </tbody>

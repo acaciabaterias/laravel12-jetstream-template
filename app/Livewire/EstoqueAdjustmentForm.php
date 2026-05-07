@@ -37,10 +37,11 @@ class EstoqueAdjustmentForm extends Component
             'tipoOperacao' => ['required', 'in:entrada,saida,ajuste_positivo,ajuste_negativo'],
             'quantidade' => ['required', 'integer', 'min:1'],
             'origem' => ['required', 'string', 'max:100'],
-            'justificativa' => ['nullable', 'string', 'max:1000'],
+            'justificativa' => ['required_if:origem,ajuste_manual', 'nullable', 'string', 'max:1000'],
         ], [
             'bateriaId.required' => 'Selecione uma bateria.',
             'depositoId.required' => 'Selecione um deposito.',
+            'justificativa.required_if' => 'Informe a justificativa para ajuste manual.',
         ]);
 
         $estoqueSaldoService->registrarMovimentacao(

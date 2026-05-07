@@ -12,44 +12,44 @@
 
 ## Phase 1: Database Migrations (Tenant)
 
-- [ ] T001: Criar migration `create_notas_fiscais_orquestradas_table`
-- [ ] T002: Criar migration `create_boletos_orquestrados_table`
-- [ ] T003: Criar migration `create_filas_contingencia_table`
-- [ ] T004: Criar migration `create_cnab_remessas_table`
-- [ ] T005: Criar migration `create_cnab_retorno_uploads_table`
-- [ ] T006: Criar migration `create_audit_logs_table`
+- [x] T001: Criar migration `create_notas_fiscais_orquestradas_table`
+- [x] T002: Criar migration `create_boletos_orquestrados_table`
+- [x] T003: Criar migration `create_filas_contingencia_table`
+- [x] T004: Criar migration `create_cnab_remessas_table`
+- [x] T005: Criar migration `create_cnab_retorno_uploads_table`
+- [x] T006: Criar migration `create_audit_logs_table`
 
 ## Phase 2: Models, Services e Gateways
 
-- [ ] T007: Criar Model `NotaFiscalOrquestrada`
-- [ ] T008: Criar Model `BoletoOrquestrado`
-- [ ] T009: Criar Model `FilaContingencia`
-- [ ] T010: Criar Model `CnabRemessa`
-- [ ] T011: Criar Model `CnabRetornoUpload`
-- [ ] T012: Criar service `FiscalGatewayClient`
-- [ ] T013: Criar service `BankGatewayClient`
-- [ ] T014: Criar service `OrchestratorIdempotencyService`
-- [ ] T015: Criar Trait `Auditable`
+- [x] T007: Criar Model `NotaFiscalOrquestrada`
+- [x] T008: Criar Model `BoletoOrquestrado`
+- [x] T009: Criar Model `FilaContingencia`
+- [x] T010: Criar Model `CnabRemessa`
+- [x] T011: Criar Model `CnabRetornoUpload`
+- [x] T012: Criar service `FiscalGatewayClient`
+- [x] T013: Criar service `BankGatewayClient`
+- [x] T014: Criar service `OrchestratorIdempotencyService`
+- [x] T015: Criar Trait `Auditable`
 
 ## Phase 3: Retry, Contingência e Painel
 
-- [ ] T016: Criar job `RetryOrchestratorJob`
-- [ ] T017: Implementar política de retry com backoff controlado
-- [ ] T018: Criar Livewire component `FiscalContingencyDashboard`
-- [ ] T019: Implementar alerta para contingência crítica
+- [x] T016: Criar job `RetryOrchestratorJob`
+- [x] T017: Implementar política de retry com backoff controlado
+- [x] T018: Criar Livewire component `FiscalContingencyDashboard`
+- [x] T019: Implementar alerta para contingência crítica
 
 ## Phase 4: CNAB e Uploads
 
-- [ ] T020: Criar Livewire component `CnabUploadPanel`
-- [ ] T021: Criar job `DispatchCnabProcessingJob`
-- [ ] T022: Implementar upload de CNAB retorno com encaminhamento ao microserviço bancário
-- [ ] T023: Implementar download e rastreio de remessas
+- [x] T020: Criar Livewire component `CnabUploadPanel`
+- [x] T021: Criar job `DispatchCnabProcessingJob`
+- [x] T022: Implementar upload de CNAB retorno com encaminhamento ao microserviço bancário
+- [x] T023: Implementar download e rastreio de remessas
 
 ## Phase 5: Tests
 
-- [ ] T024: Testar retry e entrada em contingência após falha externa
-- [ ] T025: Testar idempotência para evitar duplicidade de emissão
-- [ ] T026: Testar upload inválido de CNAB sem quebrar o painel
-- [ ] T027: Testar persistência correta de respostas fiscal e bancária
-- [ ] T028: Testar auditoria das integrações críticas
-- [ ] T029: Testar isolamento entre tenants sem cross-access
+- [x] T024: Testar retry e entrada em contingência após falha externa
+- [x] T025: Testar idempotência para evitar duplicidade de emissão
+- [x] T026: Testar upload inválido de CNAB sem quebrar o painel
+- [x] T027: Testar persistência correta de respostas fiscal e bancária
+- [x] T028: Testar auditoria das integrações críticas
+- [x] T029: Testar isolamento entre tenants sem cross-access
