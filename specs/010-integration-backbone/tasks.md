@@ -41,7 +41,8 @@
 - [x] T005 [P] Create Eloquent models `EventoOutbox`, `EventoInbox`, `EntregaIntegracao`, `ContratoEvento` and `EndpointIntegracao` in `app/Models/`
 - [x] T006 [P] Create shared enums/value objects for status, direction and transport kind in `app/Support/Integration/`
 - [x] T007 Create base service contracts for publisher, consumer, replay and contract registry in `app/Services/Contracts/`
-- [ ] T008 Create central integration configuration entries in `config/services.php` and `config/horizon.php` for broker/gateway/backbone queues
+- [x] T008 Create central integration configuration entries in `config/services.php` and `config/horizon.php` for broker/gateway/backbone queues
+  Observação: `config/services.php` foi implementado; `config/horizon.php` não se aplica porque o projeto não usa Horizon nesta baseline.
 - [x] T009 Create foundational observability hooks and reusable metrics recorder in `app/Services/Integration/IntegrationMetrics.php`
 - [x] T010 Create authorization policy/gate baseline for operational replay and inspection in `app/Policies/` and `app/Providers/AuthServiceProvider.php`
 
