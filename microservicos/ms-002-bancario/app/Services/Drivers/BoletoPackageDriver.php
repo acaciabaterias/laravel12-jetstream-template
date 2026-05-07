@@ -7,6 +7,10 @@ use RuntimeException;
 
 class BoletoPackageDriver implements BankDriver
 {
+    /**
+     * TODO: substituir integracao de boleto por pacote/SDK compativel com Laravel 12.
+     * O pacote eduardokum/laravel-boleto foi removido temporariamente para viabilizar o build.
+     */
     public function gerarBoleto(array $data): array
     {
         return [

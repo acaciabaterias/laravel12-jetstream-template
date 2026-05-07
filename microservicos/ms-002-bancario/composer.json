@@ -8,7 +8,6 @@
         "laravel/framework": "^12.0",
         "laravel/octane": "^2.0",
         "laravel/sanctum": "^4.0",
-        "eduardokum/laravel-boleto": "^1.0",
         "guzzlehttp/guzzle": "^7.8"
     },
     "require-dev": {
@@ -40,6 +39,9 @@
     },
     "config": {
         "optimize-autoloader": true,
+        "platform": {
+            "php": "8.3.30"
+        },
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
