@@ -1,7 +1,4 @@
-#!/bin/bash
-
-# Script: generate-audit-report.sh
-# Gera relatório de auditoria completo
+#!/usr/bin/env bash
 
 set -e
 
@@ -9,18 +6,16 @@ OUTPUT_DIR="audit-reports"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 OUTPUT_FILE="${OUTPUT_DIR}/relatorio_auditoria_${TIMESTAMP}.md"
 
-mkdir -p $OUTPUT_DIR
+mkdir -p "$OUTPUT_DIR"
 
-echo "📊 Gerando relatório de auditoria..."
+printf 'Gerando relatorio de auditoria...\n'
 
-# Usar comandos artisan para coletar dados
-php artisan audit:generate-report --output=$OUTPUT_FILE --format=markdown
+php artisan audit:generate-report --output="$OUTPUT_FILE" --format=markdown
 
-# Exportar CSVs para anexos
 php artisan audit:export --days=90 --format=csv --output="${OUTPUT_DIR}/audit_full_${TIMESTAMP}.csv"
 php artisan audit:export --days=90 --format=json --output="${OUTPUT_DIR}/audit_summary_${TIMESTAMP}.json"
 
-echo "✅ Relatório gerado: $OUTPUT_FILE"
-echo "📎 Anexos:"
-echo "   - CSV: ${OUTPUT_DIR}/audit_full_${TIMESTAMP}.csv"
-echo "   - JSON: ${OUTPUT_DIR}/audit_summary_${TIMESTAMP}.json"
+printf 'Relatorio gerado: %s\n' "$OUTPUT_FILE"
+printf 'Anexos:\n'
+printf '  - CSV: %s\n' "${OUTPUT_DIR}/audit_full_${TIMESTAMP}.csv"
+printf '  - JSON: %s\n' "${OUTPUT_DIR}/audit_summary_${TIMESTAMP}.json"

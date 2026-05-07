@@ -19,6 +19,9 @@
 /storage/*.key
 /storage/pail
 /vendor
+/audit-reports
+/microservicos/*/vendor/
+/microservicos/*/bootstrap/cache/
 Homestead.json
 Homestead.yaml
 Thumbs.db
