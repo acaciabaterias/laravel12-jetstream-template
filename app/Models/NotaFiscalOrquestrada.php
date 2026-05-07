@@ -20,6 +20,8 @@ class NotaFiscalOrquestrada extends Model
         'status',
         'ms_requisicao_id',
         'idempotency_key',
+        'certificado_digital_id',
+        'certificado_referencia',
     ];
 
     public function vale(): BelongsTo

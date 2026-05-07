@@ -21,6 +21,8 @@ class BoletoOrquestrado extends Model
         'status',
         'identificador_externo',
         'idempotency_key',
+        'certificado_digital_id',
+        'certificado_referencia',
     ];
 
     public function vale(): BelongsTo

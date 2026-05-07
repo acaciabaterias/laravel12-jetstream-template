@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Assinatura extends Model
 {
@@ -24,18 +27,30 @@ class Assinatura extends Model
         ];
     }
 
-    public function cliente()
+    public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class);
     }
 
-    public function plano()
+    public function plano(): BelongsTo
     {
         return $this->belongsTo(PlanoAssinatura::class);
     }
 
-    public function faturas()
+    public function faturas(): HasMany
     {
         return $this->hasMany(Fatura::class);
+    }
+
+    public function certificadosDigitais(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            CertificadoDigital::class,
+            Cliente::class,
+            'id',
+            'cliente_id',
+            'cliente_id',
+            'id'
+        );
     }
 }
