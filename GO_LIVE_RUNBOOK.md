@@ -199,9 +199,24 @@ Valide fluxos manuais minimos:
 - consulta de estoque
 - dashboard financeiro
 - dashboard de backbone de integração em `/integration/backbone`
+- painel central de billing em `/admin/billing`
+- criação de plano e ativação de assinatura pelo painel central
+- inspeção comercial em `/admin/billing/inspection`
 - filtro da API operacional `GET /api/integration/inspections?status=dead_letter`
 - replay controlado de uma entrega com falha via `php artisan integration:replay <delivery_id> --operator=<user_id>`
 - logout
+
+### Rollback comercial do módulo 011
+
+Se o deploy introduzir inconsistência no control plane comercial:
+
+- restaurar o dump do banco central anterior ao deploy
+- invalidar eventos comerciais centrais pendentes em `evento_outboxes` se o restore for parcial
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/PlatformBillingSubscriptionLifecycleTest.php`
+  - `php artisan test --compact tests/Feature/PlatformBillingBlockReactivationTest.php`
+  - `php artisan test --compact tests/Feature/PlatformBillingBackbonePublicationTest.php`
+- confirmar que `clientes.billing_blocked`, `assinaturas.status` e `faturas.status` retornaram ao último estado consistente
 
 Com K6, quando aplicavel:
 

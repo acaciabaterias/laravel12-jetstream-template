@@ -27,7 +27,7 @@
 
 - [x] T001 Create billing service namespace scaffolding in `app/Services/Billing/` and contract namespace updates in `app/Services/Contracts/`
 - [x] T002 Create feature and unit test namespace baseline for platform billing in `tests/Feature/` and `tests/Unit/`
-- [ ] T003 [P] Register feature documentation references and central plan pointer consistency in `AGENTS.md` and `specs/011-platform-billing-control-plane/`
+- [x] T003 [P] Register feature documentation references and central plan pointer consistency in `AGENTS.md` and `specs/011-platform-billing-control-plane/`
 
 ---
 
@@ -113,7 +113,7 @@
 - [x] T029 [P] [US3] Implement `PlatformBillingSummaryService` in `app/Services/Billing/PlatformBillingSummaryService.php`
 - [x] T030 [US3] Implement super admin Livewire dashboard for commercial health in `app/Livewire/Admin/PlatformBillingDashboard.php`
 - [x] T031 [US3] Implement central filters, summaries and drill-down actions in dashboard views under `resources/views/livewire/admin/`
-- [ ] T032 [US3] Expose central billing inspection endpoints or reusable query services for operational support in `app/Http/Controllers/` or `app/Services/Billing/`
+- [x] T032 [US3] Expose central billing inspection endpoints or reusable query services for operational support in `app/Http/Controllers/` or `app/Services/Billing/`
 
 **Checkpoint**: User Story 3 should provide operational commercial visibility independently
 
@@ -123,11 +123,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T033 [P] Document commercial rollback, blocking policy and operational procedures in `GO_LIVE_RUNBOOK.md` and related operational docs
-- [ ] T034 Update architecture and product documentation for the new control plane in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
-- [ ] T035 [P] Add extra unit coverage for event publication, audit trail formatting and state serialization in `tests/Unit/`
-- [ ] T036 Perform code cleanup and Laravel Pint on changed files
-- [ ] T037 Run `quickstart.md` validation and record evidence in feature artifacts
+- [x] T033 [P] Document commercial rollback, blocking policy and operational procedures in `GO_LIVE_RUNBOOK.md` and related operational docs
+- [x] T034 Update architecture and product documentation for the new control plane in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
+- [x] T035 [P] Add extra unit coverage for event publication, audit trail formatting and state serialization in `tests/Unit/`
+- [x] T036 Perform code cleanup and Laravel Pint on changed files
+- [x] T037 Run `quickstart.md` validation and record evidence in feature artifacts
 
 ---
 

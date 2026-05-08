@@ -35,3 +35,9 @@ Validar localmente a base do plano de controle comercial da plataforma antes de 
 - bloqueio e desbloqueio rastreáveis sem ambiguidade de estado
 - eventos comerciais mínimos definidos para o backbone `010`
 - rollback operacional documentado para mudança de estado comercial crítica
+
+## Evidência de validação executada
+
+- `vendor/bin/pint --dirty --format=agent`
+- `php artisan test --compact tests/Feature/PlatformBillingSubscriptionLifecycleTest.php tests/Feature/PlatformBillingPlanChangeTest.php tests/Feature/PlatformBillingDelinquencyPolicyTest.php tests/Feature/PlatformBillingBlockReactivationTest.php tests/Feature/PlatformBillingDashboardTest.php tests/Feature/PlatformBillingPortfolioFiltersTest.php tests/Feature/PlatformBillingPlanCatalogManagerTest.php tests/Feature/PlatformBillingSubscriptionManagerTest.php tests/Feature/PlatformBillingInspectionTest.php tests/Feature/PlatformBillingBackbonePublicationTest.php tests/Unit/DelinquencyPolicyEvaluatorTest.php tests/Unit/PlatformBillingSummaryAggregatorTest.php tests/Unit/PlatformSubscriptionStateMachineTest.php`
+- suíte completa validada no ciclo: `310 passed`, `1 skipped`, `1507 assertions`

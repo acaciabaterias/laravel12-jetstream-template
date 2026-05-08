@@ -15,6 +15,7 @@
 ## Lacuna transversal fechada
 
 - [x] `010` Backbone de integração e observabilidade
+- [x] `011` Platform billing control plane
 
 Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 
@@ -23,13 +24,16 @@ Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 - outbox/inbox, retries, replay e dead-letter operacional
 - API Gateway para integrações síncronas controladas
 - métricas, dashboards e trilha operacional ponta a ponta
+- catálogo central de planos e assinaturas SaaS
+- grace period, bloqueio, reativação e trilha comercial auditável
+- painel administrativo e inspeção central da saúde comercial
 
 ## Próxima sequência sugerida
 
-### Fase 1: Billing control plane
-- [ ] Especificar `011-platform-billing-control-plane`
-- [ ] Planejar catálogo de planos, assinaturas, faturas SaaS e política de bloqueio
-- [ ] Gerar tarefas e executar a implementação incremental
+### Fase 1: Pagamentos e reconciliação SaaS
+- [ ] Especificar `012-platform-payments-reconciliation`
+- [ ] Integrar gateways de cobrança SaaS (`Stripe`/`ASAAS` ou equivalente)
+- [ ] Implementar conciliação, baixa automática e tratamento de falhas de cobrança
 
 ### Fase 2: Produção assistida
 - [ ] Validar monitoramento Prometheus/Grafana com cenários reais

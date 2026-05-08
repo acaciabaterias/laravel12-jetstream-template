@@ -38,6 +38,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `008`: financeiro inteligente
 - `009`: orquestração fiscal e bancária
 - `010`: backbone de integração, contratos canônicos, replay operacional e observabilidade
+- `011`: control plane comercial central com planos, assinaturas, faturas SaaS, bloqueio e reativação
 
 ## Integrações Externas
 
@@ -55,6 +56,14 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - rastreabilidade de entrega em `entregas_integracao`
 - catálogo síncrono controlado em `endpoints_integracao`
 - inspeção operacional via `/integration/backbone` e `/api/integration/inspections`
+
+## Control Plane Comercial
+
+- o banco central mantém `planos`, `assinaturas`, `faturas`, `politicas_inadimplencia` e `eventos_comerciais_assinante`
+- o módulo `011` não grava estado comercial nos bancos tenant
+- grace period, bloqueio e reativação atualizam o cadastro central do assinante e o `BillingAccessGuard`
+- eventos comerciais (`ASSINATURA_ATIVADA`, `PLANO_ALTERADO`, `GRACE_PERIOD_INICIADO`, `ASSINANTE_BLOQUEADO`, `ASSINANTE_REATIVADO`, `ASSINATURA_CANCELADA`) são publicados no backbone `010`
+- o painel central opera via Livewire em rotas administrativas de billing e suporta inspeção JSON em `/admin/billing/inspection`
 
 ## Padrões Técnicos
 

@@ -14,7 +14,7 @@ class ReadmeBadgesTest extends TestCase
 
         $this->assertIsString($readme);
         $this->assertStringContainsString('Tests Passing', $readme);
-        $this->assertStringContainsString('tests-301%20passed', $readme);
+        $this->assertStringContainsString('tests-310%20passed', $readme);
         $this->assertStringContainsString('PHP Version', $readme);
         $this->assertStringContainsString('Laravel Version', $readme);
         $this->assertStringContainsString('Docker Ready', $readme);

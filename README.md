@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-301%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-310%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -33,6 +33,7 @@ Os modulos core cobrem:
 - financeiro inteligente
 - orquestracao fiscal e bancaria
 - backbone de integracao e observabilidade
+- billing control plane central
 
 ## Arquitetura
 

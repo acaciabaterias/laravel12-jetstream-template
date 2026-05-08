@@ -9,18 +9,21 @@ Este arquivo foi consolidado a partir do historico recente de commits e segue o 
 ### Added
 
 - documentacao expandida de arquitetura, microservicos, API, deploy, troubleshooting, performance e templates de colaboracao
-- especificacao inicial do modulo `010` para backbone de integracao e observabilidade
+- implementacao do modulo `011` de platform billing control plane
+- painel administrativo de planos, assinaturas e saude comercial
+- inspeção central de billing e publicacao de eventos comerciais no backbone `010`
 
 ### Changed
 
-- roadmap consolidado para refletir a conclusao real dos modulos `001` a `009`
-- baseline de testes atualizado para `264` testes passando (`1313` assertions)
+- roadmap consolidado para refletir a conclusao real dos modulos `001` a `011`
+- baseline de testes atualizado para `310` testes passando (`1507` assertions)
 - endurecimento de middlewares e comandos para tolerar ambientes sem extensao Redis durante validacao automatizada
+- backbone de integracao ajustado para suportar publicacao comercial central sem regressao no fluxo tenant
 
 ### Planned
 
-- planejamento detalhado e implementacao do backbone de integracao assíncrona
-- consolidacao de observabilidade ponta a ponta entre ERP e microservicos
+- especificacao do proximo modulo `012` de pagamentos e conciliacao SaaS
+- consolidacao operacional de cobranca, webhooks e reconciliacao automatica
 
 ## [0.9.0] - 2026-04-23
 
