@@ -36,7 +36,7 @@ Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 ## Próxima sequência sugerida
 
 ### Fase 1: Analytics comercial da plataforma
-- [ ] Especificar `014-platform-commercial-analytics`
+- [x] Especificar `014-platform-commercial-analytics`
 - [ ] Consolidar métricas executivas de MRR, recuperação e churn
 - [ ] Implementar visão analítica por coorte, carteira e canal
 
