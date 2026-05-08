@@ -2,30 +2,35 @@
 
 namespace App\Providers;
 
+use App\Models\AcaoRecuperacaoReceita;
 use App\Models\AssinaturaPlataforma;
 use App\Models\BoletoOrquestrado;
+use App\Models\CasoRecuperacaoReceita;
 use App\Models\Cliente;
 use App\Models\CnabRemessa;
 use App\Models\CnabRetornoUpload;
-use App\Models\ContaBancaria;
-use App\Models\GatewayCobrancaSaaS;
 use App\Models\CobrancaSaaSExterna;
-use App\Models\RetornoPagamentoSaaS;
+use App\Models\CompromissoPagamento;
 use App\Models\ConciliacaoPagamentoSaaS;
-use App\Models\ExcecaoConciliacaoSaaS;
+use App\Models\ContaBancaria;
 use App\Models\Deposito;
 use App\Models\EntregaIntegracao;
 use App\Models\EstoqueMovimentacao;
 use App\Models\EventoComercialAssinante;
+use App\Models\ExcecaoConciliacaoSaaS;
 use App\Models\FaturaSaaS;
 use App\Models\FilaContingencia;
+use App\Models\GatewayCobrancaSaaS;
+use App\Models\IndicadorRecuperacaoReceita;
 use App\Models\NotaFiscalOrquestrada;
 use App\Models\OrdemServico;
 use App\Models\OrdemServicoGarantia;
 use App\Models\PedidoVenda;
 use App\Models\PlanoComercial;
 use App\Models\PoliticaInadimplencia;
+use App\Models\PoliticaRecuperacaoReceita;
 use App\Models\ReservaEstoque;
+use App\Models\RetornoPagamentoSaaS;
 use App\Models\TransacaoFinanceira;
 use App\Models\User;
 use App\Models\UsuarioPlataforma;
@@ -44,6 +49,7 @@ use App\Policies\OrdemServicoPolicy;
 use App\Policies\PedidoVendaPolicy;
 use App\Policies\PlatformBillingPolicy;
 use App\Policies\PlatformPaymentsPolicy;
+use App\Policies\PlatformRevenueRecoveryPolicy;
 use App\Policies\ReservaEstoquePolicy;
 use App\Policies\TenantPolicy;
 use App\Policies\TransacaoFinanceiraPolicy;
@@ -103,6 +109,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(RetornoPagamentoSaaS::class, PlatformPaymentsPolicy::class);
         Gate::policy(ConciliacaoPagamentoSaaS::class, PlatformPaymentsPolicy::class);
         Gate::policy(ExcecaoConciliacaoSaaS::class, PlatformPaymentsPolicy::class);
+        Gate::policy(PoliticaRecuperacaoReceita::class, PlatformRevenueRecoveryPolicy::class);
+        Gate::policy(CasoRecuperacaoReceita::class, PlatformRevenueRecoveryPolicy::class);
+        Gate::policy(AcaoRecuperacaoReceita::class, PlatformRevenueRecoveryPolicy::class);
+        Gate::policy(CompromissoPagamento::class, PlatformRevenueRecoveryPolicy::class);
+        Gate::policy(IndicadorRecuperacaoReceita::class, PlatformRevenueRecoveryPolicy::class);
         Gate::policy(NotaFiscalOrquestrada::class, NotaFiscalOrquestradaPolicy::class);
         Gate::policy(BoletoOrquestrado::class, BoletoOrquestradoPolicy::class);
         Gate::policy(CnabRemessa::class, CnabRemessaPolicy::class);
@@ -144,6 +155,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-platform-payments', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'billing']);
+        });
+
+        Gate::define('manage-platform-revenue-recovery', function ($user) {
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'billing']);
