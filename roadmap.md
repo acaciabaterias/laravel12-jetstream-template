@@ -17,6 +17,7 @@
 - [x] `010` Backbone de integração e observabilidade
 - [x] `011` Platform billing control plane
 - [x] `012` Platform payments and reconciliation
+- [x] `013` Platform revenue recovery
 
 Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 
@@ -30,13 +31,14 @@ Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 - painel administrativo e inspeção central da saúde comercial
 - emissão externa de cobranças SaaS, webhooks idempotentes e conciliação central
 - replay operacional de retornos, fila de exceções e inspeção financeira central
+- régua de cobrança, escalonamento, promessas e inspeção central de recuperação de receita
 
 ## Próxima sequência sugerida
 
-### Fase 1: Recuperação de receita SaaS
-- [x] Especificar `013-platform-revenue-recovery`
-- [ ] Implementar dunning multicanal para faturas vencidas e divergências abertas
-- [ ] Automatizar lembretes, régua de cobrança e escalonamento comercial pós-falha
+### Fase 1: Analytics comercial da plataforma
+- [ ] Especificar `014-platform-commercial-analytics`
+- [ ] Consolidar métricas executivas de MRR, recuperação e churn
+- [ ] Implementar visão analítica por coorte, carteira e canal
 
 ### Fase 2: Produção assistida
 - [ ] Validar monitoramento Prometheus/Grafana com cenários reais

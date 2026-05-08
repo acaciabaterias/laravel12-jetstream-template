@@ -43,5 +43,6 @@ Validar localmente a base de recuperação de receita do SaaS após falha de pag
 
 ## Evidência de validação executada
 
-- `git diff --check`
-- artefatos de planejamento do `013` gerados e revisados no ciclo atual
+- `vendor/bin/pint --dirty --format=agent`
+- `php artisan test --compact tests/Feature/PlatformRevenueRecoveryFoundationTest.php tests/Feature/PlatformRevenueRecoveryOpenCaseTest.php tests/Feature/PlatformRevenueRecoveryDeduplicationTest.php tests/Feature/PlatformRevenueRecoveryEscalationTest.php tests/Feature/PlatformRevenueRecoveryPromiseTest.php tests/Feature/PlatformRevenueRecoveryDashboardTest.php tests/Feature/PlatformRevenueRecoveryFiltersTest.php tests/Unit/PlatformRevenueRecoveryIdempotencyTest.php tests/Unit/PlatformRevenueRecoveryRulesTest.php tests/Unit/PlatformRevenueRecoverySummaryTest.php`
+- suíte completa validada no ciclo: `347 passed`, `1 skipped`, `1635 assertions`

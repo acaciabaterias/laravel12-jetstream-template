@@ -205,6 +205,9 @@ Valide fluxos manuais minimos:
 - dashboard central de pagamentos em `/admin/payments`
 - emissão manual controlada em `/admin/payments/emitir`
 - inspeção financeira em `/admin/payments/inspection`
+- dashboard central de recovery em `/admin/recovery`
+- operação manual de recovery em `/admin/recovery/operacoes`
+- inspeção de recovery em `/admin/recovery/inspection`
 - filtro da API operacional `GET /api/integration/inspections?status=dead_letter`
 - replay controlado de uma entrega com falha via `php artisan integration:replay <delivery_id> --operator=<user_id>`
 - replay controlado de um retorno financeiro via `php artisan platform-payments:replay-return <return_id> --operator=<user_id>`
@@ -239,6 +242,24 @@ Se o deploy introduzir inconsistência no ciclo de pagamentos SaaS:
   - `audit_logs.action=payment_return_replayed` quando houver replay manual
   - `retornos_pagamento_saas.processing_status` consistente com o último reprocessamento autorizado
   - `faturas.status` e `valor_pago` alinhados ao último retorno conciliado com segurança
+
+### Rollback operacional do módulo 013
+
+Se o deploy introduzir inconsistência na régua de recuperação de receita:
+
+- restaurar o dump do banco central anterior ao deploy
+- revisar `casos_recuperacao_receita`, `acoes_recuperacao_receita`, `compromissos_pagamento` e `indicadores_recuperacao_receita` antes de reenfileirar qualquer ação de cobrança
+- diferenciar replay de comunicação de reversão operacional:
+  - replay de comunicação reexecuta ação falha sem recriar caso novo
+  - quebra de promessa, chargeback ou reabertura financeira exigem novo passo auditável, não sobrescrita silenciosa do histórico
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/PlatformRevenueRecoveryOpenCaseTest.php`
+  - `php artisan test --compact tests/Feature/PlatformRevenueRecoveryPromiseTest.php`
+  - `php artisan test --compact tests/Feature/PlatformRevenueRecoveryFiltersTest.php`
+- confirmar consistência mínima:
+  - `casos_recuperacao_receita.status` alinhado ao último estado comercial esperado
+  - `acoes_recuperacao_receita` sem duplicidade indevida por estágio/canal
+  - `compromissos_pagamento.status` e `suspends_until` coerentes com o último acordo válido
 
 Com K6, quando aplicavel:
 

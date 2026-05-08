@@ -15,19 +15,23 @@ Este arquivo foi consolidado a partir do historico recente de commits e segue o 
 - implementacao do modulo `012` de platform payments and reconciliation
 - emissao externa de cobrancas SaaS, webhooks idempotentes e conciliacao automatica central
 - replay operacional de retornos, dashboard financeiro central e inspecao JSON de excecoes
+- implementacao do modulo `013` de platform revenue recovery
+- regua central de cobranca, escalonamento humano, promessas de pagamento e painel operacional de recuperacao
+- inspecao JSON e governanca central de casos de atraso, falha de cobranca e reengajamento
 
 ### Changed
 
-- roadmap consolidado para refletir a conclusao real dos modulos `001` a `012`
-- baseline de testes atualizado para `331` testes passando (`1576` assertions)
+- roadmap consolidado para refletir a conclusao real dos modulos `001` a `013`
+- baseline de testes atualizado para `347` testes passando (`1635` assertions)
 - endurecimento de middlewares e comandos para tolerar ambientes sem extensao Redis durante validacao automatizada
 - backbone de integracao ajustado para suportar publicacao comercial central sem regressao no fluxo tenant
 - ingestao de webhooks do modulo `012` ajustada para replay manual auditavel e sem quebrar idempotencia do fluxo normal
+- camada de recovery central adicionada sem mover estado operacional para bancos tenant
 
 ### Planned
 
-- especificacao do proximo modulo `013` de recuperacao de receita SaaS
-- consolidacao de dunning, escalonamento comercial e automacao de cobranca recorrente
+- especificacao do proximo modulo `014` de analytics comercial da plataforma
+- consolidacao de dashboards executivos, coortes e metricas de retencao/recuperacao
 
 ## [0.9.0] - 2026-04-23
 

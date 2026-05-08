@@ -1,10 +1,10 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v1.2.0 - pronto para lançamento assistido com billing e payments centrais)
+## Status Atual (v1.3.0 - pronto para lançamento assistido com billing, payments e revenue recovery centrais)
 
-✅ 12 módulos implementados (`001` a `012`)
+✅ 13 módulos implementados (`001` a `013`)
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `331` testes passando e `1576` assertions
+✅ suíte principal estabilizada com `347` testes passando e `1635` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
@@ -27,15 +27,19 @@
 - [x] Webhooks idempotentes, baixa automática e conciliação central
 - [x] Replay operacional de retornos e fila de exceções financeiras
 - [x] Dashboard administrativo e inspeção JSON de pagamentos
+- [x] Módulo `013` de platform revenue recovery
+- [x] Abertura central de casos por atraso e falha de cobrança
+- [x] Escalonamento humano e promessas de pagamento com trilha auditável
+- [x] Dashboard e inspeção JSON de recuperação de receita
 
-## Próximo módulo sugerido (v1.3.0)
+## Próximo módulo sugerido (v1.4.0)
 
-- [ ] Módulo `013` de platform revenue recovery
-- [ ] Régua de cobrança e dunning multicanal
-- [ ] Escalonamento comercial para inadimplência persistente
-- [ ] Automação de reengajamento após falhas de pagamento e chargeback
+- [ ] Módulo `014` de platform commercial analytics
+- [ ] Métricas executivas de MRR, recuperação e churn operacional
+- [ ] Visão consolidada por coorte, canal e carteira comercial
+- [ ] Drill-down analítico para decisões de pricing, retenção e cobrança
 
-## Fase 1: Estabilização e Produção (v1.3.0)
+## Fase 1: Estabilização e Produção (v1.4.0)
 
 - [x] Subir ambiente com Docker e validar integração ponta a ponta
 - [x] Configurar Supabase para tenants reais

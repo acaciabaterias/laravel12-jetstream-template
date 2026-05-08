@@ -25,9 +25,9 @@
 
 **Purpose**: Prepare central revenue recovery namespace and feature baseline
 
-- [ ] T001 Create recovery service namespace scaffolding in `app/Services/Billing/` and related contracts updates in `app/Services/Contracts/`
-- [ ] T002 Create feature and unit test namespace baseline for platform revenue recovery in `tests/Feature/` and `tests/Unit/`
-- [ ] T003 [P] Register feature documentation references and central plan pointer consistency in `AGENTS.md` and `specs/013-platform-revenue-recovery/`
+- [x] T001 Create recovery service namespace scaffolding in `app/Services/Billing/` and related contracts updates in `app/Services/Contracts/`
+- [x] T002 Create feature and unit test namespace baseline for platform revenue recovery in `tests/Feature/` and `tests/Unit/`
+- [x] T003 [P] Register feature documentation references and central plan pointer consistency in `AGENTS.md` and `specs/013-platform-revenue-recovery/`
 
 ---
 
@@ -37,12 +37,12 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete
 
-- [ ] T004 Create central migrations for `politicas_recuperacao_receita`, `casos_recuperacao_receita`, `acoes_recuperacao_receita`, `compromissos_pagamento` and snapshots/structures for indicators in `database/migrations/central/`
-- [ ] T005 [P] Create Eloquent models `PoliticaRecuperacaoReceita`, `CasoRecuperacaoReceita`, `AcaoRecuperacaoReceita`, `CompromissoPagamento` and indicator model(s) in `app/Models/`
-- [ ] T006 [P] Create shared enums/value objects for case status, action type, action status, promise status and severity in `app/Support/Billing/`
-- [ ] T007 Create authorization policy/gate baseline for super admin and billing recovery operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
-- [ ] T008 Create central recovery configuration entries in `config/services.php` or dedicated recovery config for stage timing, replay windows and escalation defaults
-- [ ] T009 Create foundational audit/event publication hooks for recovery case and action transitions in `app/Services/Billing/`
+- [x] T004 Create central migrations for `politicas_recuperacao_receita`, `casos_recuperacao_receita`, `acoes_recuperacao_receita`, `compromissos_pagamento` and snapshots/structures for indicators in `database/migrations/central/`
+- [x] T005 [P] Create Eloquent models `PoliticaRecuperacaoReceita`, `CasoRecuperacaoReceita`, `AcaoRecuperacaoReceita`, `CompromissoPagamento` and indicator model(s) in `app/Models/`
+- [x] T006 [P] Create shared enums/value objects for case status, action type, action status, promise status and severity in `app/Support/Billing/`
+- [x] T007 Create authorization policy/gate baseline for super admin and billing recovery operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
+- [x] T008 Create central recovery configuration entries in `config/services.php` or dedicated recovery config for stage timing, replay windows and escalation defaults
+- [x] T009 Create foundational audit/event publication hooks for recovery case and action transitions in `app/Services/Billing/`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -56,17 +56,17 @@
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T010 [P] [US1] Create feature test for opening a recovery case from overdue invoice state in `tests/Feature/PlatformRevenueRecoveryOpenCaseTest.php`
-- [ ] T011 [P] [US1] Create feature test for failed payment signal reusing an existing case without duplication in `tests/Feature/PlatformRevenueRecoveryDeduplicationTest.php`
-- [ ] T012 [P] [US1] Create unit test for stage-and-channel idempotency key generation in `tests/Unit/PlatformRevenueRecoveryIdempotencyTest.php`
+- [x] T010 [P] [US1] Create feature test for opening a recovery case from overdue invoice state in `tests/Feature/PlatformRevenueRecoveryOpenCaseTest.php`
+- [x] T011 [P] [US1] Create feature test for failed payment signal reusing an existing case without duplication in `tests/Feature/PlatformRevenueRecoveryDeduplicationTest.php`
+- [x] T012 [P] [US1] Create unit test for stage-and-channel idempotency key generation in `tests/Unit/PlatformRevenueRecoveryIdempotencyTest.php`
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Implement `RevenueRecoveryPolicyService` in `app/Services/Billing/RevenueRecoveryPolicyService.php`
-- [ ] T014 [P] [US1] Implement `RevenueRecoveryCaseService` in `app/Services/Billing/RevenueRecoveryCaseService.php`
-- [ ] T015 [US1] Implement `RevenueRecoveryActionScheduler` in `app/Services/Billing/RevenueRecoveryActionScheduler.php`
-- [ ] T016 [US1] Implement commands/jobs for asynchronous evaluation of overdue and failed-payment candidates in `app/Console/Commands/` and `app/Jobs/`
-- [ ] T017 [US1] Persist recovery case history and first-stage action transitions through the new central entities
+- [x] T013 [P] [US1] Implement `RevenueRecoveryPolicyService` in `app/Services/Billing/RevenueRecoveryPolicyService.php`
+- [x] T014 [P] [US1] Implement `RevenueRecoveryCaseService` in `app/Services/Billing/RevenueRecoveryCaseService.php`
+- [x] T015 [US1] Implement `RevenueRecoveryActionScheduler` in `app/Services/Billing/RevenueRecoveryActionScheduler.php`
+- [x] T016 [US1] Implement commands/jobs for asynchronous evaluation of overdue and failed-payment candidates in `app/Console/Commands/` and `app/Jobs/`
+- [x] T017 [US1] Persist recovery case history and first-stage action transitions through the new central entities
 
 **Checkpoint**: User Story 1 should open and schedule recovery independently
 
@@ -80,17 +80,17 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T018 [P] [US2] Create feature test for automatic escalation of critical or recurrent cases in `tests/Feature/PlatformRevenueRecoveryEscalationTest.php`
-- [ ] T019 [P] [US2] Create feature test for promise-of-payment registration and selective suspension in `tests/Feature/PlatformRevenueRecoveryPromiseTest.php`
-- [ ] T020 [P] [US2] Create unit test for escalation scoring and suspension rules in `tests/Unit/PlatformRevenueRecoveryRulesTest.php`
+- [x] T018 [P] [US2] Create feature test for automatic escalation of critical or recurrent cases in `tests/Feature/PlatformRevenueRecoveryEscalationTest.php`
+- [x] T019 [P] [US2] Create feature test for promise-of-payment registration and selective suspension in `tests/Feature/PlatformRevenueRecoveryPromiseTest.php`
+- [x] T020 [P] [US2] Create unit test for escalation scoring and suspension rules in `tests/Unit/PlatformRevenueRecoveryRulesTest.php`
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Implement `RevenueRecoveryEscalationService` in `app/Services/Billing/RevenueRecoveryEscalationService.php`
-- [ ] T022 [P] [US2] Implement `PaymentPromiseService` in `app/Services/Billing/PaymentPromiseService.php`
-- [ ] T023 [US2] Implement admin workflow or Livewire screen for ownership, escalation and promise recording in `app/Livewire/Admin/`
-- [ ] T024 [US2] Implement requests/validation for promise creation, escalation and manual follow-up in `app/Http/Requests/`
-- [ ] T025 [US2] Publish central recovery events (`CASO_RECUPERACAO_ESCALADO`, `PROMESSA_PAGAMENTO_REGISTRADA`, related events) through backbone `010`
+- [x] T021 [P] [US2] Implement `RevenueRecoveryEscalationService` in `app/Services/Billing/RevenueRecoveryEscalationService.php`
+- [x] T022 [P] [US2] Implement `PaymentPromiseService` in `app/Services/Billing/PaymentPromiseService.php`
+- [x] T023 [US2] Implement admin workflow or Livewire screen for ownership, escalation and promise recording in `app/Livewire/Admin/`
+- [x] T024 [US2] Implement requests/validation for promise creation, escalation and manual follow-up in `app/Http/Requests/`
+- [x] T025 [US2] Publish central recovery events (`CASO_RECUPERACAO_ESCALADO`, `PROMESSA_PAGAMENTO_REGISTRADA`, related events) through backbone `010`
 
 **Checkpoint**: User Story 2 should support governed human intervention independently
 
@@ -104,16 +104,16 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T026 [P] [US3] Create feature test for revenue recovery dashboard visibility in `tests/Feature/PlatformRevenueRecoveryDashboardTest.php`
-- [ ] T027 [P] [US3] Create feature test for stage, severity and owner filters in `tests/Feature/PlatformRevenueRecoveryFiltersTest.php`
-- [ ] T028 [P] [US3] Create unit test for recovery summary aggregation and reengagement eligibility in `tests/Unit/PlatformRevenueRecoverySummaryTest.php`
+- [x] T026 [P] [US3] Create feature test for revenue recovery dashboard visibility in `tests/Feature/PlatformRevenueRecoveryDashboardTest.php`
+- [x] T027 [P] [US3] Create feature test for stage, severity and owner filters in `tests/Feature/PlatformRevenueRecoveryFiltersTest.php`
+- [x] T028 [P] [US3] Create unit test for recovery summary aggregation and reengagement eligibility in `tests/Unit/PlatformRevenueRecoverySummaryTest.php`
 
 ### Implementation for User Story 3
 
-- [ ] T029 [P] [US3] Implement `PlatformRevenueRecoverySummaryService` in `app/Services/Billing/PlatformRevenueRecoverySummaryService.php`
-- [ ] T030 [US3] Implement super admin Livewire dashboard for recovery health in `app/Livewire/Admin/PlatformRevenueRecoveryDashboard.php`
-- [ ] T031 [US3] Implement central filters, summaries and drill-down actions in dashboard views under `resources/views/livewire/admin/`
-- [ ] T032 [US3] Expose central recovery inspection endpoints or reusable query services for operational support in `app/Http/Controllers/` or `app/Services/Billing/`
+- [x] T029 [P] [US3] Implement `PlatformRevenueRecoverySummaryService` in `app/Services/Billing/PlatformRevenueRecoverySummaryService.php`
+- [x] T030 [US3] Implement super admin Livewire dashboard for recovery health in `app/Livewire/Admin/PlatformRevenueRecoveryDashboard.php`
+- [x] T031 [US3] Implement central filters, summaries and drill-down actions in dashboard views under `resources/views/livewire/admin/`
+- [x] T032 [US3] Expose central recovery inspection endpoints or reusable query services for operational support in `app/Http/Controllers/` or `app/Services/Billing/`
 
 **Checkpoint**: User Story 3 should provide operational recovery visibility independently
 
@@ -123,11 +123,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T033 [P] Document recovery rollback, promise handling, replay rules and escalation procedures in `GO_LIVE_RUNBOOK.md` and related operational docs
-- [ ] T034 Update architecture and product documentation for the new recovery layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
-- [ ] T035 [P] Add targeted coverage for recovery event publication, promise serialization and replay audit trail in `tests/Feature/` and `tests/Unit/`
-- [ ] T036 Perform code cleanup and Laravel Pint on changed files
-- [ ] T037 Run `quickstart.md` validation and record evidence in feature artifacts
+- [x] T033 [P] Document recovery rollback, promise handling, replay rules and escalation procedures in `GO_LIVE_RUNBOOK.md` and related operational docs
+- [x] T034 Update architecture and product documentation for the new recovery layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
+- [x] T035 [P] Add targeted coverage for recovery event publication, promise serialization and replay audit trail in `tests/Feature/` and `tests/Unit/`
+- [x] T036 Perform code cleanup and Laravel Pint on changed files
+- [x] T037 Run `quickstart.md` validation and record evidence in feature artifacts
 
 ---
 

@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-331%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-347%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -35,6 +35,7 @@ Os modulos core cobrem:
 - backbone de integracao e observabilidade
 - billing control plane central
 - pagamentos SaaS e reconciliacao central
+- recuperacao de receita e dunning central
 
 ## Arquitetura
 
@@ -92,6 +93,16 @@ O modulo `012` fecha o ciclo financeiro externo do SaaS:
 - conciliação automática segura
 - replay manual de retornos em `platform-payments:replay-return`
 - dashboard `/admin/payments` e inspeção `/admin/payments/inspection`
+
+## Revenue Recovery Control Plane
+
+O modulo `013` adiciona a camada central de recuperação de receita:
+
+- abertura de casos a partir de atraso ou falha de cobrança
+- deduplicação por estágio e canal
+- escalonamento humano de casos críticos
+- promessas de pagamento com suspensão seletiva das ações automáticas
+- dashboard `/admin/recovery`, operação `/admin/recovery/operacoes` e inspeção `/admin/recovery/inspection`
 
 ## Stack
 

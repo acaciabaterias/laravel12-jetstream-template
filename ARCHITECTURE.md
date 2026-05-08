@@ -40,6 +40,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `010`: backbone de integração, contratos canônicos, replay operacional e observabilidade
 - `011`: control plane comercial central com planos, assinaturas, faturas SaaS, bloqueio e reativação
 - `012`: payments control plane central com emissão externa, webhooks idempotentes, conciliação e exceções financeiras
+- `013`: revenue recovery central com régua de cobrança, escalonamento, promessas e reengajamento
 
 ## Integrações Externas
 
@@ -75,6 +76,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - replay manual de retornos usa job/comando dedicado, preserva o retorno original e registra auditoria explícita em `audit_logs`
 - eventos financeiros (`COBRANCA_SAAS_LIQUIDADA`, `CONCILIACAO_SAAS_PENDENTE`) são publicados no backbone `010` em escopo central
 - o painel central opera via Livewire em `/admin/payments`, suporta emissão em `/admin/payments/emitir` e inspeção JSON em `/admin/payments/inspection`
+
+## Platform Revenue Recovery
+
+- o banco central mantém `politicas_recuperacao_receita`, `casos_recuperacao_receita`, `acoes_recuperacao_receita`, `compromissos_pagamento` e `indicadores_recuperacao_receita`
+- o módulo `013` abre casos a partir de atraso, falha de cobrança ou reabertura por reversão financeira
+- a régua é deduplicada por obrigação, estágio e canal para evitar contatos duplicados
+- promessas de pagamento pausam somente as ações incompatíveis e preservam a observabilidade do caso
+- escalonamentos críticos geram tarefas internas rastreáveis e podem atribuir responsável operacional
+- eventos de recuperação (`RECUPERACAO_RECEITA_INICIADA`, `ACAO_COBRANCA_AGENDADA`, `CASO_RECUPERACAO_ESCALADO`, `PROMESSA_PAGAMENTO_REGISTRADA`) são publicados no backbone `010`
+- o painel central opera via Livewire em `/admin/recovery`, suporta operação manual em `/admin/recovery/operacoes` e inspeção JSON em `/admin/recovery/inspection`
 
 ## Padrões Técnicos
 
