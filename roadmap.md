@@ -34,7 +34,7 @@ Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 ## Próxima sequência sugerida
 
 ### Fase 1: Recuperação de receita SaaS
-- [ ] Especificar `013-platform-revenue-recovery`
+- [x] Especificar `013-platform-revenue-recovery`
 - [ ] Implementar dunning multicanal para faturas vencidas e divergências abertas
 - [ ] Automatizar lembretes, régua de cobrança e escalonamento comercial pós-falha
 
