@@ -12,18 +12,22 @@ Este arquivo foi consolidado a partir do historico recente de commits e segue o 
 - implementacao do modulo `011` de platform billing control plane
 - painel administrativo de planos, assinaturas e saude comercial
 - inspeção central de billing e publicacao de eventos comerciais no backbone `010`
+- implementacao do modulo `012` de platform payments and reconciliation
+- emissao externa de cobrancas SaaS, webhooks idempotentes e conciliacao automatica central
+- replay operacional de retornos, dashboard financeiro central e inspecao JSON de excecoes
 
 ### Changed
 
-- roadmap consolidado para refletir a conclusao real dos modulos `001` a `011`
-- baseline de testes atualizado para `310` testes passando (`1507` assertions)
+- roadmap consolidado para refletir a conclusao real dos modulos `001` a `012`
+- baseline de testes atualizado para `331` testes passando (`1576` assertions)
 - endurecimento de middlewares e comandos para tolerar ambientes sem extensao Redis durante validacao automatizada
 - backbone de integracao ajustado para suportar publicacao comercial central sem regressao no fluxo tenant
+- ingestao de webhooks do modulo `012` ajustada para replay manual auditavel e sem quebrar idempotencia do fluxo normal
 
 ### Planned
 
-- especificacao do proximo modulo `012` de pagamentos e conciliacao SaaS
-- consolidacao operacional de cobranca, webhooks e reconciliacao automatica
+- especificacao do proximo modulo `013` de recuperacao de receita SaaS
+- consolidacao de dunning, escalonamento comercial e automacao de cobranca recorrente
 
 ## [0.9.0] - 2026-04-23
 

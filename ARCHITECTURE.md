@@ -39,6 +39,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `009`: orquestração fiscal e bancária
 - `010`: backbone de integração, contratos canônicos, replay operacional e observabilidade
 - `011`: control plane comercial central com planos, assinaturas, faturas SaaS, bloqueio e reativação
+- `012`: payments control plane central com emissão externa, webhooks idempotentes, conciliação e exceções financeiras
 
 ## Integrações Externas
 
@@ -64,6 +65,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - grace period, bloqueio e reativação atualizam o cadastro central do assinante e o `BillingAccessGuard`
 - eventos comerciais (`ASSINATURA_ATIVADA`, `PLANO_ALTERADO`, `GRACE_PERIOD_INICIADO`, `ASSINANTE_BLOQUEADO`, `ASSINANTE_REATIVADO`, `ASSINATURA_CANCELADA`) são publicados no backbone `010`
 - o painel central opera via Livewire em rotas administrativas de billing e suporta inspeção JSON em `/admin/billing/inspection`
+
+## Platform Payments and Reconciliation
+
+- o banco central mantém `gateways_cobranca_saas`, `cobrancas_saas_externas`, `retornos_pagamento_saas`, `conciliacoes_pagamento_saas` e `excecoes_conciliacao_saas`
+- o módulo `012` emite cobranças externas sempre vinculadas a uma `FaturaSaaS` do módulo `011`
+- webhooks e retornos são ingeridos com chave de idempotência e só liquidam a fatura quando o match é seguro
+- divergências de referência ou valor abrem exceções operacionais centrais sem sobrescrever o histórico financeiro original
+- replay manual de retornos usa job/comando dedicado, preserva o retorno original e registra auditoria explícita em `audit_logs`
+- eventos financeiros (`COBRANCA_SAAS_LIQUIDADA`, `CONCILIACAO_SAAS_PENDENTE`) são publicados no backbone `010` em escopo central
+- o painel central opera via Livewire em `/admin/payments`, suporta emissão em `/admin/payments/emitir` e inspeção JSON em `/admin/payments/inspection`
 
 ## Padrões Técnicos
 

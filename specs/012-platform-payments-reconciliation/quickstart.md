@@ -29,6 +29,7 @@ Validar localmente a base de emissão, retorno e reconciliação de pagamentos S
 - Simular divergência de valor e confirmar abertura de exceção operacional.
 - Simular chargeback ou estorno e confirmar preservação do histórico financeiro original.
 - Consultar visão central filtrando cobranças pendentes, liquidadas e divergentes.
+- Executar replay manual de retorno e confirmar auditoria explícita do reprocessamento.
 
 ## Critérios para avançar à implementação completa
 
@@ -41,4 +42,7 @@ Validar localmente a base de emissão, retorno e reconciliação de pagamentos S
 
 ## Evidência de validação executada
 
-- pendente de implementação do módulo
+- `vendor/bin/pint --dirty --format=agent`
+- `php artisan test --compact tests/Feature/PlatformPaymentsFoundationTest.php tests/Feature/PlatformPaymentsChargeIssuanceTest.php tests/Feature/PlatformPaymentsDuplicateIssuanceTest.php tests/Feature/PlatformPaymentsWebhookSettlementTest.php tests/Feature/PlatformPaymentsWebhookIdempotencyTest.php tests/Feature/PlatformPaymentsReplayFlowTest.php tests/Feature/PlatformPaymentsDashboardTest.php tests/Feature/PlatformPaymentsExceptionFiltersTest.php tests/Unit/PlatformPaymentsIdempotencyTest.php tests/Unit/PlatformPaymentsReconciliationRuleTest.php tests/Unit/PlatformPaymentsExceptionClassifierTest.php`
+- `php artisan test --compact tests/Feature/ReadmeBadgesTest.php tests/Feature/PlatformPaymentsReplayFlowTest.php tests/Unit/PlatformPaymentsPublicationTest.php`
+- suíte completa validada no ciclo: `331 passed`, `1 skipped`, `1576 assertions`

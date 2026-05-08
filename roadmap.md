@@ -16,6 +16,7 @@
 
 - [x] `010` Backbone de integração e observabilidade
 - [x] `011` Platform billing control plane
+- [x] `012` Platform payments and reconciliation
 
 Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 
@@ -27,13 +28,15 @@ Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 - catálogo central de planos e assinaturas SaaS
 - grace period, bloqueio, reativação e trilha comercial auditável
 - painel administrativo e inspeção central da saúde comercial
+- emissão externa de cobranças SaaS, webhooks idempotentes e conciliação central
+- replay operacional de retornos, fila de exceções e inspeção financeira central
 
 ## Próxima sequência sugerida
 
-### Fase 1: Pagamentos e reconciliação SaaS
-- [ ] Especificar `012-platform-payments-reconciliation`
-- [ ] Integrar gateways de cobrança SaaS (`Stripe`/`ASAAS` ou equivalente)
-- [ ] Implementar conciliação, baixa automática e tratamento de falhas de cobrança
+### Fase 1: Recuperação de receita SaaS
+- [ ] Especificar `013-platform-revenue-recovery`
+- [ ] Implementar dunning multicanal para faturas vencidas e divergências abertas
+- [ ] Automatizar lembretes, régua de cobrança e escalonamento comercial pós-falha
 
 ### Fase 2: Produção assistida
 - [ ] Validar monitoramento Prometheus/Grafana com cenários reais

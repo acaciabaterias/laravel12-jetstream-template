@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-310%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-331%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -34,6 +34,7 @@ Os modulos core cobrem:
 - orquestracao fiscal e bancaria
 - backbone de integracao e observabilidade
 - billing control plane central
+- pagamentos SaaS e reconciliacao central
 
 ## Arquitetura
 
@@ -81,6 +82,16 @@ O modulo `010` adiciona a espinha dorsal assíncrona entre ERP e microservicos:
 - `entregas_integracao` para retries, dead-letter e replay
 - `contratos_evento` e `endpoints_integracao` para governança operacional
 - dashboard `/integration/backbone` e API `/api/integration/inspections` para operação
+
+## Payments Control Plane
+
+O modulo `012` fecha o ciclo financeiro externo do SaaS:
+
+- emissão de cobranças externas vinculadas a `FaturaSaaS`
+- webhooks e retornos idempotentes
+- conciliação automática segura
+- replay manual de retornos em `platform-payments:replay-return`
+- dashboard `/admin/payments` e inspeção `/admin/payments/inspection`
 
 ## Stack
 

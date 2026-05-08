@@ -202,8 +202,12 @@ Valide fluxos manuais minimos:
 - painel central de billing em `/admin/billing`
 - criação de plano e ativação de assinatura pelo painel central
 - inspeção comercial em `/admin/billing/inspection`
+- dashboard central de pagamentos em `/admin/payments`
+- emissão manual controlada em `/admin/payments/emitir`
+- inspeção financeira em `/admin/payments/inspection`
 - filtro da API operacional `GET /api/integration/inspections?status=dead_letter`
 - replay controlado de uma entrega com falha via `php artisan integration:replay <delivery_id> --operator=<user_id>`
+- replay controlado de um retorno financeiro via `php artisan platform-payments:replay-return <return_id> --operator=<user_id>`
 - logout
 
 ### Rollback comercial do módulo 011
@@ -217,6 +221,24 @@ Se o deploy introduzir inconsistência no control plane comercial:
   - `php artisan test --compact tests/Feature/PlatformBillingBlockReactivationTest.php`
   - `php artisan test --compact tests/Feature/PlatformBillingBackbonePublicationTest.php`
 - confirmar que `clientes.billing_blocked`, `assinaturas.status` e `faturas.status` retornaram ao último estado consistente
+
+### Rollback operacional do módulo 012
+
+Se o deploy introduzir inconsistência no ciclo de pagamentos SaaS:
+
+- restaurar o dump do banco central anterior ao deploy
+- revisar `cobrancas_saas_externas`, `retornos_pagamento_saas`, `conciliacoes_pagamento_saas` e `excecoes_conciliacao_saas` antes de reenfileirar qualquer replay
+- diferenciar reversão financeira real de replay técnico:
+  - replay técnico reprocessa o mesmo retorno já persistido
+  - estorno, chargeback ou cancelamento exigem novo evento financeiro e não sobrescrevem a cobrança original
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/PlatformPaymentsWebhookSettlementTest.php`
+  - `php artisan test --compact tests/Feature/PlatformPaymentsWebhookIdempotencyTest.php`
+  - `php artisan test --compact tests/Feature/PlatformPaymentsReplayFlowTest.php`
+- confirmar auditoria mínima:
+  - `audit_logs.action=payment_return_replayed` quando houver replay manual
+  - `retornos_pagamento_saas.processing_status` consistente com o último reprocessamento autorizado
+  - `faturas.status` e `valor_pago` alinhados ao último retorno conciliado com segurança
 
 Com K6, quando aplicavel:
 

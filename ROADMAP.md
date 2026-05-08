@@ -1,10 +1,10 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v1.1.0 - pronto para lançamento assistido com control plane comercial)
+## Status Atual (v1.2.0 - pronto para lançamento assistido com billing e payments centrais)
 
-✅ 11 módulos implementados (`001` a `011`)
+✅ 12 módulos implementados (`001` a `012`)
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `310` testes passando e `1507` assertions
+✅ suíte principal estabilizada com `331` testes passando e `1576` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
@@ -22,16 +22,20 @@
 - [x] Política central de grace period, bloqueio e reativação
 - [x] Painel super admin de saúde comercial dos assinantes
 - [x] Eventos comerciais integrados ao backbone `010`
+- [x] Módulo `012` de platform payments and reconciliation
+- [x] Emissão externa de cobranças SaaS vinculadas a `FaturaSaaS`
+- [x] Webhooks idempotentes, baixa automática e conciliação central
+- [x] Replay operacional de retornos e fila de exceções financeiras
+- [x] Dashboard administrativo e inspeção JSON de pagamentos
 
-## Próximo módulo sugerido (v1.2.0)
+## Próximo módulo sugerido (v1.3.0)
 
-- [ ] Módulo `012` de platform payments and reconciliation
-- [ ] Integração com gateway de cobrança SaaS
-- [ ] Baixa e conciliação automática de faturas
-- [ ] Webhooks de pagamento com idempotência
-- [ ] Exceções operacionais de falha, chargeback e retry comercial
+- [ ] Módulo `013` de platform revenue recovery
+- [ ] Régua de cobrança e dunning multicanal
+- [ ] Escalonamento comercial para inadimplência persistente
+- [ ] Automação de reengajamento após falhas de pagamento e chargeback
 
-## Fase 1: Estabilização e Produção (v1.2.0)
+## Fase 1: Estabilização e Produção (v1.3.0)
 
 - [x] Subir ambiente com Docker e validar integração ponta a ponta
 - [x] Configurar Supabase para tenants reais

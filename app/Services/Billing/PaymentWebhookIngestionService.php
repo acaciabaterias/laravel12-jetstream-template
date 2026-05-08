@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services\Billing;
 
+use App\Jobs\LogAuditJob;
 use App\Models\CobrancaSaaSExterna;
 use App\Models\GatewayCobrancaSaaS;
 use App\Models\RetornoPagamentoSaaS;
 use App\Models\UsuarioPlataforma;
 use App\Support\Billing\PaymentReturnProcessingStatus;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class PaymentWebhookIngestionService
 {
@@ -28,8 +30,9 @@ class PaymentWebhookIngestionService
         array $payload,
         string $sourceType = 'webhook',
         ?UsuarioPlataforma $actor = null,
+        bool $forceReplay = false,
     ): RetornoPagamentoSaaS {
-        return DB::connection('central')->transaction(function () use ($gatewayCobrancaSaaS, $payload, $sourceType, $actor): RetornoPagamentoSaaS {
+        return DB::connection('central')->transaction(function () use ($gatewayCobrancaSaaS, $payload, $sourceType, $actor, $forceReplay): RetornoPagamentoSaaS {
             $externalReference = (string) ($payload['external_reference'] ?? '');
             $eventType = (string) ($payload['event_type'] ?? 'payment_received');
             $idempotencyKey = (string) ($payload['idempotency_key'] ?? sha1(json_encode([
@@ -58,7 +61,10 @@ class PaymentWebhookIngestionService
                 ],
             );
 
-            if ($retorno->processing_status === PaymentReturnProcessingStatus::Processed) {
+            $previousStatus = $retorno->processing_status;
+            $previousError = $retorno->processing_error;
+
+            if ($retorno->processing_status === PaymentReturnProcessingStatus::Processed && ! $forceReplay) {
                 return $retorno;
             }
 
@@ -87,6 +93,8 @@ class PaymentWebhookIngestionService
 
             $retorno->update([
                 'cobranca_saas_externa_id' => $charge->id,
+                'processing_status' => PaymentReturnProcessingStatus::Pending->value,
+                'processing_error' => null,
             ]);
 
             $this->paymentReconciliationService->reconcile($charge, $retorno->refresh(), $actor);
@@ -97,7 +105,43 @@ class PaymentWebhookIngestionService
                 'processing_error' => null,
             ]);
 
+            if ($forceReplay && $sourceType === 'manual_replay' && $actor !== null) {
+                $this->recordReplayAudit($retorno->refresh(), $actor, $previousStatus, $previousError);
+            }
+
             return $retorno->refresh();
         });
+    }
+
+    private function recordReplayAudit(
+        RetornoPagamentoSaaS $retornoPagamentoSaaS,
+        UsuarioPlataforma $actor,
+        PaymentReturnProcessingStatus $previousStatus,
+        ?string $previousError,
+    ): void {
+        if (! Schema::hasTable('audit_logs')) {
+            return;
+        }
+
+        LogAuditJob::dispatchSync([
+            'user_id' => null,
+            'action' => 'payment_return_replayed',
+            'table_name' => 'retornos_pagamento_saas',
+            'record_id' => $retornoPagamentoSaaS->id,
+            'old_values' => [
+                'processing_status' => $previousStatus->value,
+                'processing_error' => $previousError,
+                'source_type' => $retornoPagamentoSaaS->source_type,
+            ],
+            'new_values' => [
+                'processing_status' => $retornoPagamentoSaaS->processing_status->value,
+                'processing_error' => $retornoPagamentoSaaS->processing_error,
+                'source_type' => 'manual_replay',
+                'operator_user_id' => $actor->id,
+                'gateway_id' => $retornoPagamentoSaaS->gateway_cobranca_saas_id,
+                'external_reference' => $retornoPagamentoSaaS->external_reference,
+                'external_event_id' => $retornoPagamentoSaaS->external_event_id,
+            ],
+        ]);
     }
 }

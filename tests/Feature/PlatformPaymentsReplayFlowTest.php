@@ -78,5 +78,11 @@ class PlatformPaymentsReplayFlowTest extends TestCase
             'retorno_pagamento_saas_id' => $retorno->id,
             'operator_user_id' => $operador->id,
         ], 'central');
+        $this->assertDatabaseHas('audit_logs', [
+            'user_id' => null,
+            'action' => 'payment_return_replayed',
+            'table_name' => 'retornos_pagamento_saas',
+            'record_id' => $retorno->id,
+        ]);
     }
 }

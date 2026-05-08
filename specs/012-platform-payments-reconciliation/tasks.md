@@ -88,7 +88,7 @@
 
 - [x] T021 [P] [US2] Implement `PaymentWebhookIngestionService` in `app/Services/Billing/PaymentWebhookIngestionService.php`
 - [x] T022 [P] [US2] Implement `PaymentReconciliationService` in `app/Services/Billing/PaymentReconciliationService.php`
-- [ ] T023 [US2] Implement job/command for asynchronous return processing and replay in `app/Jobs/` or `app/Console/Commands/`
+- [x] T023 [US2] Implement job/command for asynchronous return processing and replay in `app/Jobs/` or `app/Console/Commands/`
 - [x] T024 [US2] Integrate successful settlement and reversal signals with module `011` state management and related central checks
 - [x] T025 [US2] Publish central financial events (`COBRANCA_SAAS_LIQUIDADA`, related events) through backbone `010`
 
@@ -104,16 +104,16 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T026 [P] [US3] Create feature test for payment operations dashboard visibility in `tests/Feature/PlatformPaymentsDashboardTest.php`
-- [ ] T027 [P] [US3] Create feature test for divergence filters and exception drill-down in `tests/Feature/PlatformPaymentsExceptionFiltersTest.php`
-- [ ] T028 [P] [US3] Create unit test for exception classification and severity aggregation in `tests/Unit/PlatformPaymentsExceptionClassifierTest.php`
+- [x] T026 [P] [US3] Create feature test for payment operations dashboard visibility in `tests/Feature/PlatformPaymentsDashboardTest.php`
+- [x] T027 [P] [US3] Create feature test for divergence filters and exception drill-down in `tests/Feature/PlatformPaymentsExceptionFiltersTest.php`
+- [x] T028 [P] [US3] Create unit test for exception classification and severity aggregation in `tests/Unit/PlatformPaymentsExceptionClassifierTest.php`
 
 ### Implementation for User Story 3
 
-- [ ] T029 [P] [US3] Implement `PlatformPaymentsSummaryService` in `app/Services/Billing/PlatformPaymentsSummaryService.php`
-- [ ] T030 [US3] Implement super admin Livewire dashboard for payments and reconciliation health in `app/Livewire/Admin/PlatformPaymentsDashboard.php`
-- [ ] T031 [US3] Implement central filters, summaries and drill-down actions in dashboard views under `resources/views/livewire/admin/`
-- [ ] T032 [US3] Expose central payment inspection endpoints or reusable query services for operational support in `app/Http/Controllers/` or `app/Services/Billing/`
+- [x] T029 [P] [US3] Implement `PlatformPaymentsSummaryService` in `app/Services/Billing/PlatformPaymentsSummaryService.php`
+- [x] T030 [US3] Implement super admin Livewire dashboard for payments and reconciliation health in `app/Livewire/Admin/PlatformPaymentsDashboard.php`
+- [x] T031 [US3] Implement central filters, summaries and drill-down actions in dashboard views under `resources/views/livewire/admin/`
+- [x] T032 [US3] Expose central payment inspection endpoints or reusable query services for operational support in `app/Http/Controllers/` or `app/Services/Billing/`
 
 **Checkpoint**: User Story 3 should provide operational payment visibility independently
 
@@ -123,11 +123,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T033 [P] Document payment rollback, webhook idempotency and reconciliation procedures in `GO_LIVE_RUNBOOK.md` and related operational docs
-- [ ] T034 Update architecture and product documentation for the new payments layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
-- [ ] T035 [P] Add extra unit coverage for event publication, exception serialization and replay audit formatting in `tests/Unit/`
-- [ ] T036 Perform code cleanup and Laravel Pint on changed files
-- [ ] T037 Run `quickstart.md` validation and record evidence in feature artifacts
+- [x] T033 [P] Document payment rollback, webhook idempotency and reconciliation procedures in `GO_LIVE_RUNBOOK.md` and related operational docs
+- [x] T034 Update architecture and product documentation for the new payments layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
+- [x] T035 [P] Add targeted coverage for payment event publication, exception classification and replay audit trail in `tests/Feature/` and `tests/Unit/`
+- [x] T036 Perform code cleanup and Laravel Pint on changed files
+- [x] T037 Run `quickstart.md` validation and record evidence in feature artifacts
 
 ---
 
