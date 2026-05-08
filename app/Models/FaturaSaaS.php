@@ -6,6 +6,7 @@ use Database\Factories\FaturaSaaSFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FaturaSaaS extends Model
 {
@@ -51,5 +52,20 @@ class FaturaSaaS extends Model
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class);
+    }
+
+    public function cobrancasExternas(): HasMany
+    {
+        return $this->hasMany(CobrancaSaaSExterna::class, 'fatura_saas_id');
+    }
+
+    public function conciliacoesPagamento(): HasMany
+    {
+        return $this->hasMany(ConciliacaoPagamentoSaaS::class, 'fatura_saas_id');
+    }
+
+    public function excecoesConciliacao(): HasMany
+    {
+        return $this->hasMany(ExcecaoConciliacaoSaaS::class, 'fatura_saas_id');
     }
 }

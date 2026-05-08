@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\PlatformBillingInspectionController;
 use App\Http\Middleware\PlatformAdminMiddleware;
 use App\Livewire\Admin\PlanCatalogManager;
 use App\Livewire\Admin\PlatformBillingDashboard;
+use App\Livewire\Admin\PlatformPaymentsManager;
 use App\Livewire\Admin\PlatformSubscriptionManager;
 use App\Livewire\TenantForm;
 use App\Livewire\TenantManager;
@@ -31,5 +32,6 @@ Route::name('admin.')->group(function () {
         Route::get('/billing/planos', PlanCatalogManager::class)->name('billing.plans');
         Route::get('/billing/assinaturas', PlatformSubscriptionManager::class)->name('billing.subscriptions');
         Route::get('/billing/inspection', PlatformBillingInspectionController::class)->name('billing.inspection');
+        Route::get('/payments', PlatformPaymentsManager::class)->name('payments.index');
     });
 });

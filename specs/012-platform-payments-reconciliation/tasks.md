@@ -25,9 +25,9 @@
 
 **Purpose**: Prepare central payments namespace and feature baseline
 
-- [ ] T001 Create payments service namespace scaffolding in `app/Services/Billing/` and contracts updates in `app/Services/Contracts/`
-- [ ] T002 Create feature and unit test namespace baseline for platform payments in `tests/Feature/` and `tests/Unit/`
-- [ ] T003 [P] Register feature documentation references and central plan pointer consistency in `AGENTS.md` and `specs/012-platform-payments-reconciliation/`
+- [x] T001 Create payments service namespace scaffolding in `app/Services/Billing/` and contracts updates in `app/Services/Contracts/`
+- [x] T002 Create feature and unit test namespace baseline for platform payments in `tests/Feature/` and `tests/Unit/`
+- [x] T003 [P] Register feature documentation references and central plan pointer consistency in `AGENTS.md` and `specs/012-platform-payments-reconciliation/`
 
 ---
 
@@ -37,12 +37,12 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete
 
-- [ ] T004 Create central migrations for `gateways_cobranca_saas`, `cobrancas_saas_externas`, `retornos_pagamento_saas`, `conciliacoes_pagamento_saas` and `excecoes_conciliacao_saas` in `database/migrations/central/`
-- [ ] T005 [P] Create Eloquent models `GatewayCobrancaSaaS`, `CobrancaSaaSExterna`, `RetornoPagamentoSaaS`, `ConciliacaoPagamentoSaaS` and `ExcecaoConciliacaoSaaS` in `app/Models/`
-- [ ] T006 [P] Create shared enums/value objects for external charge status, webhook processing and reconciliation outcomes in `app/Support/Billing/`
-- [ ] T007 Create authorization policy/gate baseline for super admin payment operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
-- [ ] T008 Create central payment configuration entries in `config/services.php` or dedicated payment config file for gateway profiles, idempotency and retry defaults
-- [ ] T009 Create foundational audit/event publication hooks for external charge and reconciliation state transitions in `app/Services/Billing/`
+- [x] T004 Create central migrations for `gateways_cobranca_saas`, `cobrancas_saas_externas`, `retornos_pagamento_saas`, `conciliacoes_pagamento_saas` and `excecoes_conciliacao_saas` in `database/migrations/central/`
+- [x] T005 [P] Create Eloquent models `GatewayCobrancaSaaS`, `CobrancaSaaSExterna`, `RetornoPagamentoSaaS`, `ConciliacaoPagamentoSaaS` and `ExcecaoConciliacaoSaaS` in `app/Models/`
+- [x] T006 [P] Create shared enums/value objects for external charge status, webhook processing and reconciliation outcomes in `app/Support/Billing/`
+- [x] T007 Create authorization policy/gate baseline for super admin payment operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
+- [x] T008 Create central payment configuration entries in `config/services.php` or dedicated payment config file for gateway profiles, idempotency and retry defaults
+- [x] T009 Create foundational audit/event publication hooks for external charge and reconciliation state transitions in `app/Services/Billing/`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -56,17 +56,17 @@
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T010 [P] [US1] Create feature test for external charge issuance and linkage in `tests/Feature/PlatformPaymentsChargeIssuanceTest.php`
-- [ ] T011 [P] [US1] Create feature test for duplicate issuance prevention and controlled reissue in `tests/Feature/PlatformPaymentsDuplicateIssuanceTest.php`
-- [ ] T012 [P] [US1] Create unit test for external charge idempotency key generation in `tests/Unit/PlatformPaymentsIdempotencyTest.php`
+- [x] T010 [P] [US1] Create feature test for external charge issuance and linkage in `tests/Feature/PlatformPaymentsChargeIssuanceTest.php`
+- [x] T011 [P] [US1] Create feature test for duplicate issuance prevention and controlled reissue in `tests/Feature/PlatformPaymentsDuplicateIssuanceTest.php`
+- [x] T012 [P] [US1] Create unit test for external charge idempotency key generation in `tests/Unit/PlatformPaymentsIdempotencyTest.php`
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Implement `GatewayRegistryService` in `app/Services/Billing/GatewayRegistryService.php`
-- [ ] T014 [P] [US1] Implement `ExternalChargeIssuanceService` in `app/Services/Billing/ExternalChargeIssuanceService.php`
-- [ ] T015 [US1] Implement central admin workflow or Livewire screen for charge issuance in `app/Livewire/Admin/`
-- [ ] T016 [US1] Implement requests/validation for gateway selection and controlled reissue in `app/Http/Requests/`
-- [ ] T017 [US1] Persist external issuance history and state transitions through central payment entities
+- [x] T013 [P] [US1] Implement `GatewayRegistryService` in `app/Services/Billing/GatewayRegistryService.php`
+- [x] T014 [P] [US1] Implement `ExternalChargeIssuanceService` in `app/Services/Billing/ExternalChargeIssuanceService.php`
+- [x] T015 [US1] Implement central admin workflow or Livewire screen for charge issuance in `app/Livewire/Admin/`
+- [x] T016 [US1] Implement requests/validation for gateway selection and controlled reissue in `app/Http/Requests/`
+- [x] T017 [US1] Persist external issuance history and state transitions through central payment entities
 
 **Checkpoint**: User Story 1 should emit and track SaaS charges independently
 
@@ -80,17 +80,17 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T018 [P] [US2] Create feature test for webhook processing and automatic settlement in `tests/Feature/PlatformPaymentsWebhookSettlementTest.php`
-- [ ] T019 [P] [US2] Create feature test for duplicate or out-of-order webhook handling in `tests/Feature/PlatformPaymentsWebhookIdempotencyTest.php`
-- [ ] T020 [P] [US2] Create unit test for reconciliation safety rules in `tests/Unit/PlatformPaymentsReconciliationRuleTest.php`
+- [x] T018 [P] [US2] Create feature test for webhook processing and automatic settlement in `tests/Feature/PlatformPaymentsWebhookSettlementTest.php`
+- [x] T019 [P] [US2] Create feature test for duplicate or out-of-order webhook handling in `tests/Feature/PlatformPaymentsWebhookIdempotencyTest.php`
+- [x] T020 [P] [US2] Create unit test for reconciliation safety rules in `tests/Unit/PlatformPaymentsReconciliationRuleTest.php`
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Implement `PaymentWebhookIngestionService` in `app/Services/Billing/PaymentWebhookIngestionService.php`
-- [ ] T022 [P] [US2] Implement `PaymentReconciliationService` in `app/Services/Billing/PaymentReconciliationService.php`
+- [x] T021 [P] [US2] Implement `PaymentWebhookIngestionService` in `app/Services/Billing/PaymentWebhookIngestionService.php`
+- [x] T022 [P] [US2] Implement `PaymentReconciliationService` in `app/Services/Billing/PaymentReconciliationService.php`
 - [ ] T023 [US2] Implement job/command for asynchronous return processing and replay in `app/Jobs/` or `app/Console/Commands/`
-- [ ] T024 [US2] Integrate successful settlement and reversal signals with module `011` state management and related central checks
-- [ ] T025 [US2] Publish central financial events (`COBRANCA_SAAS_LIQUIDADA`, related events) through backbone `010`
+- [x] T024 [US2] Integrate successful settlement and reversal signals with module `011` state management and related central checks
+- [x] T025 [US2] Publish central financial events (`COBRANCA_SAAS_LIQUIDADA`, related events) through backbone `010`
 
 **Checkpoint**: User Story 2 should reconcile valid returns independently
 

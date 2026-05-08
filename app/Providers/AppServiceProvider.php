@@ -8,6 +8,11 @@ use App\Models\Cliente;
 use App\Models\CnabRemessa;
 use App\Models\CnabRetornoUpload;
 use App\Models\ContaBancaria;
+use App\Models\GatewayCobrancaSaaS;
+use App\Models\CobrancaSaaSExterna;
+use App\Models\RetornoPagamentoSaaS;
+use App\Models\ConciliacaoPagamentoSaaS;
+use App\Models\ExcecaoConciliacaoSaaS;
 use App\Models\Deposito;
 use App\Models\EntregaIntegracao;
 use App\Models\EstoqueMovimentacao;
@@ -38,6 +43,7 @@ use App\Policies\OrdemServicoGarantiaPolicy;
 use App\Policies\OrdemServicoPolicy;
 use App\Policies\PedidoVendaPolicy;
 use App\Policies\PlatformBillingPolicy;
+use App\Policies\PlatformPaymentsPolicy;
 use App\Policies\ReservaEstoquePolicy;
 use App\Policies\TenantPolicy;
 use App\Policies\TransacaoFinanceiraPolicy;
@@ -92,6 +98,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(FaturaSaaS::class, PlatformBillingPolicy::class);
         Gate::policy(PoliticaInadimplencia::class, PlatformBillingPolicy::class);
         Gate::policy(EventoComercialAssinante::class, PlatformBillingPolicy::class);
+        Gate::policy(GatewayCobrancaSaaS::class, PlatformPaymentsPolicy::class);
+        Gate::policy(CobrancaSaaSExterna::class, PlatformPaymentsPolicy::class);
+        Gate::policy(RetornoPagamentoSaaS::class, PlatformPaymentsPolicy::class);
+        Gate::policy(ConciliacaoPagamentoSaaS::class, PlatformPaymentsPolicy::class);
+        Gate::policy(ExcecaoConciliacaoSaaS::class, PlatformPaymentsPolicy::class);
         Gate::policy(NotaFiscalOrquestrada::class, NotaFiscalOrquestradaPolicy::class);
         Gate::policy(BoletoOrquestrado::class, BoletoOrquestradoPolicy::class);
         Gate::policy(CnabRemessa::class, CnabRemessaPolicy::class);
@@ -127,6 +138,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-platform-billing', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'billing']);
+        });
+
+        Gate::define('manage-platform-payments', function ($user) {
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'billing']);
