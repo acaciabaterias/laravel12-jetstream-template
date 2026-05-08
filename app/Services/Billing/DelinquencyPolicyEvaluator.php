@@ -164,6 +164,20 @@ class DelinquencyPolicyEvaluator
             ],
         );
 
+        $this->publishBackboneEvent(
+            eventType: 'GRACE_PERIOD_INICIADO',
+            assinaturaPlataforma: $assinaturaPlataforma->refresh()->loadMissing('cliente', 'plano'),
+            payload: [
+                'subscription_id' => $assinaturaPlataforma->id,
+                'tenant_id' => $assinaturaPlataforma->cliente_id,
+                'invoice_id' => $faturaSaaS?->id,
+                'status' => $assinaturaPlataforma->status,
+                'grace_ends_at' => $graceEndsAt?->toDateString(),
+            ],
+            consumers: ['platform', 'ms-003'],
+            schemaDefinition: ['subscription_id' => 'integer', 'tenant_id' => 'integer', 'invoice_id' => 'integer|null', 'status' => 'string', 'grace_ends_at' => 'date|null'],
+        );
+
         return $assinaturaPlataforma->refresh();
     }
 
@@ -207,6 +221,20 @@ class DelinquencyPolicyEvaluator
             ],
         );
 
+        $this->publishBackboneEvent(
+            eventType: 'ASSINANTE_BLOQUEADO',
+            assinaturaPlataforma: $assinaturaPlataforma->refresh()->loadMissing('cliente', 'plano'),
+            payload: [
+                'subscription_id' => $assinaturaPlataforma->id,
+                'tenant_id' => $assinaturaPlataforma->cliente_id,
+                'invoice_id' => $faturaSaaS?->id,
+                'status' => $assinaturaPlataforma->status,
+                'blocked_at' => $referenceDate->toIso8601String(),
+            ],
+            consumers: ['platform', 'ms-003'],
+            schemaDefinition: ['subscription_id' => 'integer', 'tenant_id' => 'integer', 'invoice_id' => 'integer|null', 'status' => 'string', 'blocked_at' => 'datetime'],
+        );
+
         return $assinaturaPlataforma->refresh();
     }
 
@@ -246,6 +274,19 @@ class DelinquencyPolicyEvaluator
             afterState: $this->snapshot($assinaturaPlataforma->refresh()),
             reason: 'Assinante reativado apos regularizacao financeira.',
             effectiveAt: $referenceDate,
+        );
+
+        $this->publishBackboneEvent(
+            eventType: 'ASSINANTE_REATIVADO',
+            assinaturaPlataforma: $assinaturaPlataforma->refresh()->loadMissing('cliente', 'plano'),
+            payload: [
+                'subscription_id' => $assinaturaPlataforma->id,
+                'tenant_id' => $assinaturaPlataforma->cliente_id,
+                'status' => $assinaturaPlataforma->status,
+                'reactivated_at' => $referenceDate->toIso8601String(),
+            ],
+            consumers: ['platform', 'ms-003'],
+            schemaDefinition: ['subscription_id' => 'integer', 'tenant_id' => 'integer', 'status' => 'string', 'reactivated_at' => 'datetime'],
         );
 
         return $assinaturaPlataforma->refresh();
@@ -291,5 +332,26 @@ class DelinquencyPolicyEvaluator
             'reason' => $reason,
             'metadata' => $metadata,
         ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @param  array<int, string>  $consumers
+     * @param  array<string, mixed>  $schemaDefinition
+     */
+    private function publishBackboneEvent(
+        string $eventType,
+        AssinaturaPlataforma $assinaturaPlataforma,
+        array $payload,
+        array $consumers,
+        array $schemaDefinition,
+    ): void {
+        app(PlatformBillingEventPublisher::class)->publish(
+            eventType: $eventType,
+            assinaturaPlataforma: $assinaturaPlataforma,
+            payload: $payload,
+            consumers: $consumers,
+            schemaDefinition: $schemaDefinition,
+        );
     }
 }

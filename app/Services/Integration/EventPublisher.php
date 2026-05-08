@@ -12,6 +12,7 @@ class EventPublisher implements EventPublisherContract
     public function __construct(
         private readonly EventContractRegistry $contractRegistry,
         private readonly OutboxEventFactory $outboxEventFactory,
+        private readonly IntegrationStorageManager $integrationStorageManager,
     ) {}
 
     public function publish(
@@ -56,8 +57,10 @@ class EventPublisher implements EventPublisherContract
             )
         );
 
-        DB::afterCommit(function () use ($outbox): void {
-            DispatchOutboxEventJob::dispatch($outbox->id)
+        $storageConnection = $this->integrationStorageManager->currentConnection();
+
+        DB::afterCommit(function () use ($outbox, $storageConnection): void {
+            DispatchOutboxEventJob::dispatch($outbox->id, $storageConnection)
                 ->onQueue(config('services.integration_backbone.broker.outbox_queue'));
         });
 

@@ -64,8 +64,8 @@
 
 - [x] T013 [P] [US1] Implement `PlanCatalogService` in `app/Services/Billing/PlanCatalogService.php`
 - [x] T014 [P] [US1] Implement `SubscriptionLifecycleService` in `app/Services/Billing/SubscriptionLifecycleService.php`
-- [ ] T015 [US1] Implement central admin Livewire screens for plans and subscriptions in `app/Livewire/Admin/`
-- [ ] T016 [US1] Implement requests/validation for plan creation and subscription activation in `app/Http/Requests/`
+- [x] T015 [US1] Implement central admin Livewire screens for plans and subscriptions in `app/Livewire/Admin/`
+- [x] T016 [US1] Implement requests/validation for plan creation and subscription activation in `app/Http/Requests/`
 - [x] T017 [US1] Persist commercial history and state transitions through `EventoComercialAssinante`
 
 **Checkpoint**: User Story 1 should manage plans and subscriptions independently
@@ -90,7 +90,7 @@
 - [x] T022 [P] [US2] Implement `DelinquencyPolicyEvaluator` in `app/Services/Billing/DelinquencyPolicyEvaluator.php`
 - [x] T023 [US2] Implement job/command for recurring delinquency assessment in `app/Jobs/` or `app/Console/Commands/`
 - [x] T024 [US2] Integrate commercial block/unblock flow with existing `BillingAccessGuard` and related central checks
-- [ ] T025 [US2] Publish central commercial events (`ASSINANTE_BLOQUEADO`, `ASSINANTE_REATIVADO`, related events) through backbone `010`
+- [x] T025 [US2] Publish central commercial events (`ASSINANTE_BLOQUEADO`, `ASSINANTE_REATIVADO`, related events) through backbone `010`
 
 **Checkpoint**: User Story 2 should apply delinquency policy independently
 

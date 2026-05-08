@@ -3,8 +3,11 @@
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FilialController;
+use App\Http\Controllers\Admin\PlatformBillingInspectionController;
 use App\Http\Middleware\PlatformAdminMiddleware;
+use App\Livewire\Admin\PlanCatalogManager;
 use App\Livewire\Admin\PlatformBillingDashboard;
+use App\Livewire\Admin\PlatformSubscriptionManager;
 use App\Livewire\TenantForm;
 use App\Livewire\TenantManager;
 use Illuminate\Support\Facades\Route;
@@ -25,5 +28,8 @@ Route::name('admin.')->group(function () {
         Route::get('/clientes/novo', TenantForm::class)->name('clientes.create');
         Route::get('/clientes/{tenant}/editar', TenantForm::class)->name('clientes.edit');
         Route::get('/billing', PlatformBillingDashboard::class)->name('billing.index');
+        Route::get('/billing/planos', PlanCatalogManager::class)->name('billing.plans');
+        Route::get('/billing/assinaturas', PlatformSubscriptionManager::class)->name('billing.subscriptions');
+        Route::get('/billing/inspection', PlatformBillingInspectionController::class)->name('billing.inspection');
     });
 });

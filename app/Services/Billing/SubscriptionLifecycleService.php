@@ -71,6 +71,20 @@ class SubscriptionLifecycleService
                 effectiveAt: $effectiveDate,
             );
 
+            $this->publishBackboneEvent(
+                eventType: 'ASSINATURA_ATIVADA',
+                assinaturaPlataforma: $assinatura->refresh()->loadMissing('cliente', 'plano'),
+                payload: [
+                    'subscription_id' => $assinatura->id,
+                    'tenant_id' => $cliente->id,
+                    'plan_slug' => $planoComercial->slug,
+                    'status' => $assinatura->status,
+                    'effective_at' => $effectiveDate->toIso8601String(),
+                ],
+                consumers: ['platform', 'ms-003'],
+                schemaDefinition: ['subscription_id' => 'integer', 'tenant_id' => 'integer', 'plan_slug' => 'string', 'status' => 'string', 'effective_at' => 'datetime'],
+            );
+
             return $assinatura->refresh();
         });
     }
@@ -119,6 +133,21 @@ class SubscriptionLifecycleService
                 effectiveAt: $effectiveDate,
             );
 
+            $this->publishBackboneEvent(
+                eventType: 'PLANO_ALTERADO',
+                assinaturaPlataforma: $assinatura->refresh()->loadMissing('cliente', 'plano'),
+                payload: [
+                    'subscription_id' => $assinatura->id,
+                    'tenant_id' => $assinatura->cliente_id,
+                    'previous_plan_id' => $beforeState['plano_id'] ?? null,
+                    'current_plan_id' => $assinatura->plano_id,
+                    'current_plan_slug' => $assinatura->plano?->slug,
+                    'effective_at' => $effectiveDate->toIso8601String(),
+                ],
+                consumers: ['platform', 'analytics'],
+                schemaDefinition: ['subscription_id' => 'integer', 'tenant_id' => 'integer', 'previous_plan_id' => 'integer|null', 'current_plan_id' => 'integer', 'current_plan_slug' => 'string|null', 'effective_at' => 'datetime'],
+            );
+
             return $assinatura;
         });
     }
@@ -159,6 +188,20 @@ class SubscriptionLifecycleService
                 actor: $actor,
                 reason: $reason,
                 effectiveAt: $effectiveDate,
+            );
+
+            $this->publishBackboneEvent(
+                eventType: 'ASSINATURA_CANCELADA',
+                assinaturaPlataforma: $assinatura->refresh()->loadMissing('cliente', 'plano'),
+                payload: [
+                    'subscription_id' => $assinatura->id,
+                    'tenant_id' => $assinatura->cliente_id,
+                    'status' => $assinatura->status,
+                    'cancel_reason' => $reason,
+                    'effective_at' => $effectiveDate->toIso8601String(),
+                ],
+                consumers: ['platform', 'analytics'],
+                schemaDefinition: ['subscription_id' => 'integer', 'tenant_id' => 'integer', 'status' => 'string', 'cancel_reason' => 'string', 'effective_at' => 'datetime'],
             );
 
             return $assinatura;
@@ -207,5 +250,26 @@ class SubscriptionLifecycleService
                 'plano_slug' => $assinatura->plano?->slug,
             ],
         ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @param  array<int, string>  $consumers
+     * @param  array<string, mixed>  $schemaDefinition
+     */
+    private function publishBackboneEvent(
+        string $eventType,
+        AssinaturaPlataforma $assinaturaPlataforma,
+        array $payload,
+        array $consumers,
+        array $schemaDefinition,
+    ): void {
+        app(PlatformBillingEventPublisher::class)->publish(
+            eventType: $eventType,
+            assinaturaPlataforma: $assinaturaPlataforma,
+            payload: $payload,
+            consumers: $consumers,
+            schemaDefinition: $schemaDefinition,
+        );
     }
 }

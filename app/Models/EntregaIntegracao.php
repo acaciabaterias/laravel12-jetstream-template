@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Integration\IntegrationStorageManager;
 use App\Support\Integration\IntegrationDirection;
 use App\Support\Integration\IntegrationFlowStatus;
 use App\Support\Integration\IntegrationTransportKind;
@@ -55,5 +56,10 @@ class EntregaIntegracao extends Model
     public function replaySource(): BelongsTo
     {
         return $this->belongsTo(self::class, 'replayed_from_entrega_id');
+    }
+
+    public function getConnectionName(): ?string
+    {
+        return app(IntegrationStorageManager::class)->currentConnection();
     }
 }

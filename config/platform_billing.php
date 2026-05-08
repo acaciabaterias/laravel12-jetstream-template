@@ -12,7 +12,7 @@ return [
         ],
     ],
     'events' => [
-        'publish_to_backbone' => filter_var(env('PLATFORM_BILLING_PUBLISH_EVENTS', false), FILTER_VALIDATE_BOOL),
+        'publish_to_backbone' => filter_var(env('PLATFORM_BILLING_PUBLISH_EVENTS', true), FILTER_VALIDATE_BOOL),
         'default_consumers' => array_values(array_filter(array_map('trim', explode(',', (string) env('PLATFORM_BILLING_EVENT_CONSUMERS', 'platform,ms-003'))))),
     ],
 ];

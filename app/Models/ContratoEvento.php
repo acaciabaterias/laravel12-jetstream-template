@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Integration\IntegrationStorageManager;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,5 +32,10 @@ class ContratoEvento extends Model
             'schema_definition' => 'array',
             'deprecated_at' => 'datetime',
         ];
+    }
+
+    public function getConnectionName(): ?string
+    {
+        return app(IntegrationStorageManager::class)->currentConnection();
     }
 }

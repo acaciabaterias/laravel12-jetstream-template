@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Integration\IntegrationStorageManager;
 use App\Support\Integration\IntegrationFlowStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,5 +47,10 @@ class EventoOutbox extends Model
     public function entregas(): MorphMany
     {
         return $this->morphMany(EntregaIntegracao::class, 'entregavel');
+    }
+
+    public function getConnectionName(): ?string
+    {
+        return app(IntegrationStorageManager::class)->currentConnection();
     }
 }
