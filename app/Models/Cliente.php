@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 class Cliente extends Model
 {
@@ -29,6 +31,7 @@ class Cliente extends Model
     protected $fillable = [
         'cnpj', 'razao_social', 'nome_fantasia', 'email_contato', 'telefone',
         'subdominio', 'plano', 'status', 'trial_ends_at', 'subscription_ends_at',
+        'plano_atual_id', 'billing_blocked', 'provisioning_status', 'metadata',
         'supabase_project_ref', 'supabase_url', 'supabase_db_host',
         'supabase_db_password', 'supabase_anon_key', 'supabase_service_role_key',
         'endereco', 'saldo_sucata_kg',
@@ -39,11 +42,24 @@ class Cliente extends Model
         return [
             'trial_ends_at' => 'date',
             'subscription_ends_at' => 'date',
+            'billing_blocked' => 'boolean',
             'saldo_sucata_kg' => 'decimal:2',
+            'metadata' => 'array',
             'supabase_db_password' => 'encrypted',
             'supabase_anon_key' => 'encrypted',
             'supabase_service_role_key' => 'encrypted',
         ];
+    }
+
+    public function getConnectionName(): ?string
+    {
+        try {
+            return Schema::connection('central')->hasTable($this->getTable())
+                ? 'central'
+                : parent::getConnectionName();
+        } catch (Throwable) {
+            return parent::getConnectionName();
+        }
     }
 
     public function hasActiveSubscription(): bool
@@ -71,5 +87,10 @@ class Cliente extends Model
     public function certificadosDigitais(): HasMany
     {
         return $this->hasMany(CertificadoDigital::class);
+    }
+
+    public function assinaturasPlataforma(): HasMany
+    {
+        return $this->hasMany(AssinaturaPlataforma::class);
     }
 }

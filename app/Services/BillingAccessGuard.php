@@ -23,28 +23,10 @@ class BillingAccessGuard
                 return true;
             }
 
-            $hasPastDueSubscription = DB::connection('central')
+            return DB::connection('central')
                 ->table('assinaturas')
                 ->where('cliente_id', $clienteId)
-                ->where('status', 'past_due')
-                ->exists();
-
-            if ($hasPastDueSubscription) {
-                return true;
-            }
-
-            return DB::connection('central')
-                ->table('faturas')
-                ->where('cliente_id', $clienteId)
-                ->where(function ($query): void {
-                    $query
-                        ->where('status', 'overdue')
-                        ->orWhere(function ($subQuery): void {
-                            $subQuery
-                                ->where('status', 'pending')
-                                ->whereDate('vencimento', '<', now()->toDateString());
-                        });
-                })
+                ->where('status', 'blocked')
                 ->exists();
         } catch (Throwable $exception) {
             Log::warning('Falha ao validar bloqueio por inadimplência.', [

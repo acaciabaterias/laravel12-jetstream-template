@@ -11,7 +11,9 @@ return new class extends Migration
 
     public function up(): void
     {
-        DB::connection($this->connection)->statement('create extension if not exists pgcrypto');
+        if ($this->usesPostgres()) {
+            DB::connection($this->connection)->statement('create extension if not exists pgcrypto');
+        }
 
         Schema::connection($this->connection)->create('planos', function (Blueprint $table) {
             $table->id();
@@ -23,7 +25,7 @@ return new class extends Migration
             $table->boolean('has_white_label')->default(false);
             $table->boolean('has_support_priority')->default(false);
             $table->boolean('ativo')->default(true);
-            $table->jsonb('recursos')->default(DB::raw("'{}'::jsonb"));
+            $this->addJsonWithEmptyObjectDefault($table, 'recursos');
             $table->timestampsTz();
         });
 
@@ -34,7 +36,10 @@ return new class extends Migration
             $table->string('nome_fantasia', 100)->nullable();
             $table->string('email_contato', 150);
             $table->string('telefone', 30)->nullable();
+            $table->string('endereco', 255)->nullable();
+            $table->decimal('saldo_sucata_kg', 10, 2)->default(0);
             $table->string('subdominio', 80)->unique();
+            $table->string('plano', 20)->default('essential');
             $table->string('status', 30)->default('trial');
             $table->date('trial_ends_at')->nullable();
             $table->date('subscription_ends_at')->nullable();
@@ -47,7 +52,7 @@ return new class extends Migration
             $table->text('supabase_service_role_key')->nullable();
             $table->string('provisioning_status', 30)->default('pending');
             $table->boolean('billing_blocked')->default(false);
-            $table->jsonb('metadata')->default(DB::raw("'{}'::jsonb"));
+            $this->addJsonWithEmptyObjectDefault($table, 'metadata');
             $table->timestampsTz();
             $table->softDeletesTz();
 
@@ -85,15 +90,17 @@ return new class extends Migration
             $table->index('papel');
         });
 
-        DB::connection($this->connection)->statement(
-            "alter table clientes add constraint clientes_status_check check (status in ('trial', 'active', 'expired', 'cancelled', 'suspended', 'provisioning'))"
-        );
-        DB::connection($this->connection)->statement(
-            "alter table clientes add constraint clientes_provisioning_status_check check (provisioning_status in ('pending', 'provisioning', 'ready', 'failed'))"
-        );
-        DB::connection($this->connection)->statement(
-            "alter table usuarios_plataforma add constraint usuarios_plataforma_papel_check check (papel in ('super_admin', 'support', 'billing'))"
-        );
+        if ($this->usesPostgres()) {
+            DB::connection($this->connection)->statement(
+                "alter table clientes add constraint clientes_status_check check (status in ('trial', 'active', 'expired', 'cancelled', 'suspended', 'provisioning'))"
+            );
+            DB::connection($this->connection)->statement(
+                "alter table clientes add constraint clientes_provisioning_status_check check (provisioning_status in ('pending', 'provisioning', 'ready', 'failed'))"
+            );
+            DB::connection($this->connection)->statement(
+                "alter table usuarios_plataforma add constraint usuarios_plataforma_papel_check check (papel in ('super_admin', 'support', 'billing'))"
+            );
+        }
     }
 
     public function down(): void
@@ -102,5 +109,21 @@ return new class extends Migration
         Schema::connection($this->connection)->dropIfExists('white_label_configs');
         Schema::connection($this->connection)->dropIfExists('clientes');
         Schema::connection($this->connection)->dropIfExists('planos');
+    }
+
+    private function addJsonWithEmptyObjectDefault(Blueprint $table, string $column): void
+    {
+        if ($this->usesPostgres()) {
+            $table->jsonb($column)->default(DB::raw("'{}'::jsonb"));
+
+            return;
+        }
+
+        $table->json($column)->nullable();
+    }
+
+    private function usesPostgres(): bool
+    {
+        return DB::connection($this->connection)->getDriverName() === 'pgsql';
     }
 };

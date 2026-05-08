@@ -34,6 +34,11 @@ Schedule::command('integration:dispatch-outbox --limit=200')
     ->withoutOverlapping()
     ->runInBackground();
 
+Schedule::command('platform-billing:assess-delinquency')
+    ->everyMinute()
+    ->withoutOverlapping()
+    ->runInBackground();
+
 Schedule::job(new AtualizarIndiceRetornoJob)
     ->dailyAt('01:30')
     ->withoutOverlapping();

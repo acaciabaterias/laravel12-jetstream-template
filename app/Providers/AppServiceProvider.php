@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\AssinaturaPlataforma;
 use App\Models\BoletoOrquestrado;
 use App\Models\Cliente;
 use App\Models\CnabRemessa;
@@ -10,11 +11,15 @@ use App\Models\ContaBancaria;
 use App\Models\Deposito;
 use App\Models\EntregaIntegracao;
 use App\Models\EstoqueMovimentacao;
+use App\Models\EventoComercialAssinante;
+use App\Models\FaturaSaaS;
 use App\Models\FilaContingencia;
 use App\Models\NotaFiscalOrquestrada;
 use App\Models\OrdemServico;
 use App\Models\OrdemServicoGarantia;
 use App\Models\PedidoVenda;
+use App\Models\PlanoComercial;
+use App\Models\PoliticaInadimplencia;
 use App\Models\ReservaEstoque;
 use App\Models\TransacaoFinanceira;
 use App\Models\User;
@@ -32,6 +37,7 @@ use App\Policies\NotaFiscalOrquestradaPolicy;
 use App\Policies\OrdemServicoGarantiaPolicy;
 use App\Policies\OrdemServicoPolicy;
 use App\Policies\PedidoVendaPolicy;
+use App\Policies\PlatformBillingPolicy;
 use App\Policies\ReservaEstoquePolicy;
 use App\Policies\TenantPolicy;
 use App\Policies\TransacaoFinanceiraPolicy;
@@ -81,6 +87,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(ReservaEstoque::class, ReservaEstoquePolicy::class);
         Gate::policy(ContaBancaria::class, ContaBancariaPolicy::class);
         Gate::policy(TransacaoFinanceira::class, TransacaoFinanceiraPolicy::class);
+        Gate::policy(PlanoComercial::class, PlatformBillingPolicy::class);
+        Gate::policy(AssinaturaPlataforma::class, PlatformBillingPolicy::class);
+        Gate::policy(FaturaSaaS::class, PlatformBillingPolicy::class);
+        Gate::policy(PoliticaInadimplencia::class, PlatformBillingPolicy::class);
+        Gate::policy(EventoComercialAssinante::class, PlatformBillingPolicy::class);
         Gate::policy(NotaFiscalOrquestrada::class, NotaFiscalOrquestradaPolicy::class);
         Gate::policy(BoletoOrquestrado::class, BoletoOrquestradoPolicy::class);
         Gate::policy(CnabRemessa::class, CnabRemessaPolicy::class);

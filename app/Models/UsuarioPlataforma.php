@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 class UsuarioPlataforma extends Authenticatable
 {
@@ -32,6 +34,17 @@ class UsuarioPlataforma extends Authenticatable
             'password' => 'hashed',
             'ativo' => 'boolean',
         ];
+    }
+
+    public function getConnectionName(): ?string
+    {
+        try {
+            return Schema::connection('central')->hasTable($this->getTable())
+                ? 'central'
+                : parent::getConnectionName();
+        } catch (Throwable) {
+            return parent::getConnectionName();
+        }
     }
 
     public function isSuperAdmin(): bool

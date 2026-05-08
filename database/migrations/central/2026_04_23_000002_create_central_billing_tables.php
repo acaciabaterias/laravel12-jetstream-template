@@ -39,7 +39,11 @@ return new class extends Migration
             $table->string('status', 30)->default('pending');
             $table->string('external_invoice_id', 150)->nullable();
             $table->timestampTz('paid_at')->nullable();
-            $table->jsonb('payload_gateway')->default(DB::raw("'{}'::jsonb"));
+            if ($this->usesPostgres()) {
+                $table->jsonb('payload_gateway')->default(DB::raw("'{}'::jsonb"));
+            } else {
+                $table->json('payload_gateway')->nullable();
+            }
             $table->timestampsTz();
 
             $table->unique(['assinatura_id', 'referencia']);
@@ -48,17 +52,24 @@ return new class extends Migration
             $table->index('vencimento');
         });
 
-        DB::connection($this->connection)->statement(
-            "alter table assinaturas add constraint assinaturas_status_check check (status in ('trial', 'active', 'expired', 'cancelled', 'past_due', 'paused'))"
-        );
-        DB::connection($this->connection)->statement(
-            "alter table faturas add constraint faturas_status_check check (status in ('pending', 'paid', 'overdue', 'cancelled', 'refunded'))"
-        );
+        if ($this->usesPostgres()) {
+            DB::connection($this->connection)->statement(
+                "alter table assinaturas add constraint assinaturas_status_check check (status in ('trial', 'active', 'expired', 'cancelled', 'past_due', 'paused'))"
+            );
+            DB::connection($this->connection)->statement(
+                "alter table faturas add constraint faturas_status_check check (status in ('pending', 'paid', 'overdue', 'cancelled', 'refunded'))"
+            );
+        }
     }
 
     public function down(): void
     {
         Schema::connection($this->connection)->dropIfExists('faturas');
         Schema::connection($this->connection)->dropIfExists('assinaturas');
+    }
+
+    private function usesPostgres(): bool
+    {
+        return DB::connection($this->connection)->getDriverName() === 'pgsql';
     }
 };

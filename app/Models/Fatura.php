@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Fatura extends Model
 {
@@ -25,7 +26,7 @@ class Fatura extends Model
         ];
     }
 
-    public function assinatura()
+    public function assinatura(): BelongsTo
     {
         return $this->belongsTo(Assinatura::class);
     }

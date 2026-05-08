@@ -25,8 +25,8 @@
 
 **Purpose**: Prepare central billing namespace and feature baseline
 
-- [ ] T001 Create billing service namespace scaffolding in `app/Services/Billing/` and contract namespace updates in `app/Services/Contracts/`
-- [ ] T002 Create feature and unit test namespace baseline for platform billing in `tests/Feature/` and `tests/Unit/`
+- [x] T001 Create billing service namespace scaffolding in `app/Services/Billing/` and contract namespace updates in `app/Services/Contracts/`
+- [x] T002 Create feature and unit test namespace baseline for platform billing in `tests/Feature/` and `tests/Unit/`
 - [ ] T003 [P] Register feature documentation references and central plan pointer consistency in `AGENTS.md` and `specs/011-platform-billing-control-plane/`
 
 ---
@@ -37,12 +37,12 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete
 
-- [ ] T004 Create central migrations for `planos_comerciais`, `assinaturas_plataforma`, `faturas_saas`, `politicas_inadimplencia` and `eventos_comerciais_assinante` in `database/migrations/central/`
-- [ ] T005 [P] Create Eloquent models `PlanoComercial`, `AssinaturaPlataforma`, `FaturaSaaS`, `PoliticaInadimplencia` and `EventoComercialAssinante` in `app/Models/`
-- [ ] T006 [P] Create shared enums/value objects for billing status, invoice status and commercial events in `app/Support/Billing/`
-- [ ] T007 Create authorization policy/gate baseline for super admin billing operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
-- [ ] T008 Create central billing configuration entries in `config/services.php` or dedicated billing config file for grace period, notification defaults and event publication
-- [ ] T009 Create foundational audit/event publication hooks for commercial state transitions in `app/Services/Billing/`
+- [x] T004 Create central migrations for `planos_comerciais`, `assinaturas_plataforma`, `faturas_saas`, `politicas_inadimplencia` and `eventos_comerciais_assinante` in `database/migrations/central/`
+- [x] T005 [P] Create Eloquent models `PlanoComercial`, `AssinaturaPlataforma`, `FaturaSaaS`, `PoliticaInadimplencia` and `EventoComercialAssinante` in `app/Models/`
+- [x] T006 [P] Create shared enums/value objects for billing status, invoice status and commercial events in `app/Support/Billing/`
+- [x] T007 Create authorization policy/gate baseline for super admin billing operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
+- [x] T008 Create central billing configuration entries in `config/services.php` or dedicated billing config file for grace period, notification defaults and event publication
+- [x] T009 Create foundational audit/event publication hooks for commercial state transitions in `app/Services/Billing/`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -56,17 +56,17 @@
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T010 [P] [US1] Create feature test for plan and subscription lifecycle in `tests/Feature/PlatformBillingSubscriptionLifecycleTest.php`
-- [ ] T011 [P] [US1] Create feature test for plan migration and history preservation in `tests/Feature/PlatformBillingPlanChangeTest.php`
-- [ ] T012 [P] [US1] Create unit test for subscription state transitions in `tests/Unit/PlatformSubscriptionStateMachineTest.php`
+- [x] T010 [P] [US1] Create feature test for plan and subscription lifecycle in `tests/Feature/PlatformBillingSubscriptionLifecycleTest.php`
+- [x] T011 [P] [US1] Create feature test for plan migration and history preservation in `tests/Feature/PlatformBillingPlanChangeTest.php`
+- [x] T012 [P] [US1] Create unit test for subscription state transitions in `tests/Unit/PlatformSubscriptionStateMachineTest.php`
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Implement `PlanCatalogService` in `app/Services/Billing/PlanCatalogService.php`
-- [ ] T014 [P] [US1] Implement `SubscriptionLifecycleService` in `app/Services/Billing/SubscriptionLifecycleService.php`
+- [x] T013 [P] [US1] Implement `PlanCatalogService` in `app/Services/Billing/PlanCatalogService.php`
+- [x] T014 [P] [US1] Implement `SubscriptionLifecycleService` in `app/Services/Billing/SubscriptionLifecycleService.php`
 - [ ] T015 [US1] Implement central admin Livewire screens for plans and subscriptions in `app/Livewire/Admin/`
 - [ ] T016 [US1] Implement requests/validation for plan creation and subscription activation in `app/Http/Requests/`
-- [ ] T017 [US1] Persist commercial history and state transitions through `EventoComercialAssinante`
+- [x] T017 [US1] Persist commercial history and state transitions through `EventoComercialAssinante`
 
 **Checkpoint**: User Story 1 should manage plans and subscriptions independently
 
@@ -80,16 +80,16 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T018 [P] [US2] Create feature test for overdue invoice and grace period evaluation in `tests/Feature/PlatformBillingDelinquencyPolicyTest.php`
-- [ ] T019 [P] [US2] Create feature test for block and reactivation flow in `tests/Feature/PlatformBillingBlockReactivationTest.php`
-- [ ] T020 [P] [US2] Create unit test for delinquency policy rules in `tests/Unit/DelinquencyPolicyEvaluatorTest.php`
+- [x] T018 [P] [US2] Create feature test for overdue invoice and grace period evaluation in `tests/Feature/PlatformBillingDelinquencyPolicyTest.php`
+- [x] T019 [P] [US2] Create feature test for block and reactivation flow in `tests/Feature/PlatformBillingBlockReactivationTest.php`
+- [x] T020 [P] [US2] Create unit test for delinquency policy rules in `tests/Unit/DelinquencyPolicyEvaluatorTest.php`
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Implement `SaasInvoiceService` in `app/Services/Billing/SaasInvoiceService.php`
-- [ ] T022 [P] [US2] Implement `DelinquencyPolicyEvaluator` in `app/Services/Billing/DelinquencyPolicyEvaluator.php`
-- [ ] T023 [US2] Implement job/command for recurring delinquency assessment in `app/Jobs/` or `app/Console/Commands/`
-- [ ] T024 [US2] Integrate commercial block/unblock flow with existing `BillingAccessGuard` and related central checks
+- [x] T021 [P] [US2] Implement `SaasInvoiceService` in `app/Services/Billing/SaasInvoiceService.php`
+- [x] T022 [P] [US2] Implement `DelinquencyPolicyEvaluator` in `app/Services/Billing/DelinquencyPolicyEvaluator.php`
+- [x] T023 [US2] Implement job/command for recurring delinquency assessment in `app/Jobs/` or `app/Console/Commands/`
+- [x] T024 [US2] Integrate commercial block/unblock flow with existing `BillingAccessGuard` and related central checks
 - [ ] T025 [US2] Publish central commercial events (`ASSINANTE_BLOQUEADO`, `ASSINANTE_REATIVADO`, related events) through backbone `010`
 
 **Checkpoint**: User Story 2 should apply delinquency policy independently
@@ -104,15 +104,15 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T026 [P] [US3] Create feature test for billing operations dashboard visibility in `tests/Feature/PlatformBillingDashboardTest.php`
-- [ ] T027 [P] [US3] Create feature test for central filters and overdue portfolio summaries in `tests/Feature/PlatformBillingPortfolioFiltersTest.php`
-- [ ] T028 [P] [US3] Create unit test for commercial summary aggregation in `tests/Unit/PlatformBillingSummaryAggregatorTest.php`
+- [x] T026 [P] [US3] Create feature test for billing operations dashboard visibility in `tests/Feature/PlatformBillingDashboardTest.php`
+- [x] T027 [P] [US3] Create feature test for central filters and overdue portfolio summaries in `tests/Feature/PlatformBillingPortfolioFiltersTest.php`
+- [x] T028 [P] [US3] Create unit test for commercial summary aggregation in `tests/Unit/PlatformBillingSummaryAggregatorTest.php`
 
 ### Implementation for User Story 3
 
-- [ ] T029 [P] [US3] Implement `PlatformBillingSummaryService` in `app/Services/Billing/PlatformBillingSummaryService.php`
-- [ ] T030 [US3] Implement super admin Livewire dashboard for commercial health in `app/Livewire/Admin/PlatformBillingDashboard.php`
-- [ ] T031 [US3] Implement central filters, summaries and drill-down actions in dashboard views under `resources/views/livewire/admin/`
+- [x] T029 [P] [US3] Implement `PlatformBillingSummaryService` in `app/Services/Billing/PlatformBillingSummaryService.php`
+- [x] T030 [US3] Implement super admin Livewire dashboard for commercial health in `app/Livewire/Admin/PlatformBillingDashboard.php`
+- [x] T031 [US3] Implement central filters, summaries and drill-down actions in dashboard views under `resources/views/livewire/admin/`
 - [ ] T032 [US3] Expose central billing inspection endpoints or reusable query services for operational support in `app/Http/Controllers/` or `app/Services/Billing/`
 
 **Checkpoint**: User Story 3 should provide operational commercial visibility independently
