@@ -41,6 +41,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `011`: control plane comercial central com planos, assinaturas, faturas SaaS, bloqueio e reativação
 - `012`: payments control plane central com emissão externa, webhooks idempotentes, conciliação e exceções financeiras
 - `013`: revenue recovery central com régua de cobrança, escalonamento, promessas e reengajamento
+- `014`: analytics comercial central com snapshots, coortes, canais, riscos e drill-down executivo
 
 ## Integrações Externas
 
@@ -86,6 +87,15 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - escalonamentos críticos geram tarefas internas rastreáveis e podem atribuir responsável operacional
 - eventos de recuperação (`RECUPERACAO_RECEITA_INICIADA`, `ACAO_COBRANCA_AGENDADA`, `CASO_RECUPERACAO_ESCALADO`, `PROMESSA_PAGAMENTO_REGISTRADA`) são publicados no backbone `010`
 - o painel central opera via Livewire em `/admin/recovery`, suporta operação manual em `/admin/recovery/operacoes` e inspeção JSON em `/admin/recovery/inspection`
+
+## Platform Commercial Analytics
+
+- o banco central mantém `snapshots_analytics_comercial`, `recortes_coorte_comercial`, `metric_channel_performance`, `insights_risco_comercial` e `drilldowns_analytics_comercial`
+- o módulo `014` deriva métricas executivas a partir dos módulos `011`, `012` e `013`, sem se tornar fonte transacional
+- snapshots são reconstruíveis, auditáveis e publicam eventos materiais no backbone `010`
+- recortes por coorte e canal preservam comparabilidade histórica dentro da janela reconstruída
+- drill-down central liga métricas agregadas aos registros operacionais de assinatura, fatura e recovery
+- o painel central opera via Livewire em `/admin/analytics` e suporta inspeção JSON em `/admin/analytics/inspection`
 
 ## Padrões Técnicos
 

@@ -41,4 +41,6 @@ Validar localmente a base de analytics comercial da plataforma após a estabiliz
 ## Evidência de validação executada
 
 - `git diff --check`
-- artefatos de planejamento do `014` gerados e revisados no ciclo atual
+- `vendor/bin/pint --dirty --format=agent`
+- `php artisan test --compact tests/Feature/PlatformCommercialAnalyticsFoundationTest.php tests/Feature/PlatformCommercialAnalyticsSnapshotTest.php tests/Feature/PlatformCommercialAnalyticsDashboardTest.php tests/Feature/PlatformCommercialAnalyticsCohortTest.php tests/Feature/PlatformCommercialAnalyticsChannelTest.php tests/Feature/PlatformCommercialAnalyticsDrilldownTest.php tests/Feature/PlatformCommercialAnalyticsRiskInsightTest.php tests/Unit/PlatformCommercialAnalyticsRulesTest.php tests/Unit/PlatformCommercialAnalyticsDrilldownRulesTest.php tests/Unit/PlatformCommercialAnalyticsSegmentationTest.php`
+- suíte completa: `360 passed`, `1 skipped`, `1685 assertions`

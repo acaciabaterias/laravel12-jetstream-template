@@ -208,6 +208,9 @@ Valide fluxos manuais minimos:
 - dashboard central de recovery em `/admin/recovery`
 - operação manual de recovery em `/admin/recovery/operacoes`
 - inspeção de recovery em `/admin/recovery/inspection`
+- dashboard central de analytics comercial em `/admin/analytics`
+- inspeção analítica em `/admin/analytics/inspection`
+- rebuild controlado do snapshot via `php artisan analytics:rebuild-platform-commercial-snapshot --days=30`
 - filtro da API operacional `GET /api/integration/inspections?status=dead_letter`
 - replay controlado de uma entrega com falha via `php artisan integration:replay <delivery_id> --operator=<user_id>`
 - replay controlado de um retorno financeiro via `php artisan platform-payments:replay-return <return_id> --operator=<user_id>`

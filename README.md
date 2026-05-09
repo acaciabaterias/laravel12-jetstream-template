@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-347%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-360%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -36,6 +36,7 @@ Os modulos core cobrem:
 - billing control plane central
 - pagamentos SaaS e reconciliacao central
 - recuperacao de receita e dunning central
+- analytics comercial central
 
 ## Arquitetura
 
@@ -103,6 +104,15 @@ O modulo `013` adiciona a camada central de recuperação de receita:
 - escalonamento humano de casos críticos
 - promessas de pagamento com suspensão seletiva das ações automáticas
 - dashboard `/admin/recovery`, operação `/admin/recovery/operacoes` e inspeção `/admin/recovery/inspection`
+
+## Commercial Analytics Control Plane
+
+O modulo `014` consolida a leitura executiva central da plataforma:
+
+- snapshots executivos de MRR, churn, inadimplencia, recuperacao e bloqueios
+- recortes por coorte e canal reconstruiveis a partir dos modulos `011`, `012` e `013`
+- drill-down operacional reutilizavel para inspecao e suporte
+- dashboard `/admin/analytics` e inspecao `/admin/analytics/inspection`
 
 ## Stack
 

@@ -14,6 +14,7 @@ use App\Models\CompromissoPagamento;
 use App\Models\ConciliacaoPagamentoSaaS;
 use App\Models\ContaBancaria;
 use App\Models\Deposito;
+use App\Models\DrilldownAnalyticsComercial;
 use App\Models\EntregaIntegracao;
 use App\Models\EstoqueMovimentacao;
 use App\Models\EventoComercialAssinante;
@@ -22,6 +23,8 @@ use App\Models\FaturaSaaS;
 use App\Models\FilaContingencia;
 use App\Models\GatewayCobrancaSaaS;
 use App\Models\IndicadorRecuperacaoReceita;
+use App\Models\InsightRiscoComercial;
+use App\Models\MetricaPerformanceCanal;
 use App\Models\NotaFiscalOrquestrada;
 use App\Models\OrdemServico;
 use App\Models\OrdemServicoGarantia;
@@ -29,8 +32,10 @@ use App\Models\PedidoVenda;
 use App\Models\PlanoComercial;
 use App\Models\PoliticaInadimplencia;
 use App\Models\PoliticaRecuperacaoReceita;
+use App\Models\RecorteCoorteComercial;
 use App\Models\ReservaEstoque;
 use App\Models\RetornoPagamentoSaaS;
+use App\Models\SnapshotAnalyticsComercial;
 use App\Models\TransacaoFinanceira;
 use App\Models\User;
 use App\Models\UsuarioPlataforma;
@@ -48,6 +53,7 @@ use App\Policies\OrdemServicoGarantiaPolicy;
 use App\Policies\OrdemServicoPolicy;
 use App\Policies\PedidoVendaPolicy;
 use App\Policies\PlatformBillingPolicy;
+use App\Policies\PlatformCommercialAnalyticsPolicy;
 use App\Policies\PlatformPaymentsPolicy;
 use App\Policies\PlatformRevenueRecoveryPolicy;
 use App\Policies\ReservaEstoquePolicy;
@@ -114,6 +120,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(AcaoRecuperacaoReceita::class, PlatformRevenueRecoveryPolicy::class);
         Gate::policy(CompromissoPagamento::class, PlatformRevenueRecoveryPolicy::class);
         Gate::policy(IndicadorRecuperacaoReceita::class, PlatformRevenueRecoveryPolicy::class);
+        Gate::policy(SnapshotAnalyticsComercial::class, PlatformCommercialAnalyticsPolicy::class);
+        Gate::policy(RecorteCoorteComercial::class, PlatformCommercialAnalyticsPolicy::class);
+        Gate::policy(MetricaPerformanceCanal::class, PlatformCommercialAnalyticsPolicy::class);
+        Gate::policy(InsightRiscoComercial::class, PlatformCommercialAnalyticsPolicy::class);
+        Gate::policy(DrilldownAnalyticsComercial::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(NotaFiscalOrquestrada::class, NotaFiscalOrquestradaPolicy::class);
         Gate::policy(BoletoOrquestrado::class, BoletoOrquestradoPolicy::class);
         Gate::policy(CnabRemessa::class, CnabRemessaPolicy::class);
@@ -161,6 +172,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-platform-revenue-recovery', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'billing']);
+        });
+
+        Gate::define('manage-platform-commercial-analytics', function ($user) {
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'billing']);

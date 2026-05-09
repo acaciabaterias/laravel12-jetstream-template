@@ -1,10 +1,10 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v1.3.0 - pronto para lançamento assistido com billing, payments e revenue recovery centrais)
+## Status Atual (v1.4.0 - pronto para lançamento assistido com analytics comercial central)
 
-✅ 13 módulos implementados (`001` a `013`)
+✅ 14 módulos implementados (`001` a `014`)
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `347` testes passando e `1635` assertions
+✅ suíte principal estabilizada com `360` testes passando e `1685` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
@@ -31,13 +31,15 @@
 - [x] Abertura central de casos por atraso e falha de cobrança
 - [x] Escalonamento humano e promessas de pagamento com trilha auditável
 - [x] Dashboard e inspeção JSON de recuperação de receita
+- [x] Módulo `014` de platform commercial analytics
+- [x] Snapshots executivos de MRR, churn, inadimplência e recuperação
+- [x] Recortes por coorte, canal e carteira com drill-down reutilizável
+- [x] Dashboard central e inspeção JSON de analytics comercial
 
-## Próximo módulo sugerido (v1.4.0)
+## Próximo módulo sugerido (v1.5.0)
 
-- [ ] Módulo `014` de platform commercial analytics
-- [ ] Métricas executivas de MRR, recuperação e churn operacional
-- [ ] Visão consolidada por coorte, canal e carteira comercial
-- [ ] Drill-down analítico para decisões de pricing, retenção e cobrança
+- [ ] Próximo módulo transversal a definir após o fechamento do analytics comercial
+- [ ] Consolidar observabilidade executiva e governança pós-analytics
 
 ## Fase 1: Estabilização e Produção (v1.4.0)
 

@@ -25,9 +25,9 @@
 
 **Purpose**: Prepare central analytics namespace and feature baseline
 
-- [ ] T001 Create analytics service namespace scaffolding in `app/Services/Billing/` and related contracts updates in `app/Services/Contracts/`
-- [ ] T002 Create feature and unit test namespace baseline for platform commercial analytics in `tests/Feature/` and `tests/Unit/`
-- [ ] T003 [P] Register feature documentation references and central plan pointer consistency in `AGENTS.md` and `specs/014-platform-commercial-analytics/`
+- [x] T001 Create analytics service namespace scaffolding in `app/Services/Billing/` and related contracts updates in `app/Services/Contracts/`
+- [x] T002 Create feature and unit test namespace baseline for platform commercial analytics in `tests/Feature/` and `tests/Unit/`
+- [x] T003 [P] Register feature documentation references and central plan pointer consistency in `AGENTS.md` and `specs/014-platform-commercial-analytics/`
 
 ---
 
@@ -37,12 +37,12 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete
 
-- [ ] T004 Create central migrations for `snapshots_analytics_comercial`, `recortes_coorte_comercial`, `metric_channel_performance`, `insights_risco_comercial` and `drilldowns_analytics_comercial` in `database/migrations/central/`
-- [ ] T005 [P] Create Eloquent models for commercial analytics snapshots, cohorts, channel metrics, risk insights and drill-down references in `app/Models/`
-- [ ] T006 [P] Create shared enums/value objects for snapshot type, risk category, channel dimension and rebuild status in `app/Support/Billing/`
-- [ ] T007 Create authorization policy/gate baseline for super admin and commercial analytics operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
-- [ ] T008 Create central analytics configuration entries for rebuild windows, default periods and segmentation limits in `config/services.php` or dedicated analytics config file
-- [ ] T009 Create foundational event publication hooks for executive snapshots and insight transitions in `app/Services/Billing/`
+- [x] T004 Create central migrations for `snapshots_analytics_comercial`, `recortes_coorte_comercial`, `metric_channel_performance`, `insights_risco_comercial` and `drilldowns_analytics_comercial` in `database/migrations/central/`
+- [x] T005 [P] Create Eloquent models for commercial analytics snapshots, cohorts, channel metrics, risk insights and drill-down references in `app/Models/`
+- [x] T006 [P] Create shared enums/value objects for snapshot type, risk category, channel dimension and rebuild status in `app/Support/Billing/`
+- [x] T007 Create authorization policy/gate baseline for super admin and commercial analytics operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
+- [x] T008 Create central analytics configuration entries for rebuild windows, default periods and segmentation limits in `config/services.php` or dedicated analytics config file
+- [x] T009 Create foundational event publication hooks for executive snapshots and insight transitions in `app/Services/Billing/`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -56,17 +56,17 @@
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T010 [P] [US1] Create feature test for executive snapshot generation from central billing/payment/recovery data in `tests/Feature/PlatformCommercialAnalyticsSnapshotTest.php`
-- [ ] T011 [P] [US1] Create feature test for dashboard summary visibility in `tests/Feature/PlatformCommercialAnalyticsDashboardTest.php`
-- [ ] T012 [P] [US1] Create unit test for MRR/churn/recovery aggregation rules in `tests/Unit/PlatformCommercialAnalyticsRulesTest.php`
+- [x] T010 [P] [US1] Create feature test for executive snapshot generation from central billing/payment/recovery data in `tests/Feature/PlatformCommercialAnalyticsSnapshotTest.php`
+- [x] T011 [P] [US1] Create feature test for dashboard summary visibility in `tests/Feature/PlatformCommercialAnalyticsDashboardTest.php`
+- [x] T012 [P] [US1] Create unit test for MRR/churn/recovery aggregation rules in `tests/Unit/PlatformCommercialAnalyticsRulesTest.php`
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Implement `CommercialAnalyticsSnapshotService` in `app/Services/Billing/CommercialAnalyticsSnapshotService.php`
-- [ ] T014 [P] [US1] Implement rebuild command/job for executive snapshots in `app/Console/Commands/` and `app/Jobs/`
-- [ ] T015 [US1] Implement executive summary dashboard in `app/Livewire/Admin/`
-- [ ] T016 [US1] Persist executive snapshot history and publish snapshot update events through backbone `010`
-- [ ] T017 [US1] Expose reusable summary queries for dashboard and inspection layers
+- [x] T013 [P] [US1] Implement `CommercialAnalyticsSnapshotService` in `app/Services/Billing/CommercialAnalyticsSnapshotService.php`
+- [x] T014 [P] [US1] Implement rebuild command/job for executive snapshots in `app/Console/Commands/` and `app/Jobs/`
+- [x] T015 [US1] Implement executive summary dashboard in `app/Livewire/Admin/`
+- [x] T016 [US1] Persist executive snapshot history and publish snapshot update events through backbone `010`
+- [x] T017 [US1] Expose reusable summary queries for dashboard and inspection layers
 
 **Checkpoint**: User Story 1 should provide executive platform visibility independently
 
@@ -80,17 +80,17 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T018 [P] [US2] Create feature test for cohort segmentation in `tests/Feature/PlatformCommercialAnalyticsCohortTest.php`
-- [ ] T019 [P] [US2] Create feature test for channel performance segmentation in `tests/Feature/PlatformCommercialAnalyticsChannelTest.php`
-- [ ] T020 [P] [US2] Create unit test for cohort and channel grouping logic in `tests/Unit/PlatformCommercialAnalyticsSegmentationTest.php`
+- [x] T018 [P] [US2] Create feature test for cohort segmentation in `tests/Feature/PlatformCommercialAnalyticsCohortTest.php`
+- [x] T019 [P] [US2] Create feature test for channel performance segmentation in `tests/Feature/PlatformCommercialAnalyticsChannelTest.php`
+- [x] T020 [P] [US2] Create unit test for cohort and channel grouping logic in `tests/Unit/PlatformCommercialAnalyticsSegmentationTest.php`
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Implement `CommercialAnalyticsCohortService` in `app/Services/Billing/CommercialAnalyticsCohortService.php`
-- [ ] T022 [P] [US2] Implement `CommercialAnalyticsChannelService` in `app/Services/Billing/CommercialAnalyticsChannelService.php`
-- [ ] T023 [US2] Implement dashboard filters and segmented views in `app/Livewire/Admin/` and `resources/views/livewire/admin/`
-- [ ] T024 [US2] Implement requests/validation for segmented inspection queries in `app/Http/Requests/`
-- [ ] T025 [US2] Publish central analytical insight events (`COORTE_COMERCIAL_ATUALIZADA`, `CANAL_PERFORMANCE_DEGRADADO`, related events) through backbone `010`
+- [x] T021 [P] [US2] Implement `CommercialAnalyticsCohortService` in `app/Services/Billing/CommercialAnalyticsCohortService.php`
+- [x] T022 [P] [US2] Implement `CommercialAnalyticsChannelService` in `app/Services/Billing/CommercialAnalyticsChannelService.php`
+- [x] T023 [US2] Implement dashboard filters and segmented views in `app/Livewire/Admin/` and `resources/views/livewire/admin/`
+- [x] T024 [US2] Implement requests/validation for segmented inspection queries in `app/Http/Requests/`
+- [x] T025 [US2] Publish central analytical insight events (`COORTE_COMERCIAL_ATUALIZADA`, `CANAL_PERFORMANCE_DEGRADADO`, related events) through backbone `010`
 
 **Checkpoint**: User Story 2 should support comparative analytics independently
 
@@ -104,16 +104,16 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T026 [P] [US3] Create feature test for analytics inspection drill-down in `tests/Feature/PlatformCommercialAnalyticsDrilldownTest.php`
-- [ ] T027 [P] [US3] Create feature test for risk insight exposure and filtering in `tests/Feature/PlatformCommercialAnalyticsRiskInsightTest.php`
-- [ ] T028 [P] [US3] Create unit test for drill-down composition and risk flagging in `tests/Unit/PlatformCommercialAnalyticsDrilldownRulesTest.php`
+- [x] T026 [P] [US3] Create feature test for analytics inspection drill-down in `tests/Feature/PlatformCommercialAnalyticsDrilldownTest.php`
+- [x] T027 [P] [US3] Create feature test for risk insight exposure and filtering in `tests/Feature/PlatformCommercialAnalyticsRiskInsightTest.php`
+- [x] T028 [P] [US3] Create unit test for drill-down composition and risk flagging in `tests/Unit/PlatformCommercialAnalyticsDrilldownRulesTest.php`
 
 ### Implementation for User Story 3
 
-- [ ] T029 [P] [US3] Implement `CommercialAnalyticsDrilldownService` in `app/Services/Billing/CommercialAnalyticsDrilldownService.php`
-- [ ] T030 [US3] Implement analytics inspection endpoint/controller or reusable query service in `app/Http/Controllers/` or `app/Services/Billing/`
-- [ ] T031 [US3] Implement risk insight generation and dashboard exposure in `app/Services/Billing/` and `app/Livewire/Admin/`
-- [ ] T032 [US3] Expose central drill-down and risk inspection for operational support
+- [x] T029 [P] [US3] Implement `CommercialAnalyticsDrilldownService` in `app/Services/Billing/CommercialAnalyticsDrilldownService.php`
+- [x] T030 [US3] Implement analytics inspection endpoint/controller or reusable query service in `app/Http/Controllers/` or `app/Services/Billing/`
+- [x] T031 [US3] Implement risk insight generation and dashboard exposure in `app/Services/Billing/` and `app/Livewire/Admin/`
+- [x] T032 [US3] Expose central drill-down and risk inspection for operational support
 
 **Checkpoint**: User Story 3 should make analytics actionable independently
 
@@ -123,11 +123,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T033 [P] Document snapshot rebuild, rollback, drill-down validation and executive interpretation procedures in `GO_LIVE_RUNBOOK.md` and related docs
-- [ ] T034 Update architecture and product documentation for the analytics layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
-- [ ] T035 [P] Add targeted coverage for analytics event publication, snapshot rebuild audit trail and drill-down serialization in `tests/Feature/` and `tests/Unit/`
-- [ ] T036 Perform code cleanup and Laravel Pint on changed files
-- [ ] T037 Run `quickstart.md` validation and record evidence in feature artifacts
+- [x] T033 [P] Document snapshot rebuild, rollback, drill-down validation and executive interpretation procedures in `GO_LIVE_RUNBOOK.md` and related docs
+- [x] T034 Update architecture and product documentation for the analytics layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
+- [x] T035 [P] Add targeted coverage for analytics event publication, snapshot rebuild audit trail and drill-down serialization in `tests/Feature/` and `tests/Unit/`
+- [x] T036 Perform code cleanup and Laravel Pint on changed files
+- [x] T037 Run `quickstart.md` validation and record evidence in feature artifacts
 
 ---
 
