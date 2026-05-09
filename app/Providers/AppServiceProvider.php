@@ -26,6 +26,9 @@ use App\Models\IndicadorRecuperacaoReceita;
 use App\Models\InsightRiscoComercial;
 use App\Models\MetricaPerformanceCanal;
 use App\Models\NotaFiscalOrquestrada;
+use App\Models\OperationalAlertSnapshot;
+use App\Models\OperationalIncidentRecord;
+use App\Models\OperationalSloDefinition;
 use App\Models\OrdemServico;
 use App\Models\OrdemServicoGarantia;
 use App\Models\PedidoVenda;
@@ -35,8 +38,10 @@ use App\Models\PoliticaRecuperacaoReceita;
 use App\Models\RecorteCoorteComercial;
 use App\Models\ReservaEstoque;
 use App\Models\RetornoPagamentoSaaS;
+use App\Models\RunbookExecutionEvidence;
 use App\Models\SnapshotAnalyticsComercial;
 use App\Models\TransacaoFinanceira;
+use App\Models\LoadTestBaseline;
 use App\Models\User;
 use App\Models\UsuarioPlataforma;
 use App\Models\Vale;
@@ -56,6 +61,7 @@ use App\Policies\PlatformBillingPolicy;
 use App\Policies\PlatformCommercialAnalyticsPolicy;
 use App\Policies\PlatformPaymentsPolicy;
 use App\Policies\PlatformRevenueRecoveryPolicy;
+use App\Policies\ProductionObservabilityPolicy;
 use App\Policies\ReservaEstoquePolicy;
 use App\Policies\TenantPolicy;
 use App\Policies\TransacaoFinanceiraPolicy;
@@ -125,6 +131,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(MetricaPerformanceCanal::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(InsightRiscoComercial::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(DrilldownAnalyticsComercial::class, PlatformCommercialAnalyticsPolicy::class);
+        Gate::policy(OperationalSloDefinition::class, ProductionObservabilityPolicy::class);
+        Gate::policy(OperationalAlertSnapshot::class, ProductionObservabilityPolicy::class);
+        Gate::policy(LoadTestBaseline::class, ProductionObservabilityPolicy::class);
+        Gate::policy(OperationalIncidentRecord::class, ProductionObservabilityPolicy::class);
+        Gate::policy(RunbookExecutionEvidence::class, ProductionObservabilityPolicy::class);
         Gate::policy(NotaFiscalOrquestrada::class, NotaFiscalOrquestradaPolicy::class);
         Gate::policy(BoletoOrquestrado::class, BoletoOrquestradoPolicy::class);
         Gate::policy(CnabRemessa::class, CnabRemessaPolicy::class);
@@ -181,6 +192,12 @@ class AppServiceProvider extends ServiceProvider
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'billing']);
+        });
+
+        Gate::define('manage-production-observability', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'support', 'billing']);
         });
 
         Gate::define('manage-platform-support', function ($user) {
