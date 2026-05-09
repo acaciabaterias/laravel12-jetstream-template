@@ -44,6 +44,7 @@ Este bloco consolidou o que estava fora dos módulos funcionais `001-009`:
 - [x] Implementar visão analítica por coorte, carteira e canal
 
 ### Fase 2: Produção assistida
+- [x] Especificar `015-production-observability-assurance`
 - [ ] Validar monitoramento Prometheus/Grafana com cenários reais
 - [ ] Executar testes de carga nas integrações críticas
 - [ ] Formalizar runbooks de replay, contingência e recuperação

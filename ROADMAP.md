@@ -38,8 +38,9 @@
 
 ## Próximo módulo sugerido (v1.5.0)
 
-- [ ] Próximo módulo transversal a definir após o fechamento do analytics comercial
-- [ ] Consolidar observabilidade executiva e governança pós-analytics
+- [ ] Módulo `015` de production observability assurance
+- [ ] Consolidar monitoramento com Prometheus, Grafana, alertas e SLOs operacionais
+- [ ] Formalizar baselines de carga, runbooks auditáveis e readiness pós-incidente
 
 ## Fase 1: Estabilização e Produção (v1.4.0)
 
