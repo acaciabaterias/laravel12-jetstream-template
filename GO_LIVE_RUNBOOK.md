@@ -216,10 +216,32 @@ Valide fluxos manuais minimos:
 - rebuild controlado do snapshot operacional via `php artisan operations:rebuild-health-snapshot`
 - registro controlado de baseline de carga e comparação no painel operacional
 - registro de evidência de runbook e encerramento validado de incidente operacional
+- dashboard central de monitoring em `/admin/monitoring`
+- inspeção de monitoring em `/admin/monitoring/inspection?environment=production&alert_status=triggered`
+- refresh controlado de scrape health via `php artisan monitoring:refresh-readiness`
+- avaliação controlada de regras materiais e validação de package versionado no painel de monitoring
+- rollback controlado de package de dashboard/alerta com evidência posterior registrada
 - filtro da API operacional `GET /api/integration/inspections?status=dead_letter`
 - replay controlado de uma entrega com falha via `php artisan integration:replay <delivery_id> --operator=<user_id>`
 - replay controlado de um retorno financeiro via `php artisan platform-payments:replay-return <return_id> --operator=<user_id>`
 - logout
+
+### Rollback operacional do módulo 016
+
+Se o deploy introduzir inconsistência na malha externa de monitoring:
+
+- restaurar o dump do banco central anterior ao deploy
+- revisar `monitoring_target_catalogs`, `monitoring_probe_snapshots`, `alert_rule_definitions`, `dashboard_provisioning_records` e `monitoring_readiness_evidences`
+- revalidar o package ativo ou aplicar rollback explícito da versão pelo painel `/admin/monitoring`
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/BackboneMonitoringReadinessTest.php`
+  - `php artisan test --compact tests/Feature/BackboneMonitoringAlertRulesTest.php`
+  - `php artisan test --compact tests/Feature/BackboneMonitoringProvisioningInspectionTest.php`
+  - `php artisan test --compact tests/Feature/BackboneMonitoringRollbackEvidenceTest.php`
+- confirmar auditoria mínima:
+  - `evento_outboxes.event_type in ('SCRAPE_HEALTH_CRITICO', 'MONITORAMENTO_DEGRADADO', 'DASHBOARD_MONITORAMENTO_ATUALIZADO', 'ROLLBACK_MONITORAMENTO_EXECUTADO')`
+  - `dashboard_provisioning_records.status` consistente com a última versão aplicada ou revertida
+  - `monitoring_readiness_evidences.payload.dashboard_provisioning_record_id` apontando para o pacote auditado
 
 ### Rollback comercial do módulo 011
 

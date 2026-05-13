@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\AcaoRecuperacaoReceita;
+use App\Models\AlertRuleDefinition;
 use App\Models\AssinaturaPlataforma;
 use App\Models\BoletoOrquestrado;
 use App\Models\CasoRecuperacaoReceita;
@@ -13,6 +14,7 @@ use App\Models\CobrancaSaaSExterna;
 use App\Models\CompromissoPagamento;
 use App\Models\ConciliacaoPagamentoSaaS;
 use App\Models\ContaBancaria;
+use App\Models\DashboardProvisioningRecord;
 use App\Models\Deposito;
 use App\Models\DrilldownAnalyticsComercial;
 use App\Models\EntregaIntegracao;
@@ -24,7 +26,11 @@ use App\Models\FilaContingencia;
 use App\Models\GatewayCobrancaSaaS;
 use App\Models\IndicadorRecuperacaoReceita;
 use App\Models\InsightRiscoComercial;
+use App\Models\LoadTestBaseline;
 use App\Models\MetricaPerformanceCanal;
+use App\Models\MonitoringProbeSnapshot;
+use App\Models\MonitoringReadinessEvidence;
+use App\Models\MonitoringTargetCatalog;
 use App\Models\NotaFiscalOrquestrada;
 use App\Models\OperationalAlertSnapshot;
 use App\Models\OperationalIncidentRecord;
@@ -41,10 +47,10 @@ use App\Models\RetornoPagamentoSaaS;
 use App\Models\RunbookExecutionEvidence;
 use App\Models\SnapshotAnalyticsComercial;
 use App\Models\TransacaoFinanceira;
-use App\Models\LoadTestBaseline;
 use App\Models\User;
 use App\Models\UsuarioPlataforma;
 use App\Models\Vale;
+use App\Policies\BackboneMonitoringPolicy;
 use App\Policies\BoletoOrquestradoPolicy;
 use App\Policies\CnabRemessaPolicy;
 use App\Policies\CnabRetornoUploadPolicy;
@@ -136,6 +142,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(LoadTestBaseline::class, ProductionObservabilityPolicy::class);
         Gate::policy(OperationalIncidentRecord::class, ProductionObservabilityPolicy::class);
         Gate::policy(RunbookExecutionEvidence::class, ProductionObservabilityPolicy::class);
+        Gate::policy(MonitoringTargetCatalog::class, BackboneMonitoringPolicy::class);
+        Gate::policy(MonitoringProbeSnapshot::class, BackboneMonitoringPolicy::class);
+        Gate::policy(AlertRuleDefinition::class, BackboneMonitoringPolicy::class);
+        Gate::policy(DashboardProvisioningRecord::class, BackboneMonitoringPolicy::class);
+        Gate::policy(MonitoringReadinessEvidence::class, BackboneMonitoringPolicy::class);
         Gate::policy(NotaFiscalOrquestrada::class, NotaFiscalOrquestradaPolicy::class);
         Gate::policy(BoletoOrquestrado::class, BoletoOrquestradoPolicy::class);
         Gate::policy(CnabRemessa::class, CnabRemessaPolicy::class);
@@ -195,6 +206,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-production-observability', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'support', 'billing']);
+        });
+
+        Gate::define('manage-backbone-monitoring', function ($user) {
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'support', 'billing']);

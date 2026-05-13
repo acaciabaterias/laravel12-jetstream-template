@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-360%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-396%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -123,6 +123,16 @@ O modulo `015` fecha a governanca operacional central da plataforma:
 - incidentes operacionais centrais com evidencia de runbook
 - encerramento auditavel com validacao posterior obrigatoria
 - dashboard `/admin/operations` e inspecao `/admin/operations/inspection`
+
+## Backbone Monitoring Consolidation
+
+O modulo `016` consolida a camada externa de monitoramento sem deslocar a governanca para fora do ERP:
+
+- catalogo central de targets e snapshots de scrape health
+- regras de alerta versionadas com avaliacao material por fluxo
+- dashboard `/admin/monitoring` e inspecao `/admin/monitoring/inspection`
+- provisionamento, validacao e rollback auditavel de dashboards/alertas por ambiente
+- evidencias centrais de readiness para Prometheus, Grafana e exporters criticos
 
 ## Stack
 

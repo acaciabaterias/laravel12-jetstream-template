@@ -42,6 +42,8 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `012`: payments control plane central com emissão externa, webhooks idempotentes, conciliação e exceções financeiras
 - `013`: revenue recovery central com régua de cobrança, escalonamento, promessas e reengajamento
 - `014`: analytics comercial central com snapshots, coortes, canais, riscos e drill-down executivo
+- `015`: observabilidade operacional central com snapshots, baselines, incidentes e runbooks auditáveis
+- `016`: consolidação do stack externo de monitoramento com scrape health, alertas materiais, dashboards versionados e rollback auditável
 
 ## Integrações Externas
 
@@ -106,6 +108,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - incidentes centrais só podem ser encerrados após evidência concluída e `post_validation_passed`
 - eventos operacionais materiais (`INCIDENTE_OPERACIONAL_ABERTO`, `SERVICO_DEGRADADO_DETECTADO`, `BASELINE_CARGA_ATUALIZADO`) são publicados no backbone `010`
 - o painel central opera via Livewire em `/admin/operations` e a inspeção JSON reutilizável fica em `/admin/operations/inspection`
+
+## Backbone Monitoring Consolidation
+
+- o banco central mantém `monitoring_target_catalogs`, `monitoring_probe_snapshots`, `alert_rule_definitions`, `dashboard_provisioning_records` e `monitoring_readiness_evidences`
+- o módulo `016` registra o estado operacional do stack externo sem substituir Prometheus ou Grafana como camadas de coleta e visualização
+- scrape health diferencia explicitamente target degradado, coletor indisponível e ausência de materialização saudável
+- regras de alerta versionadas avaliam fluxo, severidade, threshold e target materializado de forma auditável
+- o lifecycle de dashboards suporta registro, aplicação, validação e rollback com evidência persistida
+- eventos materiais (`SCRAPE_HEALTH_CRITICO`, `MONITORAMENTO_DEGRADADO`, `DASHBOARD_MONITORAMENTO_ATUALIZADO`, `ROLLBACK_MONITORAMENTO_EXECUTADO`) são publicados no backbone `010`
+- o painel central opera via Livewire em `/admin/monitoring` e a inspeção JSON reutilizável fica em `/admin/monitoring/inspection`
 
 ## Padrões Técnicos
 

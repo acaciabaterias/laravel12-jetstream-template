@@ -1,10 +1,10 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v1.4.0 - pronto para lançamento assistido com analytics comercial central)
+## Status Atual (v1.6.0 - pronto para lançamento assistido com observabilidade e monitoring backbone consolidados)
 
-✅ 14 módulos implementados (`001` a `014`)
+✅ 16 módulos implementados (`001` a `016`)
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `360` testes passando e `1685` assertions
+✅ suíte principal estabilizada com `396` testes passando, `1 skipped` e `2172` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
@@ -35,19 +35,25 @@
 - [x] Snapshots executivos de MRR, churn, inadimplência e recuperação
 - [x] Recortes por coorte, canal e carteira com drill-down reutilizável
 - [x] Dashboard central e inspeção JSON de analytics comercial
+- [x] Módulo `015` de production observability assurance
+- [x] Snapshots operacionais, baselines de carga, incidentes e runbooks auditáveis
+- [x] Dashboard central e inspeção JSON de observabilidade operacional
+- [x] Módulo `016` de backbone monitoring consolidation
+- [x] Consolidação central de scrape health, alertas materiais e readiness do stack externo
+- [x] Versionamento de dashboards, validação, rollback e evidências auditáveis de monitoring
 
-## Próximo módulo sugerido (v1.5.0)
+## Próximo bloco sugerido (v1.7.0)
 
-- [ ] Módulo `015` de production observability assurance
-- [ ] Consolidar monitoramento com Prometheus, Grafana, alertas e SLOs operacionais
-- [ ] Formalizar baselines de carga, runbooks auditáveis e readiness pós-incidente
+- [ ] Executar teste de carga e otimização de queries nas integrações críticas
+- [ ] Consolidar baseline operacional com evidência reproduzível por fluxo
+- [ ] Expandir readiness para capacity planning e tuning preventivo
 
 ## Fase 1: Estabilização e Produção (v1.4.0)
 
 - [x] Subir ambiente com Docker e validar integração ponta a ponta
 - [x] Configurar Supabase para tenants reais
 - [x] Implementar autenticação real entre ERP Core e microserviços
-- [ ] Consolidar monitoramento com Prometheus e Grafana no backbone `010`
+- [x] Consolidar monitoramento com Prometheus e Grafana no backbone `010`
 - [ ] Executar teste de carga e otimização de queries nas integrações críticas
 
 ## Fase 2: Expansão Comercial (v1.3.0)
