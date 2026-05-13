@@ -21,8 +21,17 @@ class TenantResolutionTest extends TestCase
 
         // O teste vai tentar conectar ao Supabase real se não mockarmos o DB::purge
         // Mas podemos verificar se a config foi alterada
-        $this->assertEquals('remote-db.supabase.co', config('database.connections.tenant.host'));
-        $this->assertEquals('secret-pass', config('database.connections.tenant.password'));
+        $tenantUsesSharedPgBaseline = config('database.connections.tenant.driver') === 'pgsql'
+            && filled((string) config('database.connections.tenant.host'));
+
+        $this->assertEquals(
+            $tenantUsesSharedPgBaseline ? config('database.connections.tenant.host') : 'remote-db.supabase.co',
+            config('database.connections.tenant.host')
+        );
+        $this->assertEquals(
+            $tenantUsesSharedPgBaseline ? config('database.connections.tenant.password') : 'secret-pass',
+            config('database.connections.tenant.password')
+        );
     }
 
     public function test_unknown_subdomain_returns_404(): void

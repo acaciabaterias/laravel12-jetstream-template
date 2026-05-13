@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('geolocalizacao_eventos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('rota_entrega_id')->nullable()->constrained('rotas_entrega')->nullOnDelete();
-            $table->foreignId('ponto_entrega_id')->nullable()->constrained('pontos_entrega')->nullOnDelete();
+            $table->foreignId('ponto_entrega_id')->nullable();
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
             $table->string('tipo_evento');

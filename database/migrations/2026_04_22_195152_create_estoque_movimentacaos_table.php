@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('estoque_movimentacoes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bateria_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('deposito_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('deposito_id');
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->string('tipo_operacao');
             $table->string('origem')->nullable();

@@ -58,10 +58,20 @@ class TenantHealthCommand extends Command
             return Cliente::query()->orderBy('id')->get();
         }
 
-        return Cliente::query()
-            ->where('id', $tenant)
-            ->orWhere('subdominio', $tenant)
-            ->orWhere('cnpj', preg_replace('/\D+/', '', $tenant))
-            ->get();
+        $query = Cliente::query();
+
+        if (ctype_digit($tenant)) {
+            $query->where('id', (int) $tenant);
+        } else {
+            $query->where('subdominio', $tenant);
+
+            $normalizedCnpj = preg_replace('/\D+/', '', $tenant);
+
+            if (is_string($normalizedCnpj) && $normalizedCnpj !== '') {
+                $query->orWhere('cnpj', $normalizedCnpj);
+            }
+        }
+
+        return $query->get();
     }
 }

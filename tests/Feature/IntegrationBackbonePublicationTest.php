@@ -7,7 +7,6 @@ use App\Models\ContratoEvento;
 use App\Models\EventoOutbox;
 use App\Services\Integration\EventPublisher;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class IntegrationBackbonePublicationTest extends TestCase
@@ -16,13 +15,7 @@ class IntegrationBackbonePublicationTest extends TestCase
     {
         parent::setUp();
 
-        Schema::connection('tenant')->dropIfExists('endpoints_integracao');
-        Schema::connection('tenant')->dropIfExists('contratos_evento');
-        Schema::connection('tenant')->dropIfExists('entregas_integracao');
-        Schema::connection('tenant')->dropIfExists('evento_inboxes');
-        Schema::connection('tenant')->dropIfExists('evento_outboxes');
-
-        $this->artisan('migrate', [
+        $this->artisan('migrate:fresh', [
             '--database' => 'tenant',
             '--path' => 'database/migrations/tenant/2026_05_06_204458_create_integration_backbone_tables.php',
             '--realpath' => false,

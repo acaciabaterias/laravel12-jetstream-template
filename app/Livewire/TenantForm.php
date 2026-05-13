@@ -88,7 +88,7 @@ class TenantForm extends Component
                 'supabase_project_ref' => Str::lower(Str::random(20)),
                 'supabase_url' => 'https://pending-provision.supabase.co',
                 'supabase_db_host' => 'pending-provision.supabase.co',
-                'supabase_db_password' => Str::random(32),
+                'supabase_db_password' => Str::random(8),
                 'supabase_anon_key' => Str::random(64),
                 'supabase_service_role_key' => Str::random(64),
             ]);

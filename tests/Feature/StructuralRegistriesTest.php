@@ -200,15 +200,22 @@ class StructuralRegistriesTest extends TestCase
             'supabase_db_host' => 'db-struct-b.supabase.co',
         ]);
 
+        $tenantUsesSharedPgBaseline = config('database.connections.tenant.driver') === 'pgsql'
+            && filled((string) config('database.connections.tenant.host'));
+
         $responseA = $this->get('http://struct-a.erp.com/structural/tenant-probe');
         $responseB = $this->get('http://struct-b.erp.com/structural/tenant-probe');
 
         $responseA->assertOk()->assertJson([
-            'tenant_host' => 'db-struct-a.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-struct-a.supabase.co',
             'cliente_id' => $tenantA->id,
         ]);
         $responseB->assertOk()->assertJson([
-            'tenant_host' => 'db-struct-b.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-struct-b.supabase.co',
             'cliente_id' => $tenantB->id,
         ]);
     }

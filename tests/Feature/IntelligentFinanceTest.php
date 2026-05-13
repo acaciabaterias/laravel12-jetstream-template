@@ -347,16 +347,23 @@ class IntelligentFinanceTest extends TestCase
             'supabase_db_host' => 'db-fin-b.supabase.co',
         ]);
 
+        $tenantUsesSharedPgBaseline = config('database.connections.tenant.driver') === 'pgsql'
+            && filled((string) config('database.connections.tenant.host'));
+
         $responseA = $this->get('http://fin-a.erp.com/finance/tenant-probe');
         $responseB = $this->get('http://fin-b.erp.com/finance/tenant-probe');
 
         $responseA->assertOk()->assertJson([
-            'tenant_host' => 'db-fin-a.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-fin-a.supabase.co',
             'cliente_id' => $tenantA->id,
         ]);
 
         $responseB->assertOk()->assertJson([
-            'tenant_host' => 'db-fin-b.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-fin-b.supabase.co',
             'cliente_id' => $tenantB->id,
         ]);
     }

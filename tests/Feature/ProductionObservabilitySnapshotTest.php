@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\AssinaturaPlataforma;
 use App\Models\CasoRecuperacaoReceita;
 use App\Models\Cliente;
 use App\Models\EventoOutbox;
@@ -12,7 +13,6 @@ use App\Models\FaturaSaaS;
 use App\Models\OperationalAlertSnapshot;
 use App\Models\PlanoComercial;
 use App\Models\PoliticaRecuperacaoReceita;
-use App\Models\AssinaturaPlataforma;
 use App\Services\Integration\IntegrationStorageManager;
 use App\Services\Operations\OperationalHealthSnapshotService;
 use Illuminate\Support\Facades\Artisan;
@@ -107,11 +107,15 @@ class ProductionObservabilitySnapshotTest extends TestCase
         ], 'central');
         $this->assertDatabaseHas('operational_alert_snapshots', [
             'flow_name' => 'platform_payments',
-            'severity' => 'warning',
+            'severity' => 'critical',
         ], 'central');
         $this->assertDatabaseHas('operational_alert_snapshots', [
             'flow_name' => 'platform_recovery',
-            'severity' => 'warning',
+            'severity' => 'critical',
+        ], 'central');
+        $this->assertDatabaseHas('evento_outboxes', [
+            'event_type' => 'SERVICO_DEGRADADO_DETECTADO',
+            'origin_context' => 'production-observability',
         ], 'central');
         $this->assertDatabaseHas('evento_outboxes', [
             'event_type' => 'INCIDENTE_OPERACIONAL_ABERTO',

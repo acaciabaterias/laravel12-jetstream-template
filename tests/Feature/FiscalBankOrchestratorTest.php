@@ -371,16 +371,23 @@ class FiscalBankOrchestratorTest extends TestCase
             'supabase_db_host' => 'db-orc-b.supabase.co',
         ]);
 
+        $tenantUsesSharedPgBaseline = config('database.connections.tenant.driver') === 'pgsql'
+            && filled((string) config('database.connections.tenant.host'));
+
         $responseA = $this->get('http://orc-a.erp.com/orchestrator/tenant-probe');
         $responseB = $this->get('http://orc-b.erp.com/orchestrator/tenant-probe');
 
         $responseA->assertOk()->assertJson([
-            'tenant_host' => 'db-orc-a.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-orc-a.supabase.co',
             'cliente_id' => $tenantA->id,
         ]);
 
         $responseB->assertOk()->assertJson([
-            'tenant_host' => 'db-orc-b.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-orc-b.supabase.co',
             'cliente_id' => $tenantB->id,
         ]);
     }

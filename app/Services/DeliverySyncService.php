@@ -9,6 +9,7 @@ use App\Models\PontoEntrega;
 use App\Models\RecebimentoMovel;
 use App\Models\SyncEvento;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DeliverySyncService
 {
@@ -34,7 +35,7 @@ class DeliverySyncService
                     'payload_hash' => $payloadHash,
                 ],
                 [
-                    'dispositivo_uuid' => $payload['dispositivo_uuid'],
+                    'dispositivo_uuid' => $this->normalizeDeviceUuid((string) $payload['dispositivo_uuid']),
                     'entidade_tipo' => $payload['entidade_tipo'],
                     'entidade_id' => $payload['entidade_id'] ?? null,
                     'payload' => $payload,
@@ -143,5 +144,23 @@ class DeliverySyncService
         $totalQuantity = max(1, (int) $itens->sum('quantidade'));
 
         return round($weightedValue / $totalQuantity, 2);
+    }
+
+    protected function normalizeDeviceUuid(string $deviceIdentifier): string
+    {
+        if (Str::isUuid($deviceIdentifier)) {
+            return $deviceIdentifier;
+        }
+
+        $hash = md5($deviceIdentifier);
+
+        return sprintf(
+            '%s-%s-%s-%s-%s',
+            substr($hash, 0, 8),
+            substr($hash, 8, 4),
+            substr($hash, 12, 4),
+            substr($hash, 16, 4),
+            substr($hash, 20, 12),
+        );
     }
 }

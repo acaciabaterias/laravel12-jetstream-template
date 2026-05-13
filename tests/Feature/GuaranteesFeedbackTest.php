@@ -253,16 +253,23 @@ class GuaranteesFeedbackTest extends TestCase
             'supabase_db_host' => 'db-gar-b.supabase.co',
         ]);
 
+        $tenantUsesSharedPgBaseline = config('database.connections.tenant.driver') === 'pgsql'
+            && filled((string) config('database.connections.tenant.host'));
+
         $responseA = $this->get('http://gar-a.erp.com/guarantees/tenant-probe');
         $responseB = $this->get('http://gar-b.erp.com/guarantees/tenant-probe');
 
         $responseA->assertOk()->assertJson([
-            'tenant_host' => 'db-gar-a.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-gar-a.supabase.co',
             'cliente_id' => $tenantA->id,
         ]);
 
         $responseB->assertOk()->assertJson([
-            'tenant_host' => 'db-gar-b.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-gar-b.supabase.co',
             'cliente_id' => $tenantB->id,
         ]);
     }

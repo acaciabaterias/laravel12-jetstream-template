@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transacoes_financeiras', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('conta_bancaria_id')->constrained('contas_bancarias')->cascadeOnDelete();
+            $table->foreignId('conta_bancaria_id');
             $table->string('tipo');
             $table->decimal('valor', 12, 2);
             $table->timestamp('data_transacao');

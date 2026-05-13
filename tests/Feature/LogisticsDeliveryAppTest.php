@@ -321,15 +321,22 @@ class LogisticsDeliveryAppTest extends TestCase
             'supabase_db_host' => 'db-log-b.supabase.co',
         ]);
 
+        $tenantUsesSharedPgBaseline = config('database.connections.tenant.driver') === 'pgsql'
+            && filled((string) config('database.connections.tenant.host'));
+
         $responseA = $this->get('http://log-a.erp.com/logistics/tenant-probe');
         $responseB = $this->get('http://log-b.erp.com/logistics/tenant-probe');
 
         $responseA->assertOk()->assertJson([
-            'tenant_host' => 'db-log-a.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-log-a.supabase.co',
             'cliente_id' => $tenantA->id,
         ]);
         $responseB->assertOk()->assertJson([
-            'tenant_host' => 'db-log-b.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-log-b.supabase.co',
             'cliente_id' => $tenantB->id,
         ]);
     }

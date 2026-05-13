@@ -20,7 +20,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, pdo, sqlite, pdo_sqlite
+          extensions: mbstring, pcntl, pdo, sqlite, pdo_sqlite
           coverage: none
 
       - name: Cache Composer
@@ -43,7 +43,119 @@ jobs:
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
-        run: php artisan test --compact
+        run: php artisan test --compact --parallel
+
+  laravel-tests-postgresql-central:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: ci_central
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pcntl, pdo, pdo_pgsql, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate --no-interaction
+
+      - name: Suite central em PostgreSQL (control plane/billing/analytics/certificação)
+        env:
+          DB_CENTRAL_DRIVER: pgsql
+          DB_CENTRAL_HOST: 127.0.0.1
+          DB_CENTRAL_PORT: 5432
+          DB_CENTRAL_DATABASE: ci_central
+          DB_CENTRAL_USERNAME: postgres
+          DB_CENTRAL_PASSWORD: postgres
+        run: >
+          php artisan test --compact
+          "--filter=ProductionObservability|PlatformCommercialAnalytics|PlatformRevenueRecovery|PlatformPayments|PlatformBilling|FiscalBank|GatewayCertificate|CertificadoDigital|PayloadContractsV1"
+
+  laravel-tests-postgresql-tenant:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: ci_tenant
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pcntl, pdo, pdo_pgsql, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate --no-interaction
+
+      - name: Integration backbone tenant em PostgreSQL
+        env:
+          DB_TENANT_DRIVER: pgsql
+          DB_TENANT_HOST: 127.0.0.1
+          DB_TENANT_PORT: 5432
+          DB_TENANT_DATABASE: ci_tenant
+          DB_TENANT_USERNAME: postgres
+          DB_TENANT_PASSWORD: postgres
+        run: >
+          php artisan test --compact
+          "--filter=IntegrationBackboneRetry|IntegrationBackboneDashboard|IntegrationBackboneReplay|IntegrationBackboneInbox|IntegrationBackbonePublication|IntegrationGateway|IntegrationContractCatalog|SalesServiceOs"
 
   frontend-build:
     runs-on: ubuntu-latest

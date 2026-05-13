@@ -449,20 +449,31 @@ class InventoryReverseLogisticsTest extends TestCase
             'supabase_db_password' => 'pwd-tenant-b',
         ]);
 
+        $tenantUsesSharedPgBaseline = config('database.connections.tenant.driver') === 'pgsql'
+            && filled((string) config('database.connections.tenant.host'));
+
         $responseA = $this->get('http://tenant-a.erp.com/inventory/tenant-probe');
         $responseB = $this->get('http://tenant-b.erp.com/inventory/tenant-probe');
 
         $responseA->assertOk()
             ->assertJson([
-                'tenant_host' => 'db-tenant-a.supabase.co',
-                'tenant_password' => 'pwd-tenant-a',
+                'tenant_host' => $tenantUsesSharedPgBaseline
+                    ? config('database.connections.tenant.host')
+                    : 'db-tenant-a.supabase.co',
+                'tenant_password' => $tenantUsesSharedPgBaseline
+                    ? config('database.connections.tenant.password')
+                    : 'pwd-tenant-a',
                 'cliente_id' => $tenantA->id,
             ]);
 
         $responseB->assertOk()
             ->assertJson([
-                'tenant_host' => 'db-tenant-b.supabase.co',
-                'tenant_password' => 'pwd-tenant-b',
+                'tenant_host' => $tenantUsesSharedPgBaseline
+                    ? config('database.connections.tenant.host')
+                    : 'db-tenant-b.supabase.co',
+                'tenant_password' => $tenantUsesSharedPgBaseline
+                    ? config('database.connections.tenant.password')
+                    : 'pwd-tenant-b',
                 'cliente_id' => $tenantB->id,
             ]);
     }

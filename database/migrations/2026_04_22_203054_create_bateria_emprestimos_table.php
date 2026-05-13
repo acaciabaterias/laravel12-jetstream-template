@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('baterias_emprestimo', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('os_garantia_id')->constrained('ordens_servico_garantia')->cascadeOnDelete();
+            $table->foreignId('os_garantia_id');
             $table->foreignId('bateria_usada_id')->constrained('baterias')->cascadeOnDelete();
             $table->timestamp('data_retirada');
             $table->timestamp('data_devolucao_prevista');

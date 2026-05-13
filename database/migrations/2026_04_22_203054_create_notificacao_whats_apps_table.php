@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('notificacoes_whatsapp', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('os_garantia_id')->constrained('ordens_servico_garantia')->cascadeOnDelete();
+            $table->foreignId('os_garantia_id');
             $table->string('cliente_telefone')->nullable();
             $table->string('status')->default('pendente');
             $table->text('mensagem');

@@ -53,7 +53,16 @@ class TenantConnectionMiddleware
             return $this->denyOverdueAccess($request);
         }
 
-        if (app()->environment('testing')) {
+        $baselineTenantConnection = config('database.connections.tenant');
+
+        $useSqliteInMemoryTenant = app()->environment('testing')
+            && ($baselineTenantConnection['driver'] ?? '') === 'sqlite';
+
+        $useSharedPgTenantForCi = app()->environment('testing')
+            && ($baselineTenantConnection['driver'] ?? '') === 'pgsql'
+            && filled((string) ($baselineTenantConnection['host'] ?? ''));
+
+        if ($useSqliteInMemoryTenant) {
             Config::set('database.connections.tenant', [
                 'driver' => 'sqlite',
                 'database' => ':memory:',
@@ -61,21 +70,36 @@ class TenantConnectionMiddleware
                 'host' => $cliente->supabase_db_host,
                 'password' => $cliente->supabase_db_password,
             ]);
+        } elseif ($useSharedPgTenantForCi) {
+            $passwordFromEnv = filled($baselineTenantConnection['password'] ?? null)
+                ? (string) $baselineTenantConnection['password']
+                : (string) ($cliente->supabase_db_password ?? '');
+
+            Config::set('database.connections.tenant', [
+                'driver' => 'pgsql',
+                'host' => $baselineTenantConnection['host'],
+                'port' => $baselineTenantConnection['port'] ?? '5432',
+                'database' => $baselineTenantConnection['database'] ?? 'postgres',
+                'username' => $baselineTenantConnection['username'] ?? 'postgres',
+                'password' => $passwordFromEnv,
+                'charset' => 'utf8',
+                'prefix' => '',
+                'schema' => 'public',
+            ]);
+            DB::purge('tenant');
+            DB::reconnect('tenant');
         } else {
             Config::set('database.connections.tenant', [
                 'driver' => 'pgsql',
                 'host' => $cliente->supabase_db_host,
-                'port' => config('database.connections.tenant.port', '6543'),
-                'database' => config('database.connections.tenant.database', 'postgres'),
-                'username' => config('database.connections.tenant.username', 'postgres'),
+                'port' => $baselineTenantConnection['port'] ?? '6543',
+                'database' => $baselineTenantConnection['database'] ?? 'postgres',
+                'username' => $baselineTenantConnection['username'] ?? 'postgres',
                 'password' => $cliente->supabase_db_password,
                 'charset' => 'utf8',
                 'prefix' => '',
                 'schema' => 'public',
             ]);
-        }
-
-        if (! app()->environment('testing')) {
             DB::purge('tenant');
             DB::reconnect('tenant');
         }

@@ -9,10 +9,16 @@ abstract class TestCase extends BaseTestCase
 {
     use RefreshDatabase;
 
-    /**
-     * O TestCase foi simplificado ao máximo para estabilidade total.
-     * Como movemos as migrações para a raiz, neutralizamos os modelos
-     * e o middleware, a suíte de testes agora opera como um monolito
-     * funcional em memória, garantindo 100% de aprovação e performance.
-     */
+    protected function afterRefreshingDatabase()
+    {
+        if (($this->app['config']->get('database.connections.tenant.driver') ?? null) !== 'pgsql') {
+            return;
+        }
+
+        $this->artisan('migrate:fresh', [
+            '--database' => 'tenant',
+            '--path' => 'database/migrations/tenant/2026_05_06_204458_create_integration_backbone_tables.php',
+            '--realpath' => false,
+        ])->assertExitCode(0);
+    }
 }

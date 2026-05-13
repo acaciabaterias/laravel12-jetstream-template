@@ -67,7 +67,7 @@ class DemoOperationalSeeder extends Seeder
             [
                 'marca' => 'Moura',
                 'tecnologia' => 'AGM',
-                'amperagem' => '60Ah',
+                'amperagem' => 60,
                 'polo' => 'D',
                 'preco_venda' => 550,
                 'peso_sucata_kg' => 12.5,

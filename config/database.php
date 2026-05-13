@@ -109,13 +109,13 @@ return [
             'schema' => 'public',
         ],
 
-        'tenant' => [ // Conexão dinâmica configurada em runtime
+        'tenant' => [ // Conexão dinâmica configurada em runtime (middleware sobrescreve em HTTP)
             'driver' => env('DB_TENANT_DRIVER', 'pgsql'),
-            'host' => '',
+            'host' => env('DB_TENANT_HOST', ''),
             'port' => env('DB_TENANT_PORT', '6543'),
             'database' => env('DB_TENANT_DATABASE', 'postgres'),
             'username' => env('DB_TENANT_USERNAME', 'postgres'),
-            'password' => '',
+            'password' => env('DB_TENANT_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
             'schema' => 'public',

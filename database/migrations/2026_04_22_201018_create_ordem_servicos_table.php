@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('ordens_servico', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vale_id')->constrained('vales')->cascadeOnDelete();
+            $table->foreignId('vale_id');
             $table->foreignId('cliente_id')->constrained('clientes')->cascadeOnDelete();
             $table->foreignId('tecnico_responsavel_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('data_abertura');

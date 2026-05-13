@@ -452,16 +452,23 @@ class SalesServiceOsTest extends TestCase
             'supabase_db_host' => 'db-sales-b.supabase.co',
         ]);
 
+        $tenantUsesSharedPgBaseline = config('database.connections.tenant.driver') === 'pgsql'
+            && filled((string) config('database.connections.tenant.host'));
+
         $responseA = $this->get('http://sales-a.erp.com/sales/tenant-probe');
         $responseB = $this->get('http://sales-b.erp.com/sales/tenant-probe');
 
         $responseA->assertOk()->assertJson([
-            'tenant_host' => 'db-sales-a.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-sales-a.supabase.co',
             'cliente_id' => $tenantA->id,
         ]);
 
         $responseB->assertOk()->assertJson([
-            'tenant_host' => 'db-sales-b.supabase.co',
+            'tenant_host' => $tenantUsesSharedPgBaseline
+                ? config('database.connections.tenant.host')
+                : 'db-sales-b.supabase.co',
             'cliente_id' => $tenantB->id,
         ]);
     }

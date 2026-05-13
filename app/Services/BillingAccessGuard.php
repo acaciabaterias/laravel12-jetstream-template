@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 class BillingAccessGuard
@@ -14,13 +15,23 @@ class BillingAccessGuard
     public function shouldBlockClienteAccess(int $clienteId): bool
     {
         try {
-            $isBlockedFlag = DB::connection('central')
-                ->table('clientes')
-                ->where('id', $clienteId)
-                ->value('billing_blocked');
+            if (! Schema::connection('central')->hasTable('clientes')) {
+                return false;
+            }
+
+            $isBlockedFlag = Schema::connection('central')->hasColumn('clientes', 'billing_blocked')
+                ? DB::connection('central')
+                    ->table('clientes')
+                    ->where('id', $clienteId)
+                    ->value('billing_blocked')
+                : false;
 
             if ((bool) $isBlockedFlag) {
                 return true;
+            }
+
+            if (! Schema::connection('central')->hasTable('assinaturas')) {
+                return false;
             }
 
             return DB::connection('central')
