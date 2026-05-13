@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Livewire\Admin\ProductionObservabilityDashboard;
 use App\Models\OperationalAlertSnapshot;
+use App\Models\OperationalIncidentRecord;
 use App\Models\UsuarioPlataforma;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
@@ -59,5 +60,38 @@ class ProductionObservabilityDashboardTest extends TestCase
 
         Livewire::test(ProductionObservabilityDashboard::class)
             ->assertForbidden();
+    }
+
+    public function test_support_operator_can_manage_incident_lifecycle_from_dashboard(): void
+    {
+        $support = UsuarioPlataforma::factory()->create(['papel' => 'support']);
+        $incident = OperationalIncidentRecord::factory()->create([
+            'status' => 'open',
+            'summary' => 'Fila de pagamentos degradada.',
+        ]);
+
+        $this->actingAs($support, 'platform');
+
+        Livewire::test(ProductionObservabilityDashboard::class)
+            ->call('acknowledgeIncident', $incident->id)
+            ->assertSet('operationMessage', sprintf('Incidente %d reconhecido com sucesso.', $incident->id))
+            ->set('selectedIncidentId', (string) $incident->id)
+            ->set('incidentExecutionType', 'replay')
+            ->set('incidentResultStatus', 'success')
+            ->set('incidentValidationChecks', 'queue-drained,reconciliation-ok')
+            ->set('incidentNotes', 'Replay executado e validado.')
+            ->call('recordRunbookEvidence')
+            ->assertSet('operationMessage', sprintf('Evidencia operacional registrada no incidente %d.', $incident->id))
+            ->call('resolveIncident', $incident->id)
+            ->assertSet('operationMessage', sprintf('Incidente %d marcado como resolvido.', $incident->id))
+            ->call('closeIncident')
+            ->assertSet('operationMessage', sprintf('Incidente %d encerrado com validacao registrada.', $incident->id));
+
+        $this->assertSame('closed', $incident->fresh()->status->value);
+        $this->assertDatabaseHas('runbook_execution_evidences', [
+            'operational_incident_record_id' => $incident->id,
+            'execution_type' => 'replay',
+            'result_status' => 'success',
+        ], 'central');
     }
 }

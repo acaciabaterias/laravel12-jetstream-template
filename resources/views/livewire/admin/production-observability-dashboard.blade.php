@@ -44,6 +44,13 @@
             <option value="degraded">Degraded</option>
             <option value="unavailable">Unavailable</option>
         </select>
+        <select wire:model.live="incidentStatusFilter" class="rounded-lg border-slate-300 text-sm">
+            <option value="">Todos os incidentes</option>
+            <option value="open">Open</option>
+            <option value="acknowledged">Acknowledged</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+        </select>
     </div>
 
     <div class="grid gap-6 xl:grid-cols-2">
@@ -120,12 +127,12 @@
                 </button>
             </div>
 
-            @error('scenario_name') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
-            @error('baseline_flow_name') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
-            @error('throughput_per_minute') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
-            @error('p95_latency_ms') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
-            @error('error_rate') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
-            @error('environment_notes') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
+            @error('scenarioName') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
+            @error('baselineFlowName') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
+            @error('throughputPerMinute') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
+            @error('p95LatencyMs') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
+            @error('errorRate') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
+            @error('environmentNotes') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
 
             @if ($comparisonResult)
                 <div class="mt-6 rounded-lg border border-slate-100 bg-slate-50 p-4">
@@ -197,6 +204,105 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <div class="grid gap-6 xl:grid-cols-2">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 class="text-base font-semibold text-slate-900">Incidentes operacionais</h3>
+            <div class="mt-4 space-y-4">
+                @forelse ($recentIncidents as $incident)
+                    <div class="rounded-lg border border-slate-100 p-4">
+                        <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                            <div>
+                                <div class="font-medium text-slate-900">{{ $incident->incident_key }}</div>
+                                <div class="mt-1 text-sm text-slate-600">{{ $incident->summary }}</div>
+                                <div class="mt-2 text-xs text-slate-500">
+                                    Fluxo: {{ $incident->flow_name }} | Severidade: {{ $incident->severity->value }} | Status: {{ $incident->status->value }}
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                @if ($incident->status->value === 'open')
+                                    <button wire:click="acknowledgeIncident({{ $incident->id }})" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700">
+                                        Reconhecer
+                                    </button>
+                                @endif
+                                @if (in_array($incident->status->value, ['open', 'acknowledged'], true))
+                                    <button wire:click="resolveIncident({{ $incident->id }})" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700">
+                                        Marcar resolvido
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+
+                        @if ($incident->evidences->isNotEmpty())
+                            <div class="mt-4 overflow-x-auto">
+                                <table class="min-w-full text-sm">
+                                    <thead class="text-left text-slate-500">
+                                        <tr>
+                                            <th class="pb-2 pr-4">Execucao</th>
+                                            <th class="pb-2 pr-4">Resultado</th>
+                                            <th class="pb-2 pr-4">Operador</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-slate-700">
+                                        @foreach ($incident->evidences as $evidence)
+                                            <tr class="border-t border-slate-100">
+                                                <td class="py-2 pr-4">{{ $evidence->execution_type }}</td>
+                                                <td class="py-2 pr-4">{{ $evidence->result_status->value }}</td>
+                                                <td class="py-2 pr-4">{{ $evidence->operator?->name ?? 'N/A' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
+                @empty
+                    <div class="rounded-lg border border-dashed border-slate-200 px-4 py-6 text-sm text-slate-500">
+                        Nenhum incidente operacional para os filtros atuais.
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 class="text-base font-semibold text-slate-900">Acoes de runbook e encerramento</h3>
+            <div class="mt-4 grid gap-4 md:grid-cols-2">
+                <select wire:model.defer="selectedIncidentId" class="rounded-lg border-slate-300 text-sm md:col-span-2">
+                    <option value="">Selecione o incidente</option>
+                    @foreach ($recentIncidents as $incident)
+                        <option value="{{ $incident->id }}">{{ $incident->incident_key }} - {{ $incident->status->value }}</option>
+                    @endforeach
+                </select>
+                <select wire:model.defer="incidentExecutionType" class="rounded-lg border-slate-300 text-sm">
+                    <option value="replay">Replay</option>
+                    <option value="rollback">Rollback</option>
+                    <option value="restore_validation">Restore validation</option>
+                    <option value="contingency">Contingency</option>
+                </select>
+                <select wire:model.defer="incidentResultStatus" class="rounded-lg border-slate-300 text-sm">
+                    <option value="success">Success</option>
+                    <option value="partial">Partial</option>
+                    <option value="failed">Failed</option>
+                </select>
+                <input wire:model.defer="incidentValidationChecks" type="text" class="rounded-lg border-slate-300 text-sm md:col-span-2" placeholder="Checks validados separados por virgula">
+                <textarea wire:model.defer="incidentNotes" class="rounded-lg border-slate-300 text-sm md:col-span-2" rows="4" placeholder="Notas operacionais e evidencia objetiva"></textarea>
+            </div>
+
+            <div class="mt-4 flex flex-col gap-3 md:flex-row">
+                <button wire:click="recordRunbookEvidence" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+                    Registrar evidencia
+                </button>
+                <button wire:click="closeIncident" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700">
+                    Encerrar apos validacao
+                </button>
+            </div>
+
+            @error('selectedIncidentId') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
+            @error('incidentExecutionType') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
+            @error('incidentResultStatus') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
+            @error('incidentNotes') <div class="mt-3 text-sm text-rose-700">{{ $message }}</div> @enderror
         </div>
     </div>
 </div>
