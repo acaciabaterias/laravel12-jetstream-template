@@ -114,6 +114,16 @@ O modulo `014` consolida a leitura executiva central da plataforma:
 - drill-down operacional reutilizavel para inspecao e suporte
 - dashboard `/admin/analytics` e inspecao `/admin/analytics/inspection`
 
+## Production Observability Assurance
+
+O modulo `015` fecha a governanca operacional central da plataforma:
+
+- snapshots operacionais com classificacao explicita de severidade
+- comparacao de baseline de carga por fluxo critico
+- incidentes operacionais centrais com evidencia de runbook
+- encerramento auditavel com validacao posterior obrigatoria
+- dashboard `/admin/operations` e inspecao `/admin/operations/inspection`
+
 ## Stack
 
 - PHP `^8.3`
@@ -254,6 +264,15 @@ Formatacao:
 
 ```bash
 vendor/bin/pint --dirty --format agent
+```
+
+Para o recorte operacional central do modulo `015`, os testes chave incluem:
+
+```bash
+php artisan test --compact tests/Feature/ProductionObservabilityDashboardTest.php
+php artisan test --compact tests/Feature/ProductionObservabilitySnapshotTest.php
+php artisan test --compact tests/Feature/ProductionObservabilityLoadBaselineTest.php
+php artisan test --compact tests/Feature/ProductionObservabilityIncidentInspectionTest.php
 ```
 
 ### Documentação da API (OpenAPI/Swagger)

@@ -211,6 +211,11 @@ Valide fluxos manuais minimos:
 - dashboard central de analytics comercial em `/admin/analytics`
 - inspeção analítica em `/admin/analytics/inspection`
 - rebuild controlado do snapshot via `php artisan analytics:rebuild-platform-commercial-snapshot --days=30`
+- dashboard central de observabilidade em `/admin/operations`
+- inspeção operacional em `/admin/operations/inspection?flow_name=platform_payments&incident_status=acknowledged`
+- rebuild controlado do snapshot operacional via `php artisan operations:rebuild-health-snapshot`
+- registro controlado de baseline de carga e comparação no painel operacional
+- registro de evidência de runbook e encerramento validado de incidente operacional
 - filtro da API operacional `GET /api/integration/inspections?status=dead_letter`
 - replay controlado de uma entrega com falha via `php artisan integration:replay <delivery_id> --operator=<user_id>`
 - replay controlado de um retorno financeiro via `php artisan platform-payments:replay-return <return_id> --operator=<user_id>`
@@ -258,6 +263,24 @@ Se o deploy introduzir inconsistência na régua de recuperação de receita:
 - rerodar validação mínima:
   - `php artisan test --compact tests/Feature/PlatformRevenueRecoveryOpenCaseTest.php`
   - `php artisan test --compact tests/Feature/PlatformRevenueRecoveryPromiseTest.php`
+
+### Rollback operacional do módulo 015
+
+Se o deploy introduzir regressão na leitura operacional central:
+
+- restaurar o dump do banco central anterior ao deploy
+- revisar `operational_alert_snapshots`, `load_test_baselines`, `operational_incident_records` e `runbook_execution_evidences`
+- confirmar que o rollback não apagou a trilha auditável exigida para incidentes ainda abertos
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/ProductionObservabilitySnapshotTest.php`
+  - `php artisan test --compact tests/Feature/ProductionObservabilityLoadBaselineTest.php`
+  - `php artisan test --compact tests/Feature/ProductionObservabilityIncidentInspectionTest.php`
+  - `php artisan test --compact tests/Feature/ProductionObservabilityDashboardTest.php`
+- confirmar que:
+  - `/admin/operations` volta a renderizar snapshots, baselines e incidentes
+  - `/admin/operations/inspection` retorna `summary`, `snapshots`, `baselines`, `incidents` e `comparison` quando aplicável
+  - incidentes fechados mantêm `metadata.closure_validation`
+  - eventos `INCIDENTE_OPERACIONAL_ABERTO`, `SERVICO_DEGRADADO_DETECTADO` e `BASELINE_CARGA_ATUALIZADO` seguem publicáveis no backbone
   - `php artisan test --compact tests/Feature/PlatformRevenueRecoveryFiltersTest.php`
 - confirmar consistência mínima:
   - `casos_recuperacao_receita.status` alinhado ao último estado comercial esperado

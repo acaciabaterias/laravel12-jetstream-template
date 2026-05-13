@@ -97,6 +97,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - drill-down central liga métricas agregadas aos registros operacionais de assinatura, fatura e recovery
 - o painel central opera via Livewire em `/admin/analytics` e suporta inspeção JSON em `/admin/analytics/inspection`
 
+## Production Observability Assurance
+
+- o banco central mantém `operational_slo_definitions`, `operational_alert_snapshots`, `load_test_baselines`, `operational_incident_records` e `runbook_execution_evidences`
+- o módulo `015` consolida sinais dos módulos `010` a `014` sem se tornar nova fonte transacional de domínio
+- snapshots operacionais classificam severidade a partir de backlog, latência, falha, replay pendente e indisponibilidade de coletor
+- baselines de carga comparam throughput, latência p95 e taxa de erro contra tolerâncias explícitas
+- incidentes centrais só podem ser encerrados após evidência concluída e `post_validation_passed`
+- eventos operacionais materiais (`INCIDENTE_OPERACIONAL_ABERTO`, `SERVICO_DEGRADADO_DETECTADO`, `BASELINE_CARGA_ATUALIZADO`) são publicados no backbone `010`
+- o painel central opera via Livewire em `/admin/operations` e a inspeção JSON reutilizável fica em `/admin/operations/inspection`
+
 ## Padrões Técnicos
 
 - Laravel 12 como núcleo de aplicação

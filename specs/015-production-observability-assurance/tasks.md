@@ -123,11 +123,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T033 [P] Document monitoring, load baseline, incident response and rollback validation procedures in `GO_LIVE_RUNBOOK.md` and related docs
-- [ ] T034 Update architecture and product documentation for the operational assurance layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
-- [ ] T035 [P] Add targeted coverage for operational event publication, runbook evidence serialization and incident audit trail in `tests/Feature/` and `tests/Unit/`
-- [ ] T036 Perform code cleanup and Laravel Pint on changed files
-- [ ] T037 Run `quickstart.md` validation and record evidence in feature artifacts
+- [x] T033 [P] Document monitoring, load baseline, incident response and rollback validation procedures in `GO_LIVE_RUNBOOK.md` and related docs
+- [x] T034 Update architecture and product documentation for the operational assurance layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
+- [x] T035 [P] Add targeted coverage for operational event publication, runbook evidence serialization and incident audit trail in `tests/Feature/` and `tests/Unit/`
+- [x] T036 Perform code cleanup and Laravel Pint on changed files
+- [x] T037 Run `quickstart.md` validation and record evidence in feature artifacts
 
 ---
 

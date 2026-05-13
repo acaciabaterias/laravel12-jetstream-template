@@ -14,13 +14,13 @@ Validar localmente a camada de observabilidade operacional e readiness de produ�
 
 ## Sequência sugerida
 
-1. Criar migrations centrais para SLOs, snapshots operacionais, baselines de carga, incidentes e evidências.
-2. Implementar serviços de classificação de severidade e correlação operacional.
-3. Adicionar painel operacional com filtros por fluxo, severidade e status.
-4. Implementar endpoint de inspeção para snapshots, incidentes e evidências.
-5. Persistir baselines de carga por cenário crítico.
-6. Integrar publicação de eventos operacionais materiais no backbone `010`.
-7. Validar runbooks de replay, rollback e restore rehearsal com evidência persistida.
+1. Aplicar migrations centrais para SLOs, snapshots operacionais, baselines de carga, incidentes e evidências.
+2. Reconstruir snapshots operacionais com `php artisan operations:rebuild-health-snapshot`.
+3. Validar o dashboard central em `/admin/operations` com filtros de fluxo, severidade, status e incidentes.
+4. Validar o endpoint `/admin/operations/inspection` com snapshots, baselines, comparações e evidências.
+5. Registrar um baseline de carga por cenário crítico e comparar uma execução degradada.
+6. Registrar evidência de runbook, resolver um incidente e encerrar com `post_validation_passed`.
+7. Confirmar publicação de eventos operacionais materiais no backbone `010`.
 
 ## Cenários de validação
 
@@ -40,5 +40,9 @@ Validar localmente a camada de observabilidade operacional e readiness de produ�
 
 ## Evidência de validação executada
 
-- `git diff --check`
-- artefatos de planejamento do `015` gerados e revisados no ciclo atual
+- `php artisan test --compact tests/Feature/ProductionObservabilitySnapshotTest.php`
+- `php artisan test --compact tests/Feature/ProductionObservabilityLoadBaselineTest.php tests/Feature/ProductionObservabilityFlowFilterTest.php tests/Unit/ProductionObservabilityBaselineRulesTest.php`
+- `php artisan test --compact tests/Feature/ProductionObservabilityIncidentInspectionTest.php tests/Feature/ProductionObservabilityRunbookEvidenceTest.php tests/Unit/ProductionObservabilityIncidentRulesTest.php`
+- `php artisan test --compact tests/Feature/ProductionObservabilityDashboardTest.php`
+- `php artisan test --compact` com PostgreSQL central/tenant efêmeros: `380 passed`, `1 skipped`, `2096 assertions`
+- `vendor/bin/pint --dirty --format agent`
