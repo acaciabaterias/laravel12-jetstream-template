@@ -25,8 +25,8 @@
 
 **Purpose**: Prepare observability assurance baseline and feature namespace
 
-- [ ] T001 Create observability assurance service namespace scaffolding in `app/Services/` and related central feature baselines in `tests/`
-- [ ] T002 [P] Register feature documentation references and current plan pointer consistency in `AGENTS.md` and `specs/015-production-observability-assurance/`
+- [x] T001 Create observability assurance service namespace scaffolding in `app/Services/` and related central feature baselines in `tests/`
+- [x] T002 [P] Register feature documentation references and current plan pointer consistency in `AGENTS.md` and `specs/015-production-observability-assurance/`
 
 ---
 
@@ -36,12 +36,12 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete
 
-- [ ] T003 Create central migrations for `operational_slo_definitions`, `operational_alert_snapshots`, `load_test_baselines`, `operational_incident_records` and `runbook_execution_evidences` in `database/migrations/central/`
-- [ ] T004 [P] Create Eloquent models for SLOs, alert snapshots, baselines, incidents and evidences in `app/Models/`
-- [ ] T005 [P] Create shared enums/value objects for operational severity, incident status, runbook result and collector health in `app/Support/`
-- [ ] T006 Create authorization policy/gate baseline for operational observability in `app/Policies/` and `app/Providers/AppServiceProvider.php`
-- [ ] T007 Create configuration entries for SLO thresholds, default windows and load-test tolerances in `config/`
-- [ ] T008 Create foundational event publication hooks for incidents, degraded services and service recovery in `app/Services/`
+- [x] T003 Create central migrations for `operational_slo_definitions`, `operational_alert_snapshots`, `load_test_baselines`, `operational_incident_records` and `runbook_execution_evidences` in `database/migrations/central/`
+- [x] T004 [P] Create Eloquent models for SLOs, alert snapshots, baselines, incidents and evidences in `app/Models/`
+- [x] T005 [P] Create shared enums/value objects for operational severity, incident status, runbook result and collector health in `app/Support/`
+- [x] T006 Create authorization policy/gate baseline for operational observability in `app/Policies/` and `app/Providers/AppServiceProvider.php`
+- [x] T007 Create configuration entries for SLO thresholds, default windows and load-test tolerances in `config/`
+- [x] T008 Create foundational event publication hooks for incidents, degraded services and service recovery in `app/Services/`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -55,17 +55,17 @@
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T009 [P] [US1] Create feature test for operational snapshot generation and severity classification in `tests/Feature/ProductionObservabilitySnapshotTest.php`
-- [ ] T010 [P] [US1] Create feature test for operational dashboard visibility and access control in `tests/Feature/ProductionObservabilityDashboardTest.php`
-- [ ] T011 [P] [US1] Create unit test for severity classification rules in `tests/Unit/ProductionObservabilitySeverityRulesTest.php`
+- [x] T009 [P] [US1] Create feature test for operational snapshot generation and severity classification in `tests/Feature/ProductionObservabilitySnapshotTest.php`
+- [x] T010 [P] [US1] Create feature test for operational dashboard visibility and access control in `tests/Feature/ProductionObservabilityDashboardTest.php`
+- [x] T011 [P] [US1] Create unit test for severity classification rules in `tests/Unit/ProductionObservabilitySeverityRulesTest.php`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Implement `OperationalHealthSnapshotService` in `app/Services/`
-- [ ] T013 [P] [US1] Implement snapshot rebuild/check command or job in `app/Console/Commands/` and `app/Jobs/`
-- [ ] T014 [US1] Implement operational dashboard in `app/Livewire/Admin/`
-- [ ] T015 [US1] Persist alert snapshots and publish material operational events through backbone `010`
-- [ ] T016 [US1] Expose reusable summary queries for dashboard and inspection layers
+- [x] T012 [P] [US1] Implement `OperationalHealthSnapshotService` in `app/Services/`
+- [x] T013 [P] [US1] Implement snapshot rebuild/check command or job in `app/Console/Commands/` and `app/Jobs/`
+- [x] T014 [US1] Implement operational dashboard in `app/Livewire/Admin/`
+- [x] T015 [US1] Persist alert snapshots and publish material operational events through backbone `010`
+- [x] T016 [US1] Expose reusable summary queries for dashboard and inspection layers
 
 **Checkpoint**: User Story 1 should provide central operational visibility independently
 
@@ -79,17 +79,17 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T017 [P] [US2] Create feature test for load baseline persistence and comparison in `tests/Feature/ProductionObservabilityLoadBaselineTest.php`
-- [ ] T018 [P] [US2] Create feature test for segmented operational views by flow in `tests/Feature/ProductionObservabilityFlowFilterTest.php`
-- [ ] T019 [P] [US2] Create unit test for baseline comparison logic in `tests/Unit/ProductionObservabilityBaselineRulesTest.php`
+- [x] T017 [P] [US2] Create feature test for load baseline persistence and comparison in `tests/Feature/ProductionObservabilityLoadBaselineTest.php`
+- [x] T018 [P] [US2] Create feature test for segmented operational views by flow in `tests/Feature/ProductionObservabilityFlowFilterTest.php`
+- [x] T019 [P] [US2] Create unit test for baseline comparison logic in `tests/Unit/ProductionObservabilityBaselineRulesTest.php`
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Implement `LoadTestBaselineService` in `app/Services/`
-- [ ] T021 [P] [US2] Implement flow/segment inspection service in `app/Services/`
-- [ ] T022 [US2] Implement dashboard filters and baseline comparison views in `app/Livewire/Admin/` and `resources/views/livewire/admin/`
-- [ ] T023 [US2] Implement requests/validation for baseline and inspection queries in `app/Http/Requests/`
-- [ ] T024 [US2] Publish baseline and degradation events through backbone `010`
+- [x] T020 [P] [US2] Implement `LoadTestBaselineService` in `app/Services/`
+- [x] T021 [P] [US2] Implement flow/segment inspection service in `app/Services/`
+- [x] T022 [US2] Implement dashboard filters and baseline comparison views in `app/Livewire/Admin/` and `resources/views/livewire/admin/`
+- [x] T023 [US2] Implement requests/validation for baseline and inspection queries in `app/Http/Requests/`
+- [x] T024 [US2] Publish baseline and degradation events through backbone `010`
 
 **Checkpoint**: User Story 2 should support capacity governance independently
 
@@ -103,17 +103,17 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T025 [P] [US3] Create feature test for incident inspection and evidence capture in `tests/Feature/ProductionObservabilityIncidentInspectionTest.php`
-- [ ] T026 [P] [US3] Create feature test for runbook execution recording in `tests/Feature/ProductionObservabilityRunbookEvidenceTest.php`
-- [ ] T027 [P] [US3] Create unit test for incident lifecycle and closure rules in `tests/Unit/ProductionObservabilityIncidentRulesTest.php`
+- [x] T025 [P] [US3] Create feature test for incident inspection and evidence capture in `tests/Feature/ProductionObservabilityIncidentInspectionTest.php`
+- [x] T026 [P] [US3] Create feature test for runbook execution recording in `tests/Feature/ProductionObservabilityRunbookEvidenceTest.php`
+- [x] T027 [P] [US3] Create unit test for incident lifecycle and closure rules in `tests/Unit/ProductionObservabilityIncidentRulesTest.php`
 
 ### Implementation for User Story 3
 
-- [ ] T028 [P] [US3] Implement `OperationalIncidentService` in `app/Services/`
-- [ ] T029 [P] [US3] Implement `RunbookEvidenceService` in `app/Services/`
-- [ ] T030 [US3] Implement inspection endpoint/controller or reusable query service in `app/Http/Controllers/` or `app/Services/`
-- [ ] T031 [US3] Implement incident and evidence exposure in dashboard/admin operations in `app/Livewire/Admin/`
-- [ ] T032 [US3] Expose central incident/runbook inspection for operational support
+- [x] T028 [P] [US3] Implement `OperationalIncidentService` in `app/Services/`
+- [x] T029 [P] [US3] Implement `RunbookEvidenceService` in `app/Services/`
+- [x] T030 [US3] Implement inspection endpoint/controller or reusable query service in `app/Http/Controllers/` or `app/Services/`
+- [x] T031 [US3] Implement incident and evidence exposure in dashboard/admin operations in `app/Livewire/Admin/`
+- [x] T032 [US3] Expose central incident/runbook inspection for operational support
 
 **Checkpoint**: User Story 3 should make incident response auditable independently
 
