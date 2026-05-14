@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\BackboneMonitoringInspectionController;
+use App\Http\Controllers\Admin\CriticalLoadInspectionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FilialController;
 use App\Http\Controllers\Admin\PlatformBillingInspectionController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\PlatformRevenueRecoveryInspectionController;
 use App\Http\Controllers\Admin\ProductionObservabilityInspectionController;
 use App\Http\Middleware\PlatformAdminMiddleware;
 use App\Livewire\Admin\BackboneMonitoringDashboard;
+use App\Livewire\Admin\CriticalLoadOptimizationDashboard;
 use App\Livewire\Admin\PlanCatalogManager;
 use App\Livewire\Admin\PlatformBillingDashboard;
 use App\Livewire\Admin\PlatformCommercialAnalyticsDashboard;
@@ -55,5 +57,7 @@ Route::name('admin.')->group(function () {
         Route::get('/operations/inspection', ProductionObservabilityInspectionController::class)->name('operations.inspection');
         Route::get('/monitoring', BackboneMonitoringDashboard::class)->name('monitoring.index');
         Route::get('/monitoring/inspection', BackboneMonitoringInspectionController::class)->name('monitoring.inspection');
+        Route::get('/capacity', CriticalLoadOptimizationDashboard::class)->name('capacity.index');
+        Route::get('/capacity/inspection', CriticalLoadInspectionController::class)->name('capacity.inspection');
     });
 });

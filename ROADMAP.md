@@ -1,10 +1,10 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v1.6.0 - pronto para lançamento assistido com observabilidade e monitoring backbone consolidados)
+## Status Atual (v1.7.0 - pronto para lançamento assistido com observabilidade, monitoring e capacity governance consolidados)
 
-✅ 16 módulos implementados (`001` a `016`)
+✅ 17 módulos implementados (`001` a `017`)
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `396` testes passando, `1 skipped` e `2172` assertions
+✅ suíte principal estabilizada com `410` testes passando, `1 skipped` e `2224` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
@@ -41,12 +41,15 @@
 - [x] Módulo `016` de backbone monitoring consolidation
 - [x] Consolidação central de scrape health, alertas materiais e readiness do stack externo
 - [x] Versionamento de dashboards, validação, rollback e evidências auditáveis de monitoring
+- [x] Módulo `017` de critical integration load optimization
+- [x] Cenários reproduzíveis de benchmark, baseline e comparação por fluxo crítico
+- [x] Governança central de gargalos, tuning validado e rollback auditável de performance
 
-## Próximo bloco sugerido (v1.7.0)
+## Próximo módulo sugerido (v1.8.0)
 
-- [ ] Executar teste de carga e otimização de queries nas integrações críticas
-- [ ] Consolidar baseline operacional com evidência reproduzível por fluxo
-- [ ] Expandir readiness para capacity planning e tuning preventivo
+- [ ] White label avançado com temas customizáveis
+- [ ] Dashboard analítico super admin expandido
+- [ ] Relatórios avançados com exportação Excel e PDF
 
 ## Fase 1: Estabilização e Produção (v1.4.0)
 
@@ -54,7 +57,7 @@
 - [x] Configurar Supabase para tenants reais
 - [x] Implementar autenticação real entre ERP Core e microserviços
 - [x] Consolidar monitoramento com Prometheus e Grafana no backbone `010`
-- [ ] Executar teste de carga e otimização de queries nas integrações críticas
+- [x] Executar teste de carga e otimização de queries nas integrações críticas
 
 ## Fase 2: Expansão Comercial (v1.3.0)
 

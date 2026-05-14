@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\AcaoRecuperacaoReceita;
 use App\Models\AlertRuleDefinition;
 use App\Models\AssinaturaPlataforma;
+use App\Models\BenchmarkExecutionRecord;
 use App\Models\BoletoOrquestrado;
 use App\Models\CasoRecuperacaoReceita;
 use App\Models\Cliente;
@@ -26,6 +27,7 @@ use App\Models\FilaContingencia;
 use App\Models\GatewayCobrancaSaaS;
 use App\Models\IndicadorRecuperacaoReceita;
 use App\Models\InsightRiscoComercial;
+use App\Models\LoadScenarioProfile;
 use App\Models\LoadTestBaseline;
 use App\Models\MetricaPerformanceCanal;
 use App\Models\MonitoringProbeSnapshot;
@@ -38,6 +40,8 @@ use App\Models\OperationalSloDefinition;
 use App\Models\OrdemServico;
 use App\Models\OrdemServicoGarantia;
 use App\Models\PedidoVenda;
+use App\Models\PerformanceBottleneckRecord;
+use App\Models\PerformanceRollbackEvidence;
 use App\Models\PlanoComercial;
 use App\Models\PoliticaInadimplencia;
 use App\Models\PoliticaRecuperacaoReceita;
@@ -47,6 +51,7 @@ use App\Models\RetornoPagamentoSaaS;
 use App\Models\RunbookExecutionEvidence;
 use App\Models\SnapshotAnalyticsComercial;
 use App\Models\TransacaoFinanceira;
+use App\Models\TuningChangeRecord;
 use App\Models\User;
 use App\Models\UsuarioPlataforma;
 use App\Models\Vale;
@@ -55,6 +60,7 @@ use App\Policies\BoletoOrquestradoPolicy;
 use App\Policies\CnabRemessaPolicy;
 use App\Policies\CnabRetornoUploadPolicy;
 use App\Policies\ContaBancariaPolicy;
+use App\Policies\CriticalLoadOptimizationPolicy;
 use App\Policies\DepositoPolicy;
 use App\Policies\EstoqueMovimentacaoPolicy;
 use App\Policies\FilaContingenciaPolicy;
@@ -142,6 +148,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(LoadTestBaseline::class, ProductionObservabilityPolicy::class);
         Gate::policy(OperationalIncidentRecord::class, ProductionObservabilityPolicy::class);
         Gate::policy(RunbookExecutionEvidence::class, ProductionObservabilityPolicy::class);
+        Gate::policy(LoadScenarioProfile::class, CriticalLoadOptimizationPolicy::class);
+        Gate::policy(BenchmarkExecutionRecord::class, CriticalLoadOptimizationPolicy::class);
+        Gate::policy(PerformanceBottleneckRecord::class, CriticalLoadOptimizationPolicy::class);
+        Gate::policy(TuningChangeRecord::class, CriticalLoadOptimizationPolicy::class);
+        Gate::policy(PerformanceRollbackEvidence::class, CriticalLoadOptimizationPolicy::class);
         Gate::policy(MonitoringTargetCatalog::class, BackboneMonitoringPolicy::class);
         Gate::policy(MonitoringProbeSnapshot::class, BackboneMonitoringPolicy::class);
         Gate::policy(AlertRuleDefinition::class, BackboneMonitoringPolicy::class);
@@ -212,6 +223,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-backbone-monitoring', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'support', 'billing']);
+        });
+
+        Gate::define('manage-critical-load-optimization', function ($user) {
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'support', 'billing']);

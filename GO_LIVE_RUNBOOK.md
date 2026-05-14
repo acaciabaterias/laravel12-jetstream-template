@@ -221,10 +221,33 @@ Valide fluxos manuais minimos:
 - refresh controlado de scrape health via `php artisan monitoring:refresh-readiness`
 - avaliação controlada de regras materiais e validação de package versionado no painel de monitoring
 - rollback controlado de package de dashboard/alerta com evidência posterior registrada
+- dashboard central de capacidade em `/admin/capacity`
+- inspeção de benchmark em `/admin/capacity/inspection?flow_name=platform_payments&comparison_status=regressed`
+- registro controlado de cenário de carga, baseline e benchmark de validação no painel de capacity
+- registro de gargalo categorizado e promoção controlada de tuning validado
+- rollback de performance com evidência auditável associada ao benchmark regressivo
 - filtro da API operacional `GET /api/integration/inspections?status=dead_letter`
 - replay controlado de uma entrega com falha via `php artisan integration:replay <delivery_id> --operator=<user_id>`
 - replay controlado de um retorno financeiro via `php artisan platform-payments:replay-return <return_id> --operator=<user_id>`
 - logout
+
+### Rollback operacional do módulo 017
+
+Se o deploy introduzir regressão de capacidade ou tuning inconsistente nas integrações críticas:
+
+- restaurar o dump do banco central anterior ao deploy
+- revisar `load_scenario_profiles`, `benchmark_execution_records`, `performance_bottleneck_records`, `tuning_change_records` e `performance_rollback_evidences`
+- reverter a mudança aplicada e registrar evidência explícita pelo painel `/admin/capacity`
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/CriticalLoadBenchmarkRecordingTest.php`
+  - `php artisan test --compact tests/Feature/CriticalLoadBottleneckInspectionTest.php`
+  - `php artisan test --compact tests/Feature/CriticalLoadTuningInspectionTest.php`
+  - `php artisan test --compact tests/Feature/CriticalLoadRollbackEvidenceTest.php`
+- confirmar auditoria mínima:
+  - `evento_outboxes.event_type in ('BENCHMARK_REGRESSIVO_DETECTADO', 'BASELINE_CARGA_PROMOVIDA', 'GARGALO_CRITICO_IDENTIFICADO', 'ROLLBACK_PERFORMANCE_EXECUTADO')`
+  - `benchmark_execution_records.comparison_status` consistente com a última baseline do cenário
+  - `tuning_change_records.status` consistente com `promoted` ou `rolled_back`
+  - `performance_rollback_evidences.payload.validation_execution_id` apontando para a execução regressiva auditada
 
 ### Rollback operacional do módulo 016
 

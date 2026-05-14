@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-396%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-410%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -133,6 +133,16 @@ O modulo `016` consolida a camada externa de monitoramento sem deslocar a govern
 - dashboard `/admin/monitoring` e inspecao `/admin/monitoring/inspection`
 - provisionamento, validacao e rollback auditavel de dashboards/alertas por ambiente
 - evidencias centrais de readiness para Prometheus, Grafana e exporters criticos
+
+## Critical Integration Load Optimization
+
+O modulo `017` fecha a camada preventiva de capacidade e tuning das integracoes criticas:
+
+- perfis de carga reproduziveis com baseline promovivel por fluxo e ambiente
+- benchmark central com classificacao explicita de ganho, estabilidade ou regressao
+- catalogo auditavel de gargalos por banco, fila, integracao externa e aplicacao
+- lifecycle de tuning com validacao, promocao e rollback com evidencia persistida
+- dashboard `/admin/capacity` e inspecao `/admin/capacity/inspection`
 
 ## Stack
 

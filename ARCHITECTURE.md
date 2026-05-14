@@ -44,6 +44,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `014`: analytics comercial central com snapshots, coortes, canais, riscos e drill-down executivo
 - `015`: observabilidade operacional central com snapshots, baselines, incidentes e runbooks auditáveis
 - `016`: consolidação do stack externo de monitoramento com scrape health, alertas materiais, dashboards versionados e rollback auditável
+- `017`: governança central de benchmark, gargalos, tuning e rollback de performance nas integrações críticas
 
 ## Integrações Externas
 
@@ -118,6 +119,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - o lifecycle de dashboards suporta registro, aplicação, validação e rollback com evidência persistida
 - eventos materiais (`SCRAPE_HEALTH_CRITICO`, `MONITORAMENTO_DEGRADADO`, `DASHBOARD_MONITORAMENTO_ATUALIZADO`, `ROLLBACK_MONITORAMENTO_EXECUTADO`) são publicados no backbone `010`
 - o painel central opera via Livewire em `/admin/monitoring` e a inspeção JSON reutilizável fica em `/admin/monitoring/inspection`
+
+## Critical Integration Load Optimization
+
+- o banco central mantém `load_scenario_profiles`, `benchmark_execution_records`, `performance_bottleneck_records`, `tuning_change_records` e `performance_rollback_evidences`
+- o módulo `017` registra benchmarks reproduzíveis sem deslocar baseline, decisão de tuning ou evidência de rollback para planilhas externas
+- comparações classificam execução como `improved`, `stable` ou `regressed` a partir de throughput, latência p95 e taxa de erro
+- gargalos distinguem banco, fila, integração externa e camada aplicacional com vínculo explícito ao benchmark executado
+- mudanças de tuning só podem ser promovidas após validação positiva e preservam rollback auditável quando a reexecução degrada capacidade
+- eventos materiais (`BENCHMARK_REGRESSIVO_DETECTADO`, `BASELINE_CARGA_PROMOVIDA`, `GARGALO_CRITICO_IDENTIFICADO`, `ROLLBACK_PERFORMANCE_EXECUTADO`) são publicados no backbone `010`
+- o painel central opera via Livewire em `/admin/capacity` e a inspeção JSON reutilizável fica em `/admin/capacity/inspection`
 
 ## Padrões Técnicos
 
