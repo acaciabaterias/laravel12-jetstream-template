@@ -45,6 +45,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `015`: observabilidade operacional central com snapshots, baselines, incidentes e runbooks auditáveis
 - `016`: consolidação do stack externo de monitoramento com scrape health, alertas materiais, dashboards versionados e rollback auditável
 - `017`: governança central de benchmark, gargalos, tuning e rollback de performance nas integrações críticas
+- `018`: governança central de branding, tema versionado, publicação validada e rollback auditável de white label por tenant
 
 ## Integrações Externas
 
@@ -129,6 +130,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - mudanças de tuning só podem ser promovidas após validação positiva e preservam rollback auditável quando a reexecução degrada capacidade
 - eventos materiais (`BENCHMARK_REGRESSIVO_DETECTADO`, `BASELINE_CARGA_PROMOVIDA`, `GARGALO_CRITICO_IDENTIFICADO`, `ROLLBACK_PERFORMANCE_EXECUTADO`) são publicados no backbone `010`
 - o painel central opera via Livewire em `/admin/capacity` e a inspeção JSON reutilizável fica em `/admin/capacity/inspection`
+
+## Advanced White Label Experience
+
+- o banco central mantém `brand_identity_profiles`, `tenant_theme_versions`, `theme_asset_records`, `theme_publication_records` e `theme_rollback_evidences`
+- o módulo `018` transforma o white label legado em workflow governado, sem depender de customização manual direta de layouts ou assets no deploy
+- tokens visuais obrigatórios e contraste mínimo são validados antes da promoção de uma versão de tema
+- publicações atualizam o `white_label_configs` aplicado ao shell tenant-aware como projeção operacional do tema ativo
+- rollbacks restauram a última versão saudável ou o fallback seguro preservando evidência auditável da reversão
+- eventos materiais (`TEMA_WHITE_LABEL_PUBLICADO`, `ROLLBACK_TEMA_WHITE_LABEL_EXECUTADO`) são publicados no backbone `010`
+- o painel central opera via Livewire em `/admin/branding` e a inspeção JSON reutilizável fica em `/admin/branding/inspection`
 
 ## Padrões Técnicos
 

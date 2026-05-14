@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-410%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-421%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -143,6 +143,16 @@ O modulo `017` fecha a camada preventiva de capacidade e tuning das integracoes 
 - catalogo auditavel de gargalos por banco, fila, integracao externa e aplicacao
 - lifecycle de tuning com validacao, promocao e rollback com evidencia persistida
 - dashboard `/admin/capacity` e inspecao `/admin/capacity/inspection`
+
+## Advanced White Label Experience
+
+O modulo `018` fecha a governanca visual central da plataforma multi-tenant:
+
+- identidades visuais centralizadas por tenant com ativos e tokens obrigatorios
+- temas versionados com validacao minima de contraste e completude antes da publicacao
+- publicacao auditavel e rollback para a ultima versao saudavel ou fallback seguro
+- integracao do branding ativo ao shell atual do ERP sem customizacao manual em arquivos do deploy
+- dashboard `/admin/branding` e inspecao `/admin/branding/inspection`
 
 ## Stack
 

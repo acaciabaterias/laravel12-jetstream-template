@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdvancedWhiteLabelInspectionController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\BackboneMonitoringInspectionController;
 use App\Http\Controllers\Admin\CriticalLoadInspectionController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\PlatformPaymentsInspectionController;
 use App\Http\Controllers\Admin\PlatformRevenueRecoveryInspectionController;
 use App\Http\Controllers\Admin\ProductionObservabilityInspectionController;
 use App\Http\Middleware\PlatformAdminMiddleware;
+use App\Livewire\Admin\AdvancedWhiteLabelDashboard;
 use App\Livewire\Admin\BackboneMonitoringDashboard;
 use App\Livewire\Admin\CriticalLoadOptimizationDashboard;
 use App\Livewire\Admin\PlanCatalogManager;
@@ -59,5 +61,7 @@ Route::name('admin.')->group(function () {
         Route::get('/monitoring/inspection', BackboneMonitoringInspectionController::class)->name('monitoring.inspection');
         Route::get('/capacity', CriticalLoadOptimizationDashboard::class)->name('capacity.index');
         Route::get('/capacity/inspection', CriticalLoadInspectionController::class)->name('capacity.inspection');
+        Route::get('/branding', AdvancedWhiteLabelDashboard::class)->name('branding.index');
+        Route::get('/branding/inspection', AdvancedWhiteLabelInspectionController::class)->name('branding.inspection');
     });
 });

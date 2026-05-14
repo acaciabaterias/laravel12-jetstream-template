@@ -1,10 +1,10 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v1.7.0 - pronto para lançamento assistido com observabilidade, monitoring e capacity governance consolidados)
+## Status Atual (v1.8.0 - pronto para lançamento assistido com observabilidade, monitoring, capacity e white label governado consolidados)
 
-✅ 17 módulos implementados (`001` a `017`)
+✅ 18 módulos implementados (`001` a `018`)
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `410` testes passando, `1 skipped` e `2224` assertions
+✅ suíte principal estabilizada com `421` testes passando, `1 skipped` e `2256` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
@@ -44,12 +44,15 @@
 - [x] Módulo `017` de critical integration load optimization
 - [x] Cenários reproduzíveis de benchmark, baseline e comparação por fluxo crítico
 - [x] Governança central de gargalos, tuning validado e rollback auditável de performance
+- [x] Módulo `018` de advanced white label experience
+- [x] Identidade visual centralizada, tema versionado e publicação auditável por tenant
+- [x] Rollback visual governado com restauração segura do shell administrativo
 
-## Próximo módulo sugerido (v1.8.0)
+## Próximo módulo sugerido (v1.9.0)
 
-- [ ] White label avançado com temas customizáveis
 - [ ] Dashboard analítico super admin expandido
 - [ ] Relatórios avançados com exportação Excel e PDF
+- [ ] Automação avançada de cobrança e recuperação de receita
 
 ## Fase 1: Estabilização e Produção (v1.4.0)
 
@@ -61,7 +64,7 @@
 
 ## Fase 2: Expansão Comercial (v1.3.0)
 
-- [ ] White label avançado com temas customizáveis
+ - [x] White label avançado com temas customizáveis
 - [ ] Dashboard analítico para Super Admin
 - [ ] Relatórios avançados com exportação Excel e PDF
 - [ ] Automação avançada de cobrança e recuperação de receita

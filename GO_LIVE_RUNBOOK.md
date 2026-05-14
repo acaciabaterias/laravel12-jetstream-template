@@ -226,10 +226,33 @@ Valide fluxos manuais minimos:
 - registro controlado de cenário de carga, baseline e benchmark de validação no painel de capacity
 - registro de gargalo categorizado e promoção controlada de tuning validado
 - rollback de performance com evidência auditável associada ao benchmark regressivo
+- dashboard central de branding em `/admin/branding`
+- inspeção de branding em `/admin/branding/inspection?tenant_id=<id>&publication_status=published`
+- registro controlado de identidade visual, ativos principais e tema draft no painel de branding
+- publicação controlada de tema com validação mínima de contraste e completude
+- rollback visual com restauração auditável da última versão saudável ou fallback seguro
 - filtro da API operacional `GET /api/integration/inspections?status=dead_letter`
 - replay controlado de uma entrega com falha via `php artisan integration:replay <delivery_id> --operator=<user_id>`
 - replay controlado de um retorno financeiro via `php artisan platform-payments:replay-return <return_id> --operator=<user_id>`
 - logout
+
+### Rollback operacional do módulo 018
+
+Se o deploy introduzir branding inconsistente ou white label inválido em tenants críticos:
+
+- restaurar o dump do banco central anterior ao deploy
+- revisar `brand_identity_profiles`, `tenant_theme_versions`, `theme_asset_records`, `theme_publication_records`, `theme_rollback_evidences` e a projeção `white_label_configs`
+- reverter explicitamente a versão ativa pelo painel `/admin/branding` quando o problema for apenas de publicação visual
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/AdvancedWhiteLabelPublicationTest.php`
+  - `php artisan test --compact tests/Feature/AdvancedWhiteLabelInspectionFilterTest.php`
+  - `php artisan test --compact tests/Feature/AdvancedWhiteLabelRollbackInspectionTest.php`
+  - `php artisan test --compact tests/Feature/AdvancedWhiteLabelFallbackRestorationTest.php`
+- confirmar auditoria mínima:
+  - `evento_outboxes.event_type in ('TEMA_WHITE_LABEL_PUBLICADO', 'ROLLBACK_TEMA_WHITE_LABEL_EXECUTADO')`
+  - `tenant_theme_versions.status` consistente com a versão ativa ou revertida
+  - `theme_publication_records.validation_passed` refletindo a última tentativa de publicação
+  - `theme_rollback_evidences.restored_theme_version_id` apontando para a versão saudável restaurada ou `null` quando o fallback padrão foi usado
 
 ### Rollback operacional do módulo 017
 

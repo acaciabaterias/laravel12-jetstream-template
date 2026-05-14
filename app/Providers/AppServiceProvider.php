@@ -7,6 +7,7 @@ use App\Models\AlertRuleDefinition;
 use App\Models\AssinaturaPlataforma;
 use App\Models\BenchmarkExecutionRecord;
 use App\Models\BoletoOrquestrado;
+use App\Models\BrandIdentityProfile;
 use App\Models\CasoRecuperacaoReceita;
 use App\Models\Cliente;
 use App\Models\CnabRemessa;
@@ -50,11 +51,16 @@ use App\Models\ReservaEstoque;
 use App\Models\RetornoPagamentoSaaS;
 use App\Models\RunbookExecutionEvidence;
 use App\Models\SnapshotAnalyticsComercial;
+use App\Models\TenantThemeVersion;
+use App\Models\ThemeAssetRecord;
+use App\Models\ThemePublicationRecord;
+use App\Models\ThemeRollbackEvidence;
 use App\Models\TransacaoFinanceira;
 use App\Models\TuningChangeRecord;
 use App\Models\User;
 use App\Models\UsuarioPlataforma;
 use App\Models\Vale;
+use App\Policies\AdvancedWhiteLabelPolicy;
 use App\Policies\BackboneMonitoringPolicy;
 use App\Policies\BoletoOrquestradoPolicy;
 use App\Policies\CnabRemessaPolicy;
@@ -148,6 +154,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(LoadTestBaseline::class, ProductionObservabilityPolicy::class);
         Gate::policy(OperationalIncidentRecord::class, ProductionObservabilityPolicy::class);
         Gate::policy(RunbookExecutionEvidence::class, ProductionObservabilityPolicy::class);
+        Gate::policy(BrandIdentityProfile::class, AdvancedWhiteLabelPolicy::class);
+        Gate::policy(TenantThemeVersion::class, AdvancedWhiteLabelPolicy::class);
+        Gate::policy(ThemeAssetRecord::class, AdvancedWhiteLabelPolicy::class);
+        Gate::policy(ThemePublicationRecord::class, AdvancedWhiteLabelPolicy::class);
+        Gate::policy(ThemeRollbackEvidence::class, AdvancedWhiteLabelPolicy::class);
         Gate::policy(LoadScenarioProfile::class, CriticalLoadOptimizationPolicy::class);
         Gate::policy(BenchmarkExecutionRecord::class, CriticalLoadOptimizationPolicy::class);
         Gate::policy(PerformanceBottleneckRecord::class, CriticalLoadOptimizationPolicy::class);
@@ -229,6 +240,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-critical-load-optimization', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'support', 'billing']);
+        });
+
+        Gate::define('manage-advanced-white-label', function ($user) {
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'support', 'billing']);

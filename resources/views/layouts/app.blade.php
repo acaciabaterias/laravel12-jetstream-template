@@ -1,5 +1,12 @@
 @php
-    $whiteLabel = \App\Models\WhiteLabelConfig::query()->first();
+    $resolvedCliente = request()->attributes->get('cliente');
+    $whiteLabelModel = new \App\Models\WhiteLabelConfig();
+    $canFilterByCliente = \Illuminate\Support\Facades\Schema::connection($whiteLabelModel->getConnectionName() ?? config('database.default'))
+        ->hasColumn($whiteLabelModel->getTable(), 'cliente_id');
+    $whiteLabel = \App\Models\WhiteLabelConfig::query()
+        ->when($canFilterByCliente && $resolvedCliente?->id, fn ($query) => $query->where('cliente_id', $resolvedCliente->id))
+        ->first()
+        ?? \App\Models\WhiteLabelConfig::query()->first();
     $normalizeHex = function (?string $color, string $fallback): string {
         if (! is_string($color) || ! preg_match('/^#?[0-9a-fA-F]{6}$/', $color)) {
             return $fallback;
