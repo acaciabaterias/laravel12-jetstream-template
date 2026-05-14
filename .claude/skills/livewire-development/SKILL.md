@@ -1,6 +1,6 @@
 ---
 name: livewire-development
-description: "Develops reactive Livewire 3 components. Activates when creating, updating, or modifying Livewire components; working with wire:model, wire:click, wire:loading, or any wire: directives; adding real-time updates, loading states, or reactivity; debugging component behavior; writing Livewire tests; or when the user mentions Livewire, component, counter, or reactive UI."
+description: "Develops reactive Livewire 4 components. Activates when creating, updating, or modifying Livewire components; working with wire:model, wire:click, wire:loading, or any wire: directives; adding real-time updates, loading states, or reactivity; debugging component behavior; writing Livewire tests; or when the user mentions Livewire, component, counter, or reactive UI."
 license: MIT
 metadata:
   author: laravel
@@ -11,6 +11,7 @@ metadata:
 ## When to Apply
 
 Activate this skill when:
+
 - Creating new Livewire components
 - Modifying existing component state or behavior
 - Debugging reactivity or lifecycle issues
@@ -20,7 +21,7 @@ Activate this skill when:
 
 ## Documentation
 
-Use `search-docs` for detailed Livewire 3 patterns and documentation.
+Use `search-docs` for detailed Livewire 4 patterns and documentation.
 
 ## Basic Usage
 
@@ -33,15 +34,16 @@ Use the `php artisan make:livewire [Posts\CreatePost]` Artisan command to create
 - State should live on the server, with the UI reflecting it.
 - All Livewire requests hit the Laravel backend; they're like regular HTTP requests. Always validate form data and run authorization checks in Livewire actions.
 
-## Livewire 3 Specifics
+## Livewire 4 specifics
 
-### Key Changes From Livewire 2
+### Conventions (modern Livewire stack)
 
-These things changed in Livewire 3, but may not have been updated in this application. Verify this application's setup to ensure you follow existing conventions.
-- Use `wire:model.live` for real-time updates, `wire:model` is now deferred by default.
-- Components now use the `App\Livewire` namespace (not `App\Http\Livewire`).
+This application targets Livewire 4. The conventions below match the modern Livewire 3+ stack; verify sibling components and `search-docs` when in doubt.
+
+- Use `wire:model.live` for real-time updates; `wire:model` is deferred by default.
+- Components use the `App\Livewire` namespace (not `App\Http\Livewire`).
 - Use `$this->dispatch()` to dispatch events (not `emit` or `dispatchBrowserEvent`).
-- Use the `components.layouts.app` view as the typical layout path (not `layouts.app`).
+- Prefer the layout view path used elsewhere in this app (often `components.layouts.app` rather than legacy `layouts.app`).
 
 ### New Directives
 
@@ -49,7 +51,7 @@ These things changed in Livewire 3, but may not have been updated in this applic
 
 ### Alpine Integration
 
-- Alpine is now included with Livewire; don't manually include Alpine.js.
+- Alpine ships with Livewire; don't manually duplicate Alpine.js.
 - Plugins included with Alpine: persist, intersect, collapse, and focus.
 
 ## Best Practices
@@ -120,6 +122,6 @@ $this->get('/posts/create')
 ## Common Pitfalls
 
 - Forgetting `wire:key` in loops causes unexpected behavior when items change
-- Using `wire:model` expecting real-time updates (use `wire:model.live` instead in v3)
+- Using `wire:model` expecting real-time updates (use `wire:model.live` instead on modern Livewire)
 - Not validating/authorizing in Livewire actions (treat them like HTTP requests)
-- Including Alpine.js separately when it's already bundled with Livewire 3
+- Including Alpine.js separately when it's already bundled with Livewire 4
