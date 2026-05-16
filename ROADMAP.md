@@ -1,14 +1,26 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v1.8.0 - pronto para lançamento assistido com observabilidade, monitoring, capacity e white label governado consolidados)
+## Status Atual (v1.9.0 - pronto para lançamento assistido com executive reporting consolidado)
 
-✅ 18 módulos implementados (`001` a `018`)
+✅ 19 módulos implementados (`001` a `019`)
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `421` testes passando, `1 skipped` e `2256` assertions
+✅ suíte principal estabilizada com `433` testes passando, `1 skipped` e `2315` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
 ✅ Seeders de demonstração
+
+## Fundação do ERP concluída
+
+- [x] Módulo `001` de multi-tenancy isolado com resolução tenant-aware
+- [x] Módulo `002` de autenticação, usuários, perfis, RBAC e auditoria de acesso
+- [x] Módulo `003` de cadastros estruturais com fabricantes, veículos, baterias e aplicações
+- [x] Módulo `004` de estoque e logística reversa
+- [x] Módulo `005` de vendas, vales e assistência técnica
+- [x] Módulo `006` de logística e app de entregas
+- [x] Módulo `007` de garantias e feedback
+- [x] Módulo `008` de financeiro inteligente
+- [x] Módulo `009` de orquestração fiscal e bancária
 
 ## Backbone e billing central concluídos
 
@@ -68,8 +80,8 @@
 ## Fase 2: Expansão Comercial (v1.3.0)
 
  - [x] White label avançado com temas customizáveis
-- [ ] Dashboard analítico para Super Admin
-- [ ] Relatórios avançados com exportação Excel e PDF
+- [x] Dashboard analítico para Super Admin
+- [x] Relatórios avançados com exportação Excel e PDF
 - [ ] Automação avançada de cobrança e recuperação de receita
 
 ## Fase 3: Internacionalização (v2.0.0)
