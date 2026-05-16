@@ -37,6 +37,7 @@ Os modulos core cobrem:
 - pagamentos SaaS e reconciliacao central
 - recuperacao de receita e dunning central
 - analytics comercial central
+- hub executivo central com exportação auditável
 
 ## Arquitetura
 
@@ -153,6 +154,16 @@ O modulo `018` fecha a governanca visual central da plataforma multi-tenant:
 - publicacao auditavel e rollback para a ultima versao saudavel ou fallback seguro
 - integracao do branding ativo ao shell atual do ERP sem customizacao manual em arquivos do deploy
 - dashboard `/admin/branding` e inspecao `/admin/branding/inspection`
+
+## Executive Reporting Hub
+
+O modulo `019` fecha a camada executiva de consumo da informacao:
+
+- dashboard `/admin/reports` com filtros por periodo, plano, canal, carteira e recovery
+- snapshots executivos reutilizaveis para manter coerencia entre cards, drill-down e inspecao JSON
+- exportacao Excel/PDF auditavel a partir do mesmo recorte analitico
+- historico central de geracoes e reexecucoes com `scope_summary`, operador e snapshot associado
+- eventos materiais publicados no backbone `010` para geracao, reexecucao e falha
 
 ## Stack
 

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
@@ -92,5 +91,10 @@ class Cliente extends Model
     public function assinaturasPlataforma(): HasMany
     {
         return $this->hasMany(AssinaturaPlataforma::class);
+    }
+
+    public function casosRecuperacaoReceita(): HasMany
+    {
+        return $this->hasMany(CasoRecuperacaoReceita::class);
     }
 }

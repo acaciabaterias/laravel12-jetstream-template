@@ -46,6 +46,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `016`: consolidação do stack externo de monitoramento com scrape health, alertas materiais, dashboards versionados e rollback auditável
 - `017`: governança central de benchmark, gargalos, tuning e rollback de performance nas integrações críticas
 - `018`: governança central de branding, tema versionado, publicação validada e rollback auditável de white label por tenant
+- `019`: hub executivo central com snapshots reutilizáveis, exportações Excel/PDF auditáveis e reexecução governada de relatórios
 
 ## Integrações Externas
 
@@ -140,6 +141,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - rollbacks restauram a última versão saudável ou o fallback seguro preservando evidência auditável da reversão
 - eventos materiais (`TEMA_WHITE_LABEL_PUBLICADO`, `ROLLBACK_TEMA_WHITE_LABEL_EXECUTADO`) são publicados no backbone `010`
 - o painel central opera via Livewire em `/admin/branding` e a inspeção JSON reutilizável fica em `/admin/branding/inspection`
+
+## Executive Reporting Hub
+
+- o banco central mantém `executive_analytics_snapshots`, `executive_report_definitions`, `executive_report_exports` e `executive_report_execution_logs`
+- o módulo `019` reutiliza agregações do módulo `014` para preservar consistência entre dashboard, inspeção e artefatos exportados
+- snapshots executivos guardam filtros normalizados, KPIs e drill-downs prontos para leitura super admin e reuso governado
+- exportações Excel e PDF nascem do mesmo snapshot consistente, preservando `scope_summary`, operador, formato e referência de arquivo
+- reexecuções criam nova trilha auditável sem perder vínculo com a exportação original
+- eventos materiais (`RELATORIO_EXECUTIVO_GERADO`, `RELATORIO_EXECUTIVO_REEXECUTADO`, `RELATORIO_EXECUTIVO_FALHOU`) são publicados no backbone `010`
+- o painel central opera via Livewire em `/admin/reports` e a inspeção JSON reutilizável fica em `/admin/reports/inspection`
 
 ## Padrões Técnicos
 

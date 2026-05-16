@@ -23,6 +23,10 @@ use App\Models\EntregaIntegracao;
 use App\Models\EstoqueMovimentacao;
 use App\Models\EventoComercialAssinante;
 use App\Models\ExcecaoConciliacaoSaaS;
+use App\Models\ExecutiveAnalyticsSnapshot;
+use App\Models\ExecutiveReportDefinition;
+use App\Models\ExecutiveReportExecutionLog;
+use App\Models\ExecutiveReportExport;
 use App\Models\FaturaSaaS;
 use App\Models\FilaContingencia;
 use App\Models\GatewayCobrancaSaaS;
@@ -69,6 +73,7 @@ use App\Policies\ContaBancariaPolicy;
 use App\Policies\CriticalLoadOptimizationPolicy;
 use App\Policies\DepositoPolicy;
 use App\Policies\EstoqueMovimentacaoPolicy;
+use App\Policies\ExecutiveReportingPolicy;
 use App\Policies\FilaContingenciaPolicy;
 use App\Policies\IntegrationBackbonePolicy;
 use App\Policies\NotaFiscalOrquestradaPolicy;
@@ -149,6 +154,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(MetricaPerformanceCanal::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(InsightRiscoComercial::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(DrilldownAnalyticsComercial::class, PlatformCommercialAnalyticsPolicy::class);
+        Gate::policy(ExecutiveAnalyticsSnapshot::class, ExecutiveReportingPolicy::class);
+        Gate::policy(ExecutiveReportDefinition::class, ExecutiveReportingPolicy::class);
+        Gate::policy(ExecutiveReportExport::class, ExecutiveReportingPolicy::class);
+        Gate::policy(ExecutiveReportExecutionLog::class, ExecutiveReportingPolicy::class);
         Gate::policy(OperationalSloDefinition::class, ProductionObservabilityPolicy::class);
         Gate::policy(OperationalAlertSnapshot::class, ProductionObservabilityPolicy::class);
         Gate::policy(LoadTestBaseline::class, ProductionObservabilityPolicy::class);
@@ -222,6 +231,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-platform-commercial-analytics', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'billing']);
+        });
+
+        Gate::define('manage-executive-reporting', function ($user) {
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'billing']);

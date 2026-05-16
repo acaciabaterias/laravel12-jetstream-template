@@ -211,6 +211,12 @@ Valide fluxos manuais minimos:
 - dashboard central de analytics comercial em `/admin/analytics`
 - inspeção analítica em `/admin/analytics/inspection`
 - rebuild controlado do snapshot via `php artisan analytics:rebuild-platform-commercial-snapshot --days=30`
+- dashboard executivo central em `/admin/reports`
+- inspeção executiva em `/admin/reports/inspection?format=excel&status=completed`
+- exportação controlada em Excel e PDF a partir do mesmo recorte executivo
+- reexecução auditável de uma exportação anterior com conferência do novo `export_id`
+- validação do histórico executivo com operador, filtros, snapshot e trilha `requested/completed|reexecuted`
+- conferência de publicação do evento `RELATORIO_EXECUTIVO_GERADO` ou `RELATORIO_EXECUTIVO_REEXECUTADO` no backbone `010`
 - dashboard central de observabilidade em `/admin/operations`
 - inspeção operacional em `/admin/operations/inspection?flow_name=platform_payments&incident_status=acknowledged`
 - rebuild controlado do snapshot operacional via `php artisan operations:rebuild-health-snapshot`
