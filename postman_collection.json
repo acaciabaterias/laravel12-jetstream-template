@@ -1,0 +1,185 @@
+{
+  "info": {
+    "name": "Bateria Expert Platform APIs",
+    "_postman_id": "88e57e0a-5274-4b0e-b4d5-4b5b8e-platform",
+    "description": "Colecao consolidada do ERP Core e microservicos scaffoldados no monorepo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "erp_url", "value": "http://localhost:8000" },
+    { "key": "erp_token", "value": "change-me" },
+    { "key": "ms001_url", "value": "http://localhost:8001" },
+    { "key": "ms002_url", "value": "http://localhost:8002" },
+    { "key": "ms003_url", "value": "http://localhost:8003" },
+    { "key": "ms004_url", "value": "http://localhost:8004" },
+    { "key": "ms005_url", "value": "http://localhost:8005" }
+  ],
+  "item": [
+    {
+      "name": "ERP Core",
+      "item": [
+        {
+          "name": "Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{erp_token}}" }
+            ],
+            "url": "{{erp_url}}/api/user"
+          }
+        },
+        {
+          "name": "Mobile Sync",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{erp_token}}" }
+            ],
+            "url": "{{erp_url}}/api/sync/mobile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS-001 Fiscal ACBr",
+      "item": [
+        {
+          "name": "Emitir NFe",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empresa_id\": \"tenant-demo\",\n  \"serie\": \"1\",\n  \"numero\": 123,\n  \"cliente\": {\n    \"nome\": \"Cliente Demo\",\n    \"documento\": \"12345678900\"\n  },\n  \"itens\": [\n    {\n      \"sku\": \"BAT-001\",\n      \"descricao\": \"Bateria 60Ah\",\n      \"quantidade\": 1,\n      \"valor_unitario\": 450.0\n    }\n  ]\n}"
+            },
+            "url": "{{ms001_url}}/v1/nfe/emitir"
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{ms001_url}}/v1/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS-002 Bancario",
+      "item": [
+        {
+          "name": "Emitir Boleto",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empresa_id\": \"tenant-demo\",\n  \"cliente\": {\n    \"nome\": \"Cliente Demo\",\n    \"documento\": \"12345678900\"\n  },\n  \"valor\": 599.9,\n  \"vencimento\": \"2026-05-10\",\n  \"referencia\": \"PED-1001\"\n}"
+            },
+            "url": "{{ms002_url}}/v1/boleto"
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{ms002_url}}/v1/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS-003 WhatsApp n8n",
+      "item": [
+        {
+          "name": "Enviar Notificacao",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente_id\": 1,\n  \"numero\": \"5511999999999\",\n  \"mensagem\": \"Seu pedido foi faturado\",\n  \"template\": \"pedido_faturado\"\n}"
+            },
+            "url": "{{ms003_url}}/v1/notificacao/enviar"
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{ms003_url}}/v1/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS-004 Open Finance",
+      "item": [
+        {
+          "name": "Listar Consentimentos",
+          "request": {
+            "method": "GET",
+            "url": "{{ms004_url}}/v1/consentimentos"
+          }
+        },
+        {
+          "name": "Capturar Extratos",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data_inicio\": \"2026-04-01\",\n  \"data_fim\": \"2026-04-30\"\n}"
+            },
+            "url": "{{ms004_url}}/v1/extratos/capturar/1"
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{ms004_url}}/v1/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS-005 Geocoding",
+      "item": [
+        {
+          "name": "Geocodificar Endereco",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endereco\": \"Rua das Flores, 100, Sao Paulo, SP\"\n}"
+            },
+            "url": "{{ms005_url}}/v1/geocodificar"
+          }
+        },
+        {
+          "name": "Otimizar Rota",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"base_operacional_id\": \"base-centro\",\n  \"paradas\": [\n    {\"id\": 1, \"latitude\": -23.55, \"longitude\": -46.63},\n    {\"id\": 2, \"latitude\": -23.56, \"longitude\": -46.62}\n  ]\n}"
+            },
+            "url": "{{ms005_url}}/v1/rotas/otimizar"
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{ms005_url}}/v1/health"
+          }
+        }
+      ]
+    }
+  ]
+}

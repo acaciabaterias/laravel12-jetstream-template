@@ -8,7 +8,7 @@
 
 ## Constitution Check
 
-> Requisito da constitution v1.5.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
+> Requisito da constitution v2.0.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
 
 | Functional Requirement | Princípio da Constitution | Status | Notas |
 |---|---|---|---|
@@ -22,7 +22,7 @@
 **Princípios sem conflito identificado:** III, IV, V, VI — não impactados diretamente por este MS.
 
 **Multi-Tenancy (Architecture Principle):**
-> A entidade `Rota` contém `filial_id` (visível em spec Key Entities), garantindo isolamento por filial conforme exigido. Cada filial gerencia suas próprias rotas de entrega independentemente. ✅ Alinhado.
+> Na Constitution v2.0.0, o ERP usa isolamento `database-per-client`, sem `filial_id` como mecanismo de tenancy. Neste MS, cada rota é associada a um `tenant_id_externo` e a uma `base_operacional_id` como identificadores funcionais de integração com o Módulo 006, sem reintroduzir separação lógica por coluna no core do ERP. O isolamento do ERP continua sendo resolvido pelo tenant/CNPJ; o MS-005 atua apenas como serviço geográfico autônomo consumindo e devolvendo rotas para esse contexto.
 
 **Stack Tecnológica (Quality Gate — Technology Stack Constraints):**
 - Node.js 20+ (Fastify): ✅ Serviço autônomo. Justificativa: SDK oficial Google Maps em Node.js, alta performance para processamento de coordenadas em memória
@@ -59,6 +59,12 @@ App Entregador
             └── EtaService → Recalculo ETAs
             └── Redis Broker → ETA_ATUALIZADO → App + Módulo 006
 ```
+
+## Alinhamento com o Módulo 010
+
+- Eventos consumidos e publicados por este MS devem usar o envelope canônico do backbone com `event_version`, `tenant_external_ref`, `correlation_id`, `causation_id`, `idempotency_key` e `occurred_at`
+- Retry, dead-letter e replay operacional devem ser compatíveis com a trilha de entregas do Módulo 010
+- Endpoints síncronos expostos ao ERP e ao App devem ser registráveis no gateway do backbone com autenticação, timeout e rastreio estruturado
 
 ---
 
@@ -149,8 +155,8 @@ function twoOpt(rota: Point[]): Point[] {
 ```typescript
 // Usa Google Maps Routes API v2 com waypoints optimization
 const response = await mapsClient.optimizeWaypoints({
-  origin: filial,
-  destination: filial,  // retorna para o ponto de partida
+  origin: baseOperacional,
+  destination: baseOperacional,  // retorna para o ponto de partida
   waypoints: paradas.map(p => ({ location: p, stopover: true })),
   optimizeWaypoints: true,
   travelMode: 'DRIVING',

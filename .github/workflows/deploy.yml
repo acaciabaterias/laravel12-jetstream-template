@@ -1,0 +1,59 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        default: production
+        type: choice
+        options:
+          - staging
+          - production
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate deployment bundle inputs
+        run: |
+          docker compose config --quiet
+          test -f openapi.yaml
+          test -f postman_collection.json
+          test -x backup.sh
+          test -x restore.sh
+          test -x healthcheck.sh
+
+      - name: Deploy summary
+        run: |
+          echo "Disparando pipeline de deploy para ${{ inputs.environment }}"
+          echo "Ajuste este workflow com SCP/SSH, rsync, Proxmox hooks ou deploy via runner self-hosted."
+
+      - name: Upload deployment bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-bundle-${{ inputs.environment }}
+          path: |
+            docker-compose.yml
+            openapi.yaml
+            postman_collection.json
+            backup.sh
+            restore.sh
+            healthcheck.sh
+            microservicos
+            app
+            bootstrap
+            config
+            database
+            public
+            resources
+            routes

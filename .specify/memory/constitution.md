@@ -1,21 +1,16 @@
 <!--
 Sync Impact Report
-- Version change: 1.4.0 → 1.5.0
+- Version change: 1.5.0 → 1.6.0
 - Modified principles:
-  - I. Laravel 12 First → I. Business Domain Specialization
-  - II. Reactive UI via Livewire 4 + Filament → II. Mobile-First Field Operations
-  - III. Test-First Delivery (NON-NEGOTIABLE) → III. Automated Financial Microservices
-  - IV. PostgreSQL Data Integrity → IV. Comprehensive Inventory & Reverse Logistics
-  - V. Boost-Guided, Minimal Changes → V. Proactive Quality & Customer Service
-  - VI. Production-Ready Integrations → VI. Integrated Fiscal Compliance
+  - VII. Mandatory Documentation & Algorithmic Commenting → VII. Mandatory Documentation Standards
 - Added sections:
-  - None
+  - VIII. Operational Resilience & Disaster Recovery
 - Removed sections:
-  - None
+  - Legacy duplicate section: "Constituição do Projeto: ERP Baterias"
 - Templates requiring updates:
   - ✅ updated: .specify/templates/plan-template.md
   - ✅ updated: .specify/templates/spec-template.md
-  - ⚠ pending: .specify/templates/commands/*.md (directory not present in repository)
+  - ✅ updated: .specify/templates/tasks-template.md
 - Follow-up TODOs:
   - None
 -->
@@ -53,6 +48,26 @@ Rationale: Improves customer satisfaction, enhances after-sales support, and pro
 The system MUST communicate with dedicated microservices for the issuance of Fiscal Coupons (PDV) and NF-e. Users MUST be able to consult, print, correct, cancel, and generate accounting reports for these documents directly through the ERP interface.
 
 Rationale: Ensures full compliance with fiscal regulations, simplifies tax reporting, and provides users with direct control over their fiscal documentation.
+
+### VII. Mandatory Documentation Standards
+
+All PHP files within the '/app/' directory (including Classes, Controllers, Models, Actions, and Commands) MUST be thoroughly documented.
+
+- **PHPDoc**: Every method MUST have a complete PHPDoc block including parameter and return types.
+- **Algorithmic clarity**: Complex flows MUST include concise explanatory comments. Trivial logic MUST NOT be over-commented.
+- **Consistency**: Every created or modified file MUST adhere to this documentation standard before being considered complete.
+
+### VIII. Operational Resilience & Disaster Recovery
+
+The platform MUST enforce operational continuity with verifiable backup and recovery controls for core infrastructure, including the active VM topology.
+
+- **Backup coverage**: Central database, tenant databases, and critical application configuration MUST be included in recurring backups.
+- **Restore validation**: At least one restore rehearsal per environment MUST be executed on a defined cadence and recorded with timestamp, operator, and outcome.
+- **Retention policy**: Retention windows (daily/weekly/monthly) MUST be defined and enforced in automation.
+- **Deploy gate**: Production deployments MUST require evidence of a recent valid backup and documented rollback path.
+- **Evidence trail**: Backup and restore results MUST be auditable through runbooks, logs, or checklist artifacts.
+
+Rationale: Stable operations require recovery guarantees, not only successful deployments. This principle reduces downtime and data loss risk.
 
 ## Princípios de Arquitetura
 
@@ -110,6 +125,7 @@ MUST include written justification and explicit approval before implementation.
 6. Migration files MUST be named in English and follow Laravel's migration naming conventions.
 7. When creating a new screen or interface, clarifying questions MUST ask the user for their
   desired UI direction before implementation.
+8. Plans and go-live checklists MUST include explicit backup and restore evidence when infrastructure or data-impacting changes are involved.
 
 ## Governance
 
@@ -131,19 +147,4 @@ Compliance Review Expectations:
 - Every task list MUST include explicit testing tasks.
 - Every pull request review MUST verify constitutional compliance prior to approval.
 
-**Version**: 1.5.0 | **Ratified**: 2026-02-19 | **Last Amended**: 2026-04-11
-
-# Constituição do Projeto: ERP Baterias
-
-## Princípios de Arquitetura
-1. **Multi-tenancy Absoluto:** Todo e qualquer dado deve ser filtrado por `branch_id` (Filial). O isolamento de dados é a prioridade número 1.
-2. **Precedência Hierárquica:** O desenvolvimento deve seguir a ordem de Níveis (1 a 4). Nenhuma funcionalidade de nível superior pode ser implementada sem que a sua dependência no nível inferior esteja estável.
-3. **RBAC (Role-Based Access Control):** O acesso a funcionalidades e dados é estritamente controlado por perfis de utilizador.
-
-## Padrão de Documentação (SDD)
-Todas as especificações devem seguir obrigatoriamente a estrutura:
-- **Contexto e Dependências:** O que é e o que precisa de existir antes.
-- **User Scenarios (Given-When-Then):** Comportamento esperado.
-- **Edge Cases:** Tratamento de erros e exceções.
-- **Functional Requirements (FR):** Regras técnicas numeradas.
-- **Success Criteria (SC):** Como medir se a funcionalidade funciona.
+**Version**: 1.6.0 | **Ratified**: 2026-02-19 | **Last Amended**: 2026-05-05

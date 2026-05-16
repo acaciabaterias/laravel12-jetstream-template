@@ -1,36 +1,67 @@
-# Tasks: Módulo de Vendas e "Vales"
+# Tasks: Módulo 005 - Vendas e Assistência (Vales e OS)
 
-**Feature Branch**: `005-sales-vales`
+**Feature Branch**: `005-sales-service-os`
 **Spec File**: [spec.md](spec.md)
 
-## Phase 1: Database & Models (Vales)
-- [ ] T001: Criar migration para tabela `vales` (id, cliente_id, vendedor_id, filial_id, status, observacoes, data_faturamento).
-- [ ] T002: Criar migration para tabela `itens_vale` (vale_id, bateria_id, qtde, preco_original, preco_final, flag_devolveu_sucata).
-- [ ] T003: Criar migrations complementares para `pedidos_venda` e `ordens_servico`.
-- [ ] T004: Instanciar Models (`Vale`, `ItemVale`, `PedidoVenda`, `OrdemServico`) com seus devidos relacionamentos relacional e Escopos (`HasFilial`).
+## Constitution Traceability
 
-## Phase 2: Livewire Components (Point of Sale / Vale)
-- [ ] T005: Criar Frontend com Livewire/Tailwind para interface de "Nova Venda / Novo Vale" focada no Balconista.
-- [ ] T006: Componente Livewire de adição iterativa de Itens na tabela do Vale (Carrinho de Baterias).
-- [ ] T007: Implementar lógica reativa "Net Price" (calculando acréscimo se `flag_devolveu_sucata = FALSE`) baseada no cache da tabela de sucata do Módulo 004.
-- [ ] T008: Implementar totalizadores reagindo de forma instantânea às alterações dos Itens na interface.
+- **Multi-Tenancy Isolado (v2.0.0)**: T001-T006, T009-T020, T028-T035
+- **RBAC**: T012-T017, T028-T035
+- **Comprehensive Inventory & Reverse Logistics**: T007-T011, T018-T020, T029-T033
+- **Proactive Quality & Customer Service**: T013-T017, T021-T035
 
-## Phase 3: Integração de Estoque (Reservas)
-- [ ] T009: Criar Service de gestão de Reservas interagindo com as tabelas do Sistema de Estoque (Módulo 004).
-- [ ] T010: Disparar registro de quantidade retida "Reservada" transacionalmente no DB ao adicionar Item na UI.
-- [ ] T011: Disparar evento de estorno da reserva do banco ao excluir um item do carrinho ou cancelar completamente o Vale.
-- [ ] T012: Tratar mensagens de erro da interface caso o item retorne bloqueio por "Saldo Insuficiente".
+## Phase 1: Database Migrations (Tenant)
 
-## Phase 4: Motores de Conversão 
-- [ ] T013: Criar Job em Background `ConvertValeToPedidoJob` (Gera Pedido de Venda, confirma saída física no Kardex e credita ou debita "Conta Sucata" do cliente).
-- [ ] T014: Criar Job `ConvertValeToOsJob` (Gera OS, reserva estoque, e habilita modo para técnicos editarem seu Laudo).
-- [ ] T015: Adicionar Action Buttons na view para viabilizar as conversões ("Faturar Venda", "Enviar para Garantia").
+- [x] T001: Criar migration `create_vales_table`
+- [x] T002: Criar migration `create_itens_vale_table`
+- [x] T003: Criar migration `create_pedidos_venda_table`
+- [x] T004: Criar migration `create_ordens_servico_table`
+- [x] T005: Criar migration `create_reservas_estoque_table`
+- [x] T006: Criar migration `create_audit_logs_table`
 
-## Phase 5: Buscas e Filtros
-- [ ] T016: Desenvolver tela administrativa de listagem do histórico de Vales com filtros otimizados (cliente, período, status, vendedor, filial).
-- [ ] T017: Adaptar listagem construindo a tela de forma responsiva focada em suporte offline/cache local para visualização read-only Mobile.
+## Phase 2: Models e Services
 
-## Phase 6: Edge Cases e Testes Robustos
-- [ ] T018: Escrever testes End-to-End simulando concorrência (dois balconistas tentando reservar a mesma e última unidade em Vales diferentes simultaneamente).
-- [ ] T019: Teste de verificação se a "Conta Sucata" do cliente tem o débito perfeitamente persistido em uma venda configurada para ausência de devolução física de casco.
-- [ ] T020: Teste validando estorno completo (100% dos items) ao confirmar clique de "Cancelar Vale".
+- [x] T007: Criar Model `Vale`
+- [x] T008: Criar Model `ItemVale`
+- [x] T009: Criar Model `PedidoVenda`
+- [x] T010: Criar Model `OrdemServico`
+- [x] T011: Criar Model `ReservaEstoque`
+- [x] T012: Criar service `NetPriceCalculator`
+- [x] T013: Criar service `ReservaEstoqueService`
+- [x] T014: Criar Trait `Auditable`
+
+## Phase 3: UI de Vales
+
+- [x] T015: Criar Livewire component `ValeForm`
+- [x] T016: Criar Livewire component `ValeList`
+- [x] T017: Implementar adição e remoção reativa de itens no vale
+- [x] T018: Implementar cálculo de Net Price em tempo real
+- [x] T019: Implementar reserva imediata de estoque ao adicionar item
+- [x] T020: Implementar estorno de reserva ao remover item ou cancelar vale
+
+## Phase 4: Conversões e OS
+
+- [x] T021: Criar job `ConvertValeToPedidoJob`
+- [x] T022: Criar job `ConvertValeToOsJob`
+- [x] T023: Criar Livewire component `ValeConversionActions`
+- [x] T024: Criar Livewire component `OrdemServicoForm`
+- [x] T025: Implementar conversão para pedido com saída definitiva de estoque
+- [x] T026: Implementar conversão para ordem de serviço com vínculo ao vale
+
+## Phase 5: Busca, Auditoria e Conta Sucata
+
+- [x] T027: Implementar busca de vales por cliente, período, status e vendedor
+- [x] T028: Implementar visualização móvel com cache read-only
+- [x] T029: Integrar débito e crédito com conta sucata do cliente
+- [x] T030: Registrar auditoria de criação, edição, cancelamento e conversão
+
+## Phase 6: Tests
+
+- [x] T031: Testar criação de vale com cálculo de sucata
+- [x] T032: Testar reserva concorrente da última unidade
+- [x] T033: Testar conversão de vale em pedido de venda
+- [x] T034: Testar conversão de vale em ordem de serviço
+- [x] T035: Testar cancelamento com estorno total das reservas
+- [x] T036: Testar cliente sem conta sucata com criação automática
+- [x] T037: Testar auditoria das operações críticas
+- [x] T038: Testar isolamento entre tenants sem cross-access

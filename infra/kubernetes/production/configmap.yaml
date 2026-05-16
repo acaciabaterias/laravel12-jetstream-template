@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: erp-core-config
+  namespace: bateriaexpert
+data:
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: https://erp.example.com
+  LOG_CHANNEL: stack
+  DB_CONNECTION: central
+  DB_CENTRAL_DRIVER: pgsql
+  DB_CENTRAL_HOST: postgres-central.database.svc.cluster.local
+  DB_CENTRAL_PORT: "5432"
+  DB_CENTRAL_DATABASE: erp_central
+  DB_CENTRAL_USERNAME: erp
+  REDIS_HOST: redis-master.cache.svc.cluster.local
+  REDIS_PORT: "6379"
+  CACHE_STORE: redis
+  SESSION_DRIVER: database
+  QUEUE_CONNECTION: redis
+  RUN_MIGRATIONS: "false"
+  MS_FISCAL_URL: http://ms-001-fiscal-api.bateriaexpert.svc.cluster.local:8001
+  MS_BANCARIO_URL: http://ms-002-banking-api.bateriaexpert.svc.cluster.local:8002
+  MS_WHATSAPP_URL: http://ms-003-notification-api.bateriaexpert.svc.cluster.local:8003
+  MS_OPENFINANCE_URL: http://ms-004-openfinance-api.bateriaexpert.svc.cluster.local:8004
+  MS_GEOCODING_URL: http://ms-005-geocoding-api.bateriaexpert.svc.cluster.local:8005
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ms-001-config
+  namespace: bateriaexpert
+data:
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: https://ms-001.example.com
+  LOG_CHANNEL: stack
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres-ms-001.database.svc.cluster.local
+  DB_PORT: "5432"
+  DB_DATABASE: ms_fiscal
+  DB_USERNAME: postgres
+  REDIS_HOST: redis-ms-001.cache.svc.cluster.local
+  REDIS_PORT: "6379"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ms-002-config
+  namespace: bateriaexpert
+data:
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: https://ms-002.example.com
+  LOG_CHANNEL: stack
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres-ms-002.database.svc.cluster.local
+  DB_PORT: "5432"
+  DB_DATABASE: ms_banking
+  DB_USERNAME: postgres
+  REDIS_HOST: redis-ms-002.cache.svc.cluster.local
+  REDIS_PORT: "6379"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ms-003-config
+  namespace: bateriaexpert
+data:
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: https://ms-003.example.com
+  LOG_CHANNEL: stack
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres-ms-003.database.svc.cluster.local
+  DB_PORT: "5432"
+  DB_DATABASE: ms_whatsapp
+  DB_USERNAME: postgres
+  REDIS_HOST: redis-ms-003.cache.svc.cluster.local
+  REDIS_PORT: "6379"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ms-004-config
+  namespace: bateriaexpert
+data:
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: https://ms-004.example.com
+  LOG_CHANNEL: stack
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres-ms-004.database.svc.cluster.local
+  DB_PORT: "5432"
+  DB_DATABASE: ms_openfinance
+  DB_USERNAME: postgres
+  REDIS_HOST: redis-ms-004.cache.svc.cluster.local
+  REDIS_PORT: "6379"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ms-005-config
+  namespace: bateriaexpert
+data:
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: https://ms-005.example.com
+  LOG_CHANNEL: stack
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres-ms-005.database.svc.cluster.local
+  DB_PORT: "5432"
+  DB_DATABASE: ms_geocoding
+  DB_USERNAME: postgres
+  REDIS_HOST: redis-ms-005.cache.svc.cluster.local
+  REDIS_PORT: "6379"

@@ -1,0 +1,79 @@
+name: Deploy Kubernetes
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Ambiente Kubernetes
+        required: true
+        default: production
+        type: choice
+        options:
+          - staging
+          - production
+      image_tag:
+        description: Tag das imagens a publicar
+        required: true
+        default: latest
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-k8s:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.30.0
+
+      - name: Setup kubeconfig
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+        run: |
+          if [ -z "${KUBECONFIG_B64}" ]; then
+            echo "Secret KUBECONFIG_B64 nao configurado." >&2
+            exit 1
+          fi
+
+          mkdir -p "${HOME}/.kube"
+          echo "${KUBECONFIG_B64}" | base64 -d > "${HOME}/.kube/config"
+          chmod 600 "${HOME}/.kube/config"
+
+      - name: Render image tag in kustomization
+        env:
+          K8S_NAMESPACE: ${{ inputs.environment == 'staging' && 'bateriaexpert-staging' || 'bateriaexpert' }}
+        run: |
+          perl -0pi -e 's/newTag: latest/newTag: ${{ inputs.image_tag }}/g' infra/kubernetes/production/kustomization.yaml
+          perl -0pi -e "s/namespace: bateriaexpert/namespace: ${K8S_NAMESPACE}/" infra/kubernetes/production/kustomization.yaml
+
+      - name: Validate kustomize build
+        run: kubectl kustomize infra/kubernetes/production >/tmp/bateriaexpert-k8s.yaml
+
+      - name: Apply namespaces
+        run: kubectl apply -f infra/kubernetes/namespace.yaml
+
+      - name: Apply Kubernetes stack
+        run: kubectl apply -k infra/kubernetes/production
+
+      - name: Verify rollout
+        env:
+          K8S_NAMESPACE: ${{ inputs.environment == 'staging' && 'bateriaexpert-staging' || 'bateriaexpert' }}
+        run: ./infra/kubernetes/production/verify-k8s.sh
+
+      - name: Run smoke test
+        env:
+          ERP_URL: ${{ secrets.ERP_URL }}
+          MS001_URL: ${{ secrets.MS001_URL }}
+          MS002_URL: ${{ secrets.MS002_URL }}
+          MS003_URL: ${{ secrets.MS003_URL }}
+          MS004_URL: ${{ secrets.MS004_URL }}
+          MS005_URL: ${{ secrets.MS005_URL }}
+        run: ./infra/kubernetes/production/smoke-test.sh

@@ -49,6 +49,7 @@
 - [ ] T023: Criar e importar workflow `wf-processar-resposta` (trigger: webhook Evolution) com lógica de SIM/NÃO/PARAR
 - [ ] T024: Criar sub-workflow `wf-opt-out` acionado pelo `wf-processar-resposta`
 - [ ] T025: Exportar todos os workflows como JSON para a pasta `workflows/` (versionamento em Git)
+- [ ] T025A: Padronizar triggers e publicações dos workflows com o envelope canônico do Módulo 010 (`event_version`, `tenant_external_ref`, `correlation_id`, `causation_id`, `idempotency_key`)
 
 ---
 
@@ -59,6 +60,7 @@
 - [ ] T028: Implementar rate limiting por cliente (máximo 3 msgs em 10 minutos) via query no banco
 - [ ] T029: Implementar lógica de retry em todos os workflows (3 tentativas com backoff via n8n Wait node)
 - [ ] T030: Implementar log de auditoria ao final de cada workflow (insert em `notificacao_log`)
+- [ ] T030A: Implementar dead-letter e replay operacional para eventos de notificação e webhooks da Evolution API compatíveis com o backbone
 
 ---
 
@@ -82,6 +84,7 @@
 - [ ] T040: Teste de opt-out: enviar "PARAR" → verificar inserção na blacklist + confirmação enviada
 - [ ] T041: Teste de falha Evolution API: simular instância desconectada → verificar retry e publicação de `WHATSAPP_FALHOU`
 - [ ] T042: Testar exportação e reimportação de todos os workflows do JSON (garantir reprodutibilidade)
+- [ ] T042A: Teste de contrato do envelope canônico e replay operacional contra o catálogo do Módulo 010
 
 ---
 
@@ -94,4 +97,5 @@
 - [ ] T047: Configurar backup automático do banco n8n e volume de workflows (crontab ou script)
 - [ ] T048: Configurar monitoramento: alerta no Slack/WhatsApp próprio se Evolution API desconectar
 - [ ] T048A: Configurar Grafana Dashboard calculando Taxa de Entrega (Mensagens Enviadas vs Confirmadas ≥ 95%)
+- [ ] T048B: Registrar endpoints síncronos e webhooks no gateway do Módulo 010 com autenticação, timeout e rastreio padronizado
 - [ ] T049: Executar linting e formatação em todos os arquivos TypeScript da API proxy (ESLint + Prettier) e validar JSON dos workflows exportados antes de cada merge

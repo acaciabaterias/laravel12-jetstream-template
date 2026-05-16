@@ -1,0 +1,141 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "BateriaExpert ERP API",
+        "description": "API central do ERP BateriaExpert com suporte a multi-tenancy e microserviços.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "Servidor de API Principal"
+        },
+        {
+            "url": "/api"
+        }
+    ],
+    "paths": {
+        "/internal/webhooks/fiscal/status": {
+            "post": {
+                "tags": [
+                    "Internal Webhooks"
+                ],
+                "summary": "Recebe atualizações de status fiscal de microserviços",
+                "operationId": "2dcd09e44d283102b4ded0fa2bae2a10",
+                "parameters": [
+                    {
+                        "name": "X-Internal-Service-Key",
+                        "in": "header",
+                        "description": "Chave de autenticação para serviços internos",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Internal-Signature",
+                        "in": "header",
+                        "description": "Assinatura HMAC-SHA256 do corpo da requisição",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "processed"
+                                    },
+                                    "invoice_id": {
+                                        "type": "string",
+                                        "example": "12345"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Webhook processado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "received"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Fiscal webhook processed."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autorizado - Chave interna inválida ou ausente"
+                    },
+                    "429": {
+                        "description": "Limite de requisições excedido"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "RateLimitHeaders": {
+                "properties": {
+                    "X-RateLimit-Limit": {
+                        "description": "Limite total permitido",
+                        "type": "integer"
+                    },
+                    "X-RateLimit-Remaining": {
+                        "description": "Requisições restantes",
+                        "type": "integer"
+                    },
+                    "X-RateLimit-Reset": {
+                        "description": "Timestamp Unix de reset",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Internal Webhooks",
+            "description": "Internal Webhooks"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ]
+}

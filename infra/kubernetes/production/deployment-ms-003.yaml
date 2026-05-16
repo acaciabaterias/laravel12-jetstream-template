@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-003-notification-api
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: ms-003-notification-api
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ms-003-notification-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ms-003-notification-api
+        app.kubernetes.io/part-of: bateriaexpert
+    spec:
+      containers:
+        - name: ms-003-notification-api
+          image: ghcr.io/example/bateriaexpert/ms-003-whatsapp-n8n:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8003
+              name: http
+          envFrom:
+            - configMapRef:
+                name: ms-003-config
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ms-003-secrets
+                  key: DB_PASSWORD
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ms-003-secrets
+                  key: REDIS_PASSWORD
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 768Mi

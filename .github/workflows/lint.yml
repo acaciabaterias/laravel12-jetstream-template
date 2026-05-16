@@ -1,0 +1,35 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Validate Pint formatting
+        run: vendor/bin/pint --test --format agent
+
+      - name: Lint PHP files
+        run: find app bootstrap config database routes tests microservicos -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Validate Postman collection JSON
+        run: php -r "json_decode(file_get_contents('postman_collection.json')); if (json_last_error() !== JSON_ERROR_NONE) { fwrite(STDERR, json_last_error_msg()); exit(1);} echo 'JSON OK'.PHP_EOL;"

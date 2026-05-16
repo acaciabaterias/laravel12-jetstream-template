@@ -40,12 +40,20 @@
 
 **Constitution Check**:
 - Ensure alignment with ERP principles, including reverse logistics and financial automation.
+- If the feature impacts infrastructure, deployment flow, or data integrity, include backup and restore evidence (source, timestamp, validation status, rollback path).
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- Multi-tenancy and RBAC constraints are preserved.
+- Tests cover happy path and relevant failure path.
+- Stack constraints remain within approved technologies.
+- Documentation standards are applied proportionally to complexity.
+- Operational resilience controls are addressed when applicable:
+  - Recent valid backup evidence recorded.
+  - Restore rehearsal evidence recorded or explicitly justified.
+  - Rollback path documented.
 
 ## Project Structure
 

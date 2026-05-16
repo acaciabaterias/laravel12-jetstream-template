@@ -1,28 +1,62 @@
-# Tasks: Módulo Financeiro Inteligente
+# Tasks: Módulo 008 - Financeiro Inteligente
 
 **Feature Branch**: `008-intelligent-finance`
 **Spec File**: [spec.md](spec.md)
 
-## Phase 1: Database & Model Setup
-- [ ] T001: Criar migration fundamental para entidades `contas_bancarias` blindada com constraint obrigatória para o `filial_id`.
-- [ ] T002: Criar migration detalhada para `transacoes_financeiras` contendo inputs de Receita/Despesa, Validações Booleanas, e Chaves de Integrações com Extratos/Vales/Pedidos.
-- [ ] T003: Criar migrations complementares e Views Estruturais para cachear/agregar a base gerencial de `fluxo_caixa_projetado` e `margens_lucro`.
-- [ ] T004: Instanciar Repositórios Iniciais e Models validando Políticas estritas de permissão financeira de Matriz.
+## Constitution Traceability
 
-## Phase 2: Open Finance and Daily Sync Engine (Jobs)
-- [ ] T005: Elaborar HTTP API Client modular para a comunicação das carteiras associadas da loja (`Asaas/Bancos`).
-- [ ] T006: Codificar Engine Analítica (`FinanceMatcherProcessor`) que itera entre o JSON recebido com depósitos/vendas logísticas isolando os validados na noite anterior.
-- [ ] T007: Incluir Job Scheduler no Kernel de Schedule acionando esse Parser na madrugada com fallback de segurança por falha de Tokens.
+- **Multi-Tenancy Isolado (v2.0.0)**: T001-T007, T012-T030
+- **Automated Financial Microservices**: T008-T018, T024-T029
+- **Proactive Quality & Customer Service**: T015-T018, T024-T030
+- **RBAC**: T007, T019-T023, T027-T030
 
-## Phase 3: Dashboard & Livewire Views
-- [ ] T008: Construção do Componente Front-End `Caixa Operacional` / Adorno Manual de Transações Financeiras (com suporte a lançamentos manuais ou pagamentos locais a prestadores).
-- [ ] T009: Criar a UI em formato de gráfico ou grade analítica (Chart/JS Wrapper via Livewire) exibindo visualmente `Fluxo de Caixa Diário` cruzando as contas de Contas A Pagar/Receber.
-- [ ] T010: Criar o Grid de KPI interconectado puxando a Tabela Fria que estampa aos gerentes a margem de Mark-Up/Rentabilidades apurada por produto individual.
+## Phase 1: Database Migrations (Tenant)
 
-## Phase 4: Gatilhos Multi-Domínio (Garantias Mód. 007)
-- [ ] T011: Elaborar classe de Evento `GuaranteeWasDenied` ou similar escutada pelos Observers que criará artificialmente os faturamentos de serviço obrigatórios (Ex: "Taxa de Recarga OS - X").
+- [x] T001: Criar migration `create_contas_bancarias_table`
+- [x] T002: Criar migration `create_transacoes_financeiras_table`
+- [x] T003: Criar migration `create_fluxo_caixa_projetado_table`
+- [x] T004: Criar migration `create_margens_lucro_reais_table`
+- [x] T005: Criar migration `create_conciliacoes_pendentes_table`
+- [x] T006: Criar migration `create_fechamentos_contabeis_table`
+- [x] T007: Criar migration `create_audit_logs_table`
 
-## Phase 5: Restrições & Testes Financeiros End-to-End
-- [ ] T012: Encriptar lógica de "Data Lock / Fechamento Mensal" onde edições (Updates em Modelos) batem em barreiras impeditivas que geram `Exception HTTP 403`, inviabilizando subversões de pagamentos passados após rodadas fiscais.
-- [ ] T013: Mocar dados das Requisições Bancárias em Factory testando a solidez e os índices do Algoritmo de "Matching" contra boletos avulsos maliciosos (Testando o Multi-Match/Invalidação Parcial).
-- [ ] T014: Elaboração Exaustiva Unit-Test provando escopo de segurança por Tenants. Usuários de caixas de Cidades Distintas não listam valores em espécie correntes fora do escopo vinculado na API.
+## Phase 2: Models, Services e Jobs
+
+- [x] T008: Criar Model `ContaBancaria`
+- [x] T009: Criar Model `TransacaoFinanceira`
+- [x] T010: Criar Model `FluxoCaixaProjetado`
+- [x] T011: Criar Model `MargemLucroReal`
+- [x] T012: Criar Model `ConciliacaoPendente`
+- [x] T013: Criar Model `FechamentoContabil`
+- [x] T014: Criar service `BankApiClient`
+- [x] T015: Criar service `FinanceMatcherProcessor`
+- [x] T016: Criar service `ClosingPeriodGuard`
+- [x] T017: Criar Trait `Auditable`
+- [x] T018: Criar job `SyncBankTransactionsJob`
+
+## Phase 3: Painéis e Fluxos Financeiros
+
+- [x] T019: Criar Livewire component `FinanceDashboard`
+- [x] T020: Criar Livewire component `CashFlowPanel`
+- [x] T021: Criar Livewire component `MarginAnalysisGrid`
+- [x] T022: Implementar lançamentos manuais com auditoria
+- [x] T023: Implementar painel de pendências de conciliação
+
+## Phase 4: Integrações e Gatilhos
+
+- [x] T024: Implementar importação e matching de transações bancárias
+- [x] T025: Implementar atualização do fluxo de caixa projetado
+- [x] T026: Implementar apuração de margem de lucro real
+- [x] T027: Implementar geração automática de cobrança para OS improcedente
+- [x] T028: Implementar bloqueio de alterações em período contábil fechado
+
+## Phase 5: Tests
+
+- [x] T029: Testar conciliação automática com matches simples
+- [x] T030: Testar transações ambíguas indo para pendência manual
+- [x] T031: Testar fluxo de caixa projetado
+- [x] T032: Testar margem de lucro real por produto
+- [x] T033: Testar cobrança automática de improcedência
+- [x] T034: Testar bloqueio de edição em competência fechada
+- [x] T035: Testar auditoria financeira das operações críticas
+- [x] T036: Testar isolamento entre tenants sem cross-access

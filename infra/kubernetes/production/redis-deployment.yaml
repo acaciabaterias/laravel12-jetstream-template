@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: redis-master
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: redis-master
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-master
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: redis-master
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis-master
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis-master
+        app.kubernetes.io/part-of: bateriaexpert
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+              name: redis
+          command:
+            - sh
+            - -c
+            - |
+              if [ -n "${REDIS_PASSWORD}" ]; then
+                exec redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}";
+              fi;
+              exec redis-server --appendonly yes;
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: erp-core-secrets
+                  key: REDIS_PASSWORD
+                  optional: true
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  if [ -n "${REDIS_PASSWORD}" ]; then
+                    redis-cli -a "${REDIS_PASSWORD}" ping;
+                  else
+                    redis-cli ping;
+                  fi
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  if [ -n "${REDIS_PASSWORD}" ]; then
+                    redis-cli -a "${REDIS_PASSWORD}" ping;
+                  else
+                    redis-cli ping;
+                  fi
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+          startupProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  if [ -n "${REDIS_PASSWORD}" ]; then
+                    redis-cli -a "${REDIS_PASSWORD}" ping;
+                  else
+                    redis-cli ping;
+                  fi
+            periodSeconds: 10
+            failureThreshold: 18
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi

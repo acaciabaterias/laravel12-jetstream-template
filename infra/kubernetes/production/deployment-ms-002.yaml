@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-002-banking-api
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: ms-002-banking-api
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ms-002-banking-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ms-002-banking-api
+        app.kubernetes.io/part-of: bateriaexpert
+    spec:
+      containers:
+        - name: ms-002-banking-api
+          image: ghcr.io/example/bateriaexpert/ms-002-bancario:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8002
+              name: http
+          envFrom:
+            - configMapRef:
+                name: ms-002-config
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ms-002-secrets
+                  key: DB_PASSWORD
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ms-002-secrets
+                  key: REDIS_PASSWORD
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 768Mi

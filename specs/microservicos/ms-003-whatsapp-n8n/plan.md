@@ -8,7 +8,7 @@
 
 ## Constitution Check
 
-> Requisito da constitution v1.5.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
+> Requisito da constitution v2.0.0 — Quality Gate 1 e 2: *"Every implementation plan MUST include a Constitution Check. Constitution check gates in planning MUST pass before implementation begins."*
 
 | Functional Requirement | Princípio da Constitution | Status | Notas |
 |---|---|---|---|
@@ -62,6 +62,12 @@ Evolution API
     └── Webhook → n8n Webhook node → Workflow "Processar Resposta Cliente"
             └── Publica evento de volta ao Redis
 ```
+
+## Alinhamento com o Módulo 010
+
+- Triggers Redis, publicações de retorno e webhooks da Evolution API devem ser adaptados ao envelope canônico do backbone com `event_version`, `tenant_external_ref`, `correlation_id`, `causation_id`, `idempotency_key` e `occurred_at`
+- Retry, dead-letter e replay operacional devem ser compatíveis com a trilha de entregas do Módulo 010
+- Endpoints síncronos e webhooks expostos por este MS devem ser registráveis no gateway do backbone com autenticação, timeout e rastreio estruturado
 
 ---
 
@@ -158,7 +164,7 @@ services:
 
 ## Evolution API — Configuração
 
-- **Instâncias**: Criar uma instância de WhatsApp por CNPJ/filial
+- **Instâncias**: Criar uma instância de WhatsApp por tenant/CNPJ
 - **QR Code**: Conexão inicial requer scan de QR Code pela responsável da empresa
 - **Reconexão automática**: Evolution API tenta reconectar automaticamente se a sessão cair
 - **Webhook de respostas**: Evolution envia mensagens recebidas para o n8n via `WEBHOOK_GLOBAL_URL`

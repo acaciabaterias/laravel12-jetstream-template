@@ -1,0 +1,48 @@
+project_name = "bateriaexpert"
+environment  = "production"
+region       = "nyc3"
+vpc_uuid     = "00000000-0000-0000-0000-000000000000"
+
+ssh_key_ids = [
+  "12345678"
+]
+
+allowed_ssh_cidrs = [
+  "203.0.113.10/32"
+]
+
+allowed_http_cidrs = [
+  "0.0.0.0/0"
+]
+
+common_tags = [
+  "erp",
+  "laravel"
+]
+
+droplets = {
+  erp_core = {
+    name            = "erp-core-prod-01"
+    size            = "s-4vcpu-8gb"
+    image           = "ubuntu-24-04-x64"
+    backups         = true
+    monitoring      = true
+    volume_size_gib = 120
+  }
+  microservices = {
+    name            = "erp-ms-prod-01"
+    size            = "s-4vcpu-8gb"
+    image           = "ubuntu-24-04-x64"
+    backups         = true
+    monitoring      = true
+    volume_size_gib = 120
+  }
+  edge = {
+    name            = "erp-edge-prod-01"
+    size            = "s-2vcpu-4gb"
+    image           = "ubuntu-24-04-x64"
+    backups         = true
+    monitoring      = true
+    volume_size_gib = 40
+  }
+}

@@ -1,0 +1,58 @@
+project_name      = "bateriaexpert"
+environment       = "production"
+pm_api_url        = "https://proxmox.exemplo.local:8006/api2/json"
+pm_api_token_id   = "terraform@pve!bateriaexpert"
+pm_api_token_secret = "change-me"
+pm_tls_insecure   = true
+target_node       = "pve01"
+bridge            = "vmbr0"
+storage_pool      = "local-lvm"
+vm_clone_template = "ubuntu-24-04-cloudinit"
+lxc_template_file = "ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
+gateway           = "192.168.10.1"
+dns_servers       = "1.1.1.1 8.8.8.8"
+ssh_public_keys   = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDemo chave@example"
+
+vm_definitions = {
+  app = {
+    vmid       = 201
+    name       = "vm-app-01"
+    cores      = 4
+    sockets    = 1
+    memory     = 8192
+    disk_size  = "80G"
+    ip_address = "192.168.10.21/24"
+  }
+  microservices = {
+    vmid       = 202
+    name       = "vm-ms-01"
+    cores      = 4
+    sockets    = 1
+    memory     = 8192
+    disk_size  = "80G"
+    ip_address = "192.168.10.22/24"
+  }
+}
+
+lxc_definitions = {
+  postgres = {
+    vmid       = 301
+    hostname   = "ct-db-01"
+    cores      = 2
+    memory     = 4096
+    swap       = 1024
+    disk_size  = "40G"
+    ip_address = "192.168.10.31/24"
+    password   = "change-me-db"
+  }
+  redis = {
+    vmid       = 302
+    hostname   = "ct-redis-01"
+    cores      = 1
+    memory     = 2048
+    swap       = 512
+    disk_size  = "16G"
+    ip_address = "192.168.10.32/24"
+    password   = "change-me-redis"
+  }
+}

@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-central-backup
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: postgres-central-backup
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: postgres-central-backup
+            app.kubernetes.io/part-of: bateriaexpert
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: postgres-backup
+              image: postgres:15
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: PGHOST
+                  value: postgres-central.bateriaexpert.svc.cluster.local
+                - name: PGPORT
+                  value: "5432"
+                - name: PGDATABASE
+                  value: erp_central
+                - name: PGUSER
+                  value: erp
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: erp-core-secrets
+                      key: DB_CENTRAL_PASSWORD
+                - name: BACKUP_BUCKET_PATH
+                  value: /backups
+              command:
+                - sh
+                - -c
+                - |
+                  TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+                  mkdir -p "${BACKUP_BUCKET_PATH}"
+                  pg_dump --format=custom --no-owner --no-privileges "${PGDATABASE}" > "${BACKUP_BUCKET_PATH}/erp-central-${TIMESTAMP}.dump"
+                  find "${BACKUP_BUCKET_PATH}" -type f -name '*.dump' -mtime +7 -delete
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              volumeMounts:
+                - name: backup-data
+                  mountPath: /backups
+          volumes:
+            - name: backup-data
+              persistentVolumeClaim:
+                claimName: postgres-central-backup-pvc

@@ -1,0 +1,123 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    stack: bateriaexpert
+    environment: local
+
+rule_files:
+  - /etc/prometheus/alert-rules.yml
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - prometheus:9090
+
+  - job_name: cadvisor
+    static_configs:
+      - targets:
+          - cadvisor:8080
+
+  - job_name: blackbox_exporter
+    static_configs:
+      - targets:
+          - blackbox-exporter:9115
+
+  - job_name: erp_http_health
+    metrics_path: /probe
+    params:
+      module:
+        - http_2xx
+    static_configs:
+      - targets:
+          - http://erp_core_app/up
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__address__]
+        target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__param_target]
+        target_label: target
+      - target_label: service_group
+        replacement: erp-core
+      - source_labels: [target]
+        target_label: service_name
+        replacement: erp_core_app
+
+  - job_name: microservices_http_health
+    metrics_path: /probe
+    params:
+      module:
+        - http_2xx
+    static_configs:
+      - targets:
+          - http://ms_001_fiscal_api:8001/api/v1/health
+          - http://ms_002_banking_api:8002/api/v1/health
+          - http://ms_003_notification_api:8003/api/v1/health
+          - http://ms_004_openfinance_api:8004/api/v1/health
+          - http://ms_005_geocoding_api:8005/api/v1/health
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__address__]
+        target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__param_target]
+        target_label: target
+      - target_label: service_group
+        replacement: microservices
+      - source_labels: [target]
+        regex: .*(ms_001_fiscal_api).*
+        target_label: service_name
+        replacement: $1
+      - source_labels: [target]
+        regex: .*(ms_002_banking_api).*
+        target_label: service_name
+        replacement: $1
+      - source_labels: [target]
+        regex: .*(ms_003_notification_api).*
+        target_label: service_name
+        replacement: $1
+      - source_labels: [target]
+        regex: .*(ms_004_openfinance_api).*
+        target_label: service_name
+        replacement: $1
+      - source_labels: [target]
+        regex: .*(ms_005_geocoding_api).*
+        target_label: service_name
+        replacement: $1
+
+  - job_name: infra_tcp_health
+    metrics_path: /probe
+    params:
+      module:
+        - tcp_connect
+    static_configs:
+      - targets:
+          - erp_core_db:5432
+          - erp_core_redis:6379
+          - ms_001_fiscal_db:5432
+          - ms_001_fiscal_redis:6379
+          - ms_002_banking_db:5432
+          - ms_002_banking_redis:6379
+          - ms_003_notification_db:5432
+          - ms_003_notification_redis:6379
+          - ms_004_openfinance_db:5432
+          - ms_004_openfinance_redis:6379
+          - ms_005_geocoding_db:5432
+          - ms_005_geocoding_redis:6379
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__param_target]
+        target_label: service_name

@@ -71,6 +71,15 @@ O Open Finance Brasil (anteriormente Open Banking) obriga os bancos participante
 - **API Direta Open Finance Brasil** *[FUTURO v2]*: Adapter nativo para bancos que expõem API Open Finance Brasil (Itaú, Bradesco, BB, etc.) diretamente, sem intermediário. Requer certificado digital próprio, registro no Diretório BACEN e fluxo OAuth mais complexo. Será implementado apenas após Pluggy/Belvo estarem estáveis em produção.
 - O MS DEVE abstrair a diferença entre providers via padrão de Adapter para que v2 seja adicionável sem alterar o contrato de API
 
+### FR-004-08: Compatibilidade com Backbone de Integração
+- Todo evento consumido ou publicado pelo MS DEVE usar envelope canônico compatível com o Módulo 010 contendo `event_type`, `event_version`, `tenant_external_ref`, `correlation_id`, `causation_id` quando aplicável, `idempotency_key` e `occurred_at`
+- O MS DEVE manter versionamento explícito de contratos no catálogo compartilhado e rejeitar mensagens sem versão suportada
+- O consumo de eventos, callbacks OAuth e capturas agendadas DEVE suportar retry, dead-letter e replay operacional sem duplicar transações conciliáveis
+
+### FR-004-09: Governança de Gateway e Observabilidade
+- Endpoints síncronos acionados pelo ERP DEVE estar registráveis no gateway do Módulo 010 com autenticação, timeout explícito, rate limit e logging estruturado
+- O MS DEVE expor métricas de captura, retry, dead-letter, replay, latência por provider e expiração de consentimento compatíveis com os painéis operacionais do backbone
+
 ---
 
 ## User Stories
@@ -122,6 +131,8 @@ O Open Finance Brasil (anteriormente Open Banking) obriga os bancos participante
 ---
 
 ## Eventos
+
+Todos os eventos abaixo DEVEM ser registrados no catálogo do Módulo 010 com `event_version` explícita e envelope operacional padronizado.
 
 ### Eventos que o MS-004 **PUBLICA**:
 

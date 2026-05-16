@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'central'),
 
     /*
     |--------------------------------------------------------------------------
@@ -58,7 +58,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                //PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
@@ -78,7 +78,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-               //Pdo\Mysql::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // Pdo\Mysql::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
@@ -95,6 +95,30 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+        ],
+
+        'central' => [
+            'driver' => env('DB_CENTRAL_DRIVER', 'pgsql'),
+            'host' => env('DB_CENTRAL_HOST', 'localhost'),
+            'port' => env('DB_CENTRAL_PORT', '5432'),
+            'database' => env('DB_CENTRAL_DATABASE', 'erp_central'),
+            'username' => env('DB_CENTRAL_USERNAME', 'gil'),
+            'password' => env('DB_CENTRAL_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+        ],
+
+        'tenant' => [ // Conexão dinâmica configurada em runtime (middleware sobrescreve em HTTP)
+            'driver' => env('DB_TENANT_DRIVER', 'pgsql'),
+            'host' => env('DB_TENANT_HOST', ''),
+            'port' => env('DB_TENANT_PORT', '6543'),
+            'database' => env('DB_TENANT_DATABASE', 'postgres'),
+            'username' => env('DB_TENANT_USERNAME', 'postgres'),
+            'password' => env('DB_TENANT_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
         ],
 
         'sqlsrv' => [

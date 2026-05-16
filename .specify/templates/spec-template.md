@@ -74,6 +74,7 @@
 
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
+- If feature changes data/infrastructure, how does system behave on backup failure or rollback execution?
 
 ## Requirements *(mandatory)*
 
@@ -89,6 +90,7 @@
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-XXX**: For data/infrastructure-impacting features, the spec MUST define backup, restore validation, and rollback requirements.
 
 *Example of marking unclear requirements:*
 

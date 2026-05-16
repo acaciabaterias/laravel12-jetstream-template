@@ -1,0 +1,89 @@
+groups:
+  - name: erp-core-alerts
+    interval: 30s
+    rules:
+      - alert: ErpCoreDown
+        expr: probe_success{job="erp_http_health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: ERP Core indisponivel
+          description: O endpoint de health do ERP Core nao responde com sucesso ha mais de 2 minutos.
+
+      - alert: ErpCoreHighLatency
+        expr: avg_over_time(probe_duration_seconds{job="erp_http_health"}[5m]) > 1.5
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: ERP Core com latencia elevada
+          description: O endpoint de health do ERP Core esta acima de 1.5s em media nos ultimos 5 minutos.
+
+  - name: microservices-alerts
+    interval: 30s
+    rules:
+      - alert: MicroserviceDown
+        expr: probe_success{job="microservices_http_health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: Microservico indisponivel
+          description: O microservico {{ $labels.service_name }} nao respondeu ao healthcheck HTTP por mais de 2 minutos.
+
+      - alert: MicroserviceHighLatency
+        expr: avg_over_time(probe_duration_seconds{job="microservices_http_health"}[5m]) > 1.5
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: Microservico com latencia elevada
+          description: O microservico {{ $labels.service_name }} esta com latencia media acima de 1.5s nos ultimos 5 minutos.
+
+  - name: infrastructure-alerts
+    interval: 30s
+    rules:
+      - alert: InfrastructureTcpTargetDown
+        expr: probe_success{job="infra_tcp_health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: Dependencia de infraestrutura indisponivel
+          description: O alvo TCP {{ $labels.service_name }} nao esta aceitando conexoes ha mais de 2 minutos.
+
+      - alert: MonitoringStackTargetDown
+        expr: up{job=~"prometheus|cadvisor|blackbox_exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: Componente do stack de monitoramento indisponivel
+          description: O alvo {{ $labels.job }} nao esta sendo coletado com sucesso pelo Prometheus.
+
+      - alert: AppContainerHighCpu
+        expr: sum by (name) (rate(container_cpu_usage_seconds_total{name=~"erp_core_app|erp_core_queue|erp_core_scheduler|ms_00[1-5]_.*"}[5m])) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: Container com CPU elevada
+          description: O container {{ $labels.name }} esta consumindo mais de 0.8 CPU por 10 minutos.
+
+      - alert: AppContainerHighMemory
+        expr: sum by (name) (container_memory_working_set_bytes{name=~"erp_core_app|erp_core_queue|erp_core_scheduler|ms_00[1-5]_.*"}) > 536870912
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: Container com memoria elevada
+          description: O container {{ $labels.name }} ultrapassou 512 MiB de memoria residente por 10 minutos.

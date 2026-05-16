@@ -44,6 +44,8 @@
 - [ ] T020: Implementar retry com `tenacity` (3 tentativas, backoff exponencial 30s/2min/10min)
 - [ ] T021: Implementar registro em `ExtratoCapturaLog` ao final de cada captura (success/error/partial)
 - [ ] T022: Implementar lock distribuído via Redis para evitar execuções simultâneas do mesmo consentimento
+- [ ] T022A: Adaptar eventos, callbacks OAuth e capturas ao envelope canônico do Módulo 010 (`event_version`, `tenant_external_ref`, `correlation_id`, `causation_id`, `idempotency_key`)
+- [ ] T022B: Implementar dead-letter e replay operacional compatíveis com o backbone para capturas e callbacks
 
 ---
 
@@ -74,6 +76,7 @@
 - [ ] T035: Teste E2E OAuth → Captura → Publicação: `CONSENTIMENTO_ATIVO` → cron dispara → `TRANSACOES_CAPTURADAS` publicado
 - [ ] T036: Teste de falha de provider: Pluggy retorna 503 → retry executado → `CAPTURA_ERRO` publicado após 3 falhas
 - [ ] T036A: Teste E2E cronometrado garantindo que o job cron de capturas consiga processar o batch de consentimentos dentro da janela alvo de < 2 min
+- [ ] T036B: Teste de contrato do envelope canônico e replay operacional contra o catálogo do Módulo 010
 
 ---
 
@@ -82,6 +85,7 @@
 - [ ] T037: Criar `Dockerfile` para API FastAPI (multi-stage, imagem slim)
 - [ ] T038: Configurar pipeline CI/CD com testes em ambiente sandbox dos providers
 - [ ] T039: Configurar Prometheus metrics (transações capturadas/h, taxa de deduplicação, latência por provider)
+- [ ] T039A: Registrar endpoints síncronos no gateway do Módulo 010 com timeout, autenticação e rastreio padronizado
 - [ ] T040: Documentar processo de onboarding de novo banco (criação de BancoProvider + adapter)
 - [ ] T041: Criar runbook para renovação manual de consentimento expirado
 - [ ] T042: Executar linting e formatação em todos os arquivos Python modificados (Black + isort + Ruff) antes de cada merge

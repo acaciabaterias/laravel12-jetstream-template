@@ -50,6 +50,8 @@
 - [ ] T026: Implementar `NfCceConsumer.ts` — escuta `NF_CCE_SOLICITAR`
 - [ ] T044: Implementar `NfInutilizarConsumer.ts` — escuta `NF_INUTILIZAR`, chama `AcbrService.inutilizar()` e publica resultado
 - [ ] T027: Implementar publicador de eventos de saída (`NF_AUTORIZADA`, `NF_ERRO`, `NF_EM_CONTINGENCIA`, `NF_CANCELADA`, `NF_CONTINGENCIA_CRITICA`)
+- [ ] T027A: Adaptar consumers e publishers ao envelope canônico do Módulo 010 (`event_version`, `tenant_external_ref`, `correlation_id`, `causation_id`, `idempotency_key`)
+- [ ] T027B: Implementar tratamento de retry, dead-letter e replay operacional compatível com o backbone para eventos fiscais
 
 ---
 
@@ -71,6 +73,7 @@
 - [ ] T036: Teste de idempotência — enviar mesmo `correlation_id` duas vezes, verificar que apenas 1 emissão ocorre
 - [ ] T037: Teste E2E da fila de contingência: simular SEFAZ fora do ar → notas enfileiradas → SEFAZ volta → notas transmitidas
 - [ ] T037A: Teste de carga (performance) usando k6/Artillery, validando latência de autorização em < 3s (p95) e salvamento em contingência em < 1s
+- [ ] T037B: Teste de contrato do envelope canônico e replay operacional contra o catálogo do Módulo 010
 
 ---
 
@@ -80,6 +83,7 @@
 - [ ] T039: Criar `docker-compose.prod.yml` com configurações de produção (restart policies, resource limits)
 - [ ] T040: Configurar pipeline CI/CD (GitHub Actions): lint → build → testes → push Docker image
 - [ ] T041: Configurar Prometheus metrics endpoint + Grafana dashboard template para monitoramento
+- [ ] T041A: Registrar endpoints síncronos no gateway do Módulo 010 com timeout, autenticação e rastreio padronizado
 - [ ] T042: Documentar processo de rotação de certificado A1 (sem downtime)
 - [ ] T043: Criar runbook de troubleshooting para os cenários de contingência
 - [ ] T045: Executar linting e formatação em todos os arquivos TypeScript modificados (ESLint + Prettier) antes de cada merge

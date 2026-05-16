@@ -1,0 +1,97 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: erp-core-web
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: erp-core-web
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: erp-core-web
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: erp-core-queue
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: erp-core-queue
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: erp-core-queue
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ms-001-fiscal-api
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: ms-001-fiscal-api
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ms-001-fiscal-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ms-002-banking-api
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: ms-002-banking-api
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ms-002-banking-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ms-003-notification-api
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: ms-003-notification-api
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ms-003-notification-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ms-004-openfinance-api
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: ms-004-openfinance-api
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ms-004-openfinance-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ms-005-geocoding-api
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: ms-005-geocoding-api
+    app.kubernetes.io/part-of: bateriaexpert
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ms-005-geocoding-api

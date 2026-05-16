@@ -1,37 +1,99 @@
-# Feature Specification: Módulo de Estoque e Logística Reversa
+# Feature Specification: Módulo 004 - Estoque e Logística Reversa
 
 **Feature Branch**: `004-inventory-reverse-logistics`
 **Status**: Ready for Implementation
-**Dependencies**: 001-multi-filial-tenant, 002-users-permissions-rbac, 003-structural-registries
+**Dependências**: Módulo 001 (Multi-Tenancy Isolado), Módulo 002 (RBAC), Módulo 003 (Cadastros Estruturais)
 
-## Overview
-Gestão completa de entradas e saídas de mercadorias físicas (Baterias) e da "Conta Sucata" (logística reversa). Inclui a importação automática de XML de Notas Fiscais para facilitar a entrada de estoque, controle de depósitos/prateleiras e alertas de "Shelf Life" (tempo de prateleira) para evitar que estoques fiquem obsoletos e percam carga.
+## Contexto
+
+Este módulo gerencia entradas, saídas, ajustes, depósitos, importação de XML e conta sucata dentro do banco de dados de cada tenant. O isolamento físico é garantido pelo `TenantConnectionMiddleware` do módulo 001, portanto não existe particionamento lógico por `filial_id`.
+
+## Constitution Mapping
+
+| Principle | How this module satisfies |
+|-----------|--------------------------|
+| Multi-Tenancy Isolado (v2.0.0) | Estoque e logística reversa existem no banco do tenant, sem `filial_id` |
+| Comprehensive Inventory & Reverse Logistics | Controle de estoque, XML, conta sucata e shelf life |
+| Proactive Quality | Auditoria das movimentações e rastreabilidade operacional |
 
 ## Key Entities
-### Movimentação de Estoque
-- **Atributos Base**: Produto (Bateria), Filial, Quantidade, Tipo (Entrada/Saída), Origem (Nota Fiscal, Ajuste, Devolução), Data.
-### Depósitos / Localização
-- **Atributos Base**: Nome (ex: Almoxarifado Principal, Loja, Caminhão), Filial, Status.
-### XML Import
-- **Atributos Base**: Chave NFe, Fornecedor, Status de Importação, Log de Erros.
+
+### Tenant Database
+- **Deposito**: `(id, nome, tipo, status, created_at, updated_at)`
+- **EstoqueMovimentacao**: `(id, bateria_id, deposito_id, user_id, tipo_operacao, origem, quantidade, justificativa, data_movimentacao, created_at, updated_at)`
+- **EstoqueSaldo**: `(id, bateria_id, deposito_id, quantidade_atual, updated_at)`
+- **XmlImportacao**: `(id, chave_nfe, fornecedor_id, status, log_erros, payload_xml, created_at, updated_at)`
+- **ContaSucataMovimentacao**: `(id, entidade_tipo, entidade_id, tipo_movimento, quantidade_kg, valor_unitario, saldo_resultante, origem, created_at)`
+- **AuditLog**: `(id, user_id, action, table_name, record_id, old_values, new_values, ip, user_agent, created_at)`
 
 ## Functional Requirements
-- **FR01 - Múltiplos Depósitos**: Permitir criar depósitos distintos dentro de uma Filial (ex: Loja vs. Caminhão de Entrega).
-- **FR02 - Importação de XML de Fornecedor**: O sistema DEVE permitir upload de XML de NF-e para automatizar a criação de fornecedores (se novos) e adicionar movimentações de entrada de baterias no estoque.
-- **FR03 - Auditoria e Rastreio**: Todas as movimentações de estoque DEVEM gravar histórico (quem fez, quando, motivo).
-- **FR04 - Monitoramento de Shelf Life**: O sistema DEVE calcular os dias em estoque desde a última carga baseada na entrada. Se passar de X dias (configurável), alertar no dashboard.
-- **FR05 - Conta Corrente de Sucata**: O sistema DEVE manter o saldo ("Conta Sucata") não apenas do estoque físico, mas também em formato de crédito/débito para Clientes e Fornecedores.
 
-## User Stories
-1. **Given** um Gestor, **When** ele recebe mercadorias fisicamente, **Then** ele pode fazer upload do XML da nota fiscal e o sistema credita as baterias correspondentes ao estoque da sua filial.
-2. **Given** um produto parado há 6 meses, **When** o Gestor abre o dashboard de Shelf Life, **Then** o sistema exibe a bateria em aviso indicando risco de perda de carga.
-3. **Given** um Estoquista, **When** ele faz um "Ajuste de Estoque" manual, **Then** o sistema exige que ele preencha uma "Justificativa" e grava um Log de Auditoria.
+### FR-INV-01: Múltiplos Depósitos
+- O sistema deve permitir criar depósitos distintos dentro do tenant.
+- O sistema deve permitir separar estoque por depósito, como `loja`, `almoxarifado` e `veiculo_entrega`.
+
+### FR-INV-02: Movimentações de Estoque
+- O sistema deve permitir entradas, saídas, transferências e ajustes de estoque.
+- Toda movimentação deve exigir usuário autenticado e tipo de operação válido.
+- Ajustes manuais devem exigir justificativa obrigatória.
+
+### FR-INV-03: Saldos Consolidados
+- O sistema deve manter saldo consolidado por bateria e depósito.
+- O saldo consolidado deve refletir exatamente o extrato de movimentações.
+- O sistema não deve permitir estoque negativo.
+
+### FR-INV-04: Importação de XML
+- O sistema deve permitir upload de XML de NF-e para automatizar entradas de estoque.
+- O sistema deve associar itens importados às baterias cadastradas no tenant.
+- Quando um item do XML não possuir correspondência, o sistema deve pausar a importação e solicitar vínculo manual ou cadastro rápido.
+
+### FR-INV-05: Shelf Life
+- O sistema deve monitorar o tempo em estoque das baterias com base na última entrada válida.
+- O sistema deve alertar itens acima do limite configurado no dashboard.
+
+### FR-INV-06: Conta Sucata
+- O sistema deve manter débito e crédito de sucata para clientes e fornecedores.
+- O sistema deve registrar origem, quantidade, valor unitário e saldo resultante.
+
+### FR-INV-07: Auditoria e Rastreio
+- Todas as movimentações de estoque e conta sucata devem ser auditadas.
+- O log deve conter usuário, ação, entidade afetada, valores antes e depois, IP e user agent.
+
+## User Scenarios
+
+### US01: Entrada por XML
+**Given** que um gestor autenticado recebe mercadorias  
+**When** ele faz upload do XML da nota fiscal  
+**Then** o sistema importa os itens compatíveis, cria movimentações de entrada e atualiza os saldos do tenant
+
+### US02: Ajuste manual
+**Given** que um estoquista autenticado identifica divergência física  
+**When** ele registra um ajuste manual  
+**Then** o sistema exige justificativa, grava a movimentação e atualiza o saldo sem permitir valor negativo
+
+### US03: Alerta de shelf life
+**Given** que uma bateria está parada acima do limite configurado  
+**When** o gestor acessa o dashboard  
+**Then** o sistema exibe o alerta de shelf life para ação operacional
 
 ## Edge Cases
-- **Baterias não cadastradas no XML**: Se o XML contiver códigos/EANs que ainda não existem no módulo Cadastros (`003`), o sistema deve pausar a importação e solicitar o de/para ou o cadastro rápido.
-- **Estoque Negativo**: O sistema NÃO pode permitir ajustes ou saídas que deixem o estoque negativo na filial sob nenhuma hipótese.
+
+- XML com produto não mapeado deve pausar o processamento e exigir confirmação manual.
+- Saída ou ajuste que resulte em saldo negativo deve ser bloqueado.
+- Transferência entre depósitos deve falhar se o depósito de origem não possuir saldo suficiente.
+- Exclusão de depósito com saldo ativo deve ser bloqueada ou exigir esvaziamento prévio.
+- Reprocessamento do mesmo XML deve impedir duplicidade por `chave_nfe`.
 
 ## Success Criteria
-- **SC01**: Importação de 1 XML mediano (até 50 itens) ocorre em menos de 5 segundos.
-- **SC02**: O saldo consolidado em tempo real deve bater estritamente o somatório exato do extrato de movimentações (princípio de event-sourcing para rastreio).
-- **SC03**: Movimentações só podem afetar produtos e depósitos atrelados rigidamente à `filial_id` atual do usuário no momento da sessão.
+
+- **SC-INV-01**: Importação de XML com até 50 itens conclui em menos de 5 segundos.
+- **SC-INV-02**: Saldos consolidados batem exatamente com o extrato de movimentações.
+- **SC-INV-03**: Nenhuma operação permite estoque negativo.
+- **SC-INV-04**: Alertas de shelf life aparecem no dashboard em menos de 2 segundos.
+- **SC-INV-05**: 100% das movimentações de estoque e sucata são auditadas.
+
+## Dependencies
+
+- Módulo 001 (Multi-Tenancy Isolado) para `TenantConnectionMiddleware`
+- Módulo 002 (RBAC) para autenticação e permissões
+- Módulo 003 (Cadastros Estruturais) para baterias, fornecedores e clientes

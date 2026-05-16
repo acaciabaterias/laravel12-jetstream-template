@@ -8,6 +8,8 @@
     "require": {
         "php": "^8.3",
         "archtechx/laravel-seo": "^0.10.3",
+        "darkaonline/l5-swagger": "^11.0",
+        "doctrine/annotations": "^2.0",
         "filament/actions": "^5.2",
         "filament/forms": "^5.2",
         "filament/infolists": "^5.2",
@@ -19,9 +21,12 @@
         "laravel/pennant": "^1.19",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
-        "livewire/livewire": "^4.1"
+        "livewire/livewire": "^4.1",
+        "livewire/volt": "^1.10",
+        "spatie/laravel-prometheus": "^1.4"
     },
     "require-dev": {
+        "brianium/paratest": "^7.8",
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^2.1",
         "laravel/pail": "^1.2.2",
@@ -36,7 +41,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -76,6 +84,9 @@
     },
     "config": {
         "optimize-autoloader": true,
+        "platform": {
+            "php": "8.3.30"
+        },
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {

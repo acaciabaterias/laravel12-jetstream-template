@@ -1,0 +1,50 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: erp-core-web
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: erp-core-web
+    app.kubernetes.io/part-of: bateriaexpert
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: erp-core-web
+  namespaceSelector:
+    matchNames:
+      - bateriaexpert
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: microservices
+  namespace: bateriaexpert
+  labels:
+    app.kubernetes.io/name: microservices
+    app.kubernetes.io/part-of: bateriaexpert
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - ms-001-fiscal-api
+          - ms-002-banking-api
+          - ms-003-notification-api
+          - ms-004-openfinance-api
+          - ms-005-geocoding-api
+  namespaceSelector:
+    matchNames:
+      - bateriaexpert
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s

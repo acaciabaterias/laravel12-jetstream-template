@@ -1,0 +1,266 @@
+services:
+  erp_core_app:
+    image: bateriaexpert/erp:latest
+    env_file:
+      - ./.env.example
+      - ./.env
+    environment:
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      DB_CONNECTION: central
+      DB_CENTRAL_DRIVER: pgsql
+      DB_CENTRAL_HOST: ${DB_CENTRAL_HOST:-erp_core_db}
+      DB_CENTRAL_PORT: ${DB_CENTRAL_PORT:-5432}
+      DB_CENTRAL_DATABASE: ${DB_CENTRAL_DATABASE:-erp_central}
+      DB_CENTRAL_USERNAME: ${DB_CENTRAL_USERNAME:-erp}
+      DB_CENTRAL_PASSWORD: ${DB_CENTRAL_PASSWORD:-erp}
+      REDIS_HOST: ${REDIS_HOST:-erp_core_redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      CACHE_STORE: redis
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: redis
+      RUN_MIGRATIONS: "false"
+      MS_FISCAL_URL: http://ms_001_fiscal_api:8001
+      MS_BANCARIO_URL: http://ms_002_banking_api:8002
+      MS_WHATSAPP_URL: http://ms_003_notification_api:8003
+      MS_OPENFINANCE_URL: http://ms_004_openfinance_api:8004
+      MS_GEOCODING_URL: http://ms_005_geocoding_api:8005
+    ports:
+      - target: 80
+        published: 8000
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - erp_core_storage:/var/www/html/storage
+      - erp_core_public_build:/var/www/html/public/build
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  erp_core_queue:
+    image: bateriaexpert/erp:latest
+    env_file:
+      - ./.env.example
+      - ./.env
+    environment:
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      DB_CONNECTION: central
+      DB_CENTRAL_DRIVER: pgsql
+      DB_CENTRAL_HOST: ${DB_CENTRAL_HOST:-erp_core_db}
+      DB_CENTRAL_PORT: ${DB_CENTRAL_PORT:-5432}
+      DB_CENTRAL_DATABASE: ${DB_CENTRAL_DATABASE:-erp_central}
+      DB_CENTRAL_USERNAME: ${DB_CENTRAL_USERNAME:-erp}
+      DB_CENTRAL_PASSWORD: ${DB_CENTRAL_PASSWORD:-erp}
+      REDIS_HOST: ${REDIS_HOST:-erp_core_redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      CACHE_STORE: redis
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: redis
+      RUN_MIGRATIONS: "false"
+    command: ["php", "artisan", "queue:work", "--queue=audit,default", "--verbose", "--tries=3", "--timeout=120"]
+    volumes:
+      - erp_core_storage:/var/www/html/storage
+      - erp_core_public_build:/var/www/html/public/build
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  erp_core_scheduler:
+    image: bateriaexpert/erp:latest
+    env_file:
+      - ./.env.example
+      - ./.env
+    environment:
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      DB_CONNECTION: central
+      DB_CENTRAL_DRIVER: pgsql
+      DB_CENTRAL_HOST: ${DB_CENTRAL_HOST:-erp_core_db}
+      DB_CENTRAL_PORT: ${DB_CENTRAL_PORT:-5432}
+      DB_CENTRAL_DATABASE: ${DB_CENTRAL_DATABASE:-erp_central}
+      DB_CENTRAL_USERNAME: ${DB_CENTRAL_USERNAME:-erp}
+      DB_CENTRAL_PASSWORD: ${DB_CENTRAL_PASSWORD:-erp}
+      REDIS_HOST: ${REDIS_HOST:-erp_core_redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      CACHE_STORE: redis
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: redis
+      RUN_MIGRATIONS: "false"
+    command: ["sh", "-c", "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
+    volumes:
+      - erp_core_storage:/var/www/html/storage
+      - erp_core_public_build:/var/www/html/public/build
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  ms_001_fiscal_api:
+    image: bateriaexpert/ms-001-fiscal-acbr:latest
+    env_file:
+      - ./microservicos/ms-001-fiscal-acbr/.env.example
+      - ./microservicos/ms-001-fiscal-acbr/.env
+    ports:
+      - target: 8001
+        published: 8001
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  ms_001_acbr_server:
+    image: alpine:3.20
+    command: ["sh", "-c", "while true; do sleep 3600; done"]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  ms_002_banking_api:
+    image: bateriaexpert/ms-002-bancario:latest
+    env_file:
+      - ./microservicos/ms-002-bancario/.env.example
+      - ./microservicos/ms-002-bancario/.env
+    ports:
+      - target: 8002
+        published: 8002
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  ms_003_notification_api:
+    image: bateriaexpert/ms-003-whatsapp-n8n:latest
+    env_file:
+      - ./microservicos/ms-003-whatsapp-n8n/.env.example
+      - ./microservicos/ms-003-whatsapp-n8n/.env
+    ports:
+      - target: 8003
+        published: 8003
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  ms_003_n8n:
+    image: n8nio/n8n:latest
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_DATABASE: ms_whatsapp
+      DB_POSTGRESDB_HOST: ${DB_CENTRAL_HOST:-erp_core_db}
+      DB_POSTGRESDB_PORT: ${DB_CENTRAL_PORT:-5432}
+      DB_POSTGRESDB_USER: ${DB_CENTRAL_USERNAME:-erp}
+      DB_POSTGRESDB_PASSWORD: ${DB_CENTRAL_PASSWORD:-erp}
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD:-change-me}
+      WEBHOOK_URL: ${N8N_WEBHOOK_URL:-http://localhost:5678/}
+    ports:
+      - target: 5678
+        published: 5678
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - ms_003_n8n_data:/home/node/.n8n
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  ms_003_evolution:
+    image: atendai/evolution-api:v2
+    environment:
+      SERVER_TYPE: http
+      SERVER_PORT: 8080
+      DATABASE_ENABLED: "true"
+      DATABASE_CONNECTION_URI: postgres://${DB_CENTRAL_USERNAME:-erp}:${DB_CENTRAL_PASSWORD:-erp}@${DB_CENTRAL_HOST:-erp_core_db}:${DB_CENTRAL_PORT:-5432}/ms_whatsapp
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://${REDIS_HOST:-erp_core_redis}:${REDIS_PORT:-6379}
+      AUTHENTICATION_TYPE: apikey
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-change-me}
+      WEBHOOK_GLOBAL_URL: http://ms_003_n8n:5678/webhook/evolution
+      WEBHOOK_GLOBAL_ENABLED: "true"
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  ms_004_openfinance_api:
+    image: bateriaexpert/ms-004-openfinance:latest
+    env_file:
+      - ./microservicos/ms-004-openfinance/.env.example
+      - ./microservicos/ms-004-openfinance/.env
+    ports:
+      - target: 8004
+        published: 8004
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+  ms_005_geocoding_api:
+    image: bateriaexpert/ms-005-geocoding:latest
+    env_file:
+      - ./microservicos/ms-005-geocoding/.env.example
+      - ./microservicos/ms-005-geocoding/.env
+    ports:
+      - target: 8005
+        published: 8005
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - network_swarm_public
+
+volumes:
+  erp_core_storage:
+  erp_core_public_build:
+  ms_003_n8n_data:
+
+networks:
+  network_swarm_public:
+    external: true

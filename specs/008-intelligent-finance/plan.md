@@ -1,13 +1,150 @@
-# Implementation Plan: Módulo Financeiro Inteligente
+# Implementation Plan: Módulo 008 - Financeiro Inteligente
 
 **Branch**: `008-intelligent-finance`
 **Input**: Feature specification from `/specs/008-intelligent-finance/spec.md`
 
 ## Technical Context
-**Primary Dependencies**: Laravel 12, PWA + Livewire 4, Commands Schedulers (Background Jobs para Batimentos API de Contas via Redis), Chart.js (Dashboards Financeiros em Tempo Real).
-**Storage**: PostgreSQL 15, com recurso de Views ou Materialized Views para agregações extremas de KPIs.
 
-## Project Structure
-- **Worker Padrões via Scheduler Command**: Para obedecer a meta de `Conciliação Automática`, um Scheduler de Cron no Laravel (`php artisan schedule:run` acionado todo dia no container) irá ler a credencial `token_api` inserida pela loja e submeter pools para listar transações (`Asaas/Bank API`). Match de valores idênticos darão baixa local sem intervenção visual.
-- **Isolamento via Observers e Faturamento Condicional (FR-FIN-04)**: Uma responsabilidade forte do sistema é ativada no Event/Observer do modelo `OrdemServicoGarantia` atrelada ao (Mód 007). Quando houverem updates preenchendo o status de $model->laudo como "Improcedente", a base emitirá uma Factory Request engatilhando um débito avulso imediato dentro da Tabela `transacoes_financeiras`, acoplado ao `cliente_id`, finalizando a malha de arquitetura SOLID limpíssima intermódulos.
-- **Consolidação de Múltiplos Custos (FR-FIN-03)**: A performance da Métrica "Margem de Lucro Real" não será atingida se dependermos de `SUM()` de relatórios na run-time. Modelaremos Materialized Views (PGSQL) ou uma Base Aggregator Scheduled espelhando a soma dos campos em uma tabela quente para agilizar SC-FIN-02 na UI.
+**Stack**: Laravel 12, Livewire 4, PostgreSQL (tenants), Redis queues, HTTP integrations, analytical views/materialized data  
+**Authentication**: Resolvida pelo módulo 002  
+**Database Isolation**: `TenantConnectionMiddleware` do módulo 001
+
+## Constitution Check
+
+| Principle | Status | Evidence |
+|-----------|--------|----------|
+| Multi-Tenancy Isolado (v2.0.0) | PASS | Contas e transações financeiras vivem no banco do tenant, sem `filial_id` |
+| Automated Financial Microservices | PASS | Integração bancária, conciliação e jobs assíncronos modelados |
+| Proactive Quality & Customer Service | PASS | Cobrança automática de improcedência e alertas de falha |
+| RBAC | PASS | Fluxos financeiros previstos com controle de acesso |
+
+## Database Structure (Tenant Database)
+
+```sql
+CREATE TABLE contas_bancarias (
+    id BIGSERIAL PRIMARY KEY,
+    banco VARCHAR(100) NOT NULL,
+    agencia VARCHAR(30) NOT NULL,
+    conta VARCHAR(50) NOT NULL,
+    tipo VARCHAR(30) NOT NULL,
+    token_api TEXT,
+    status VARCHAR(30) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE transacoes_financeiras (
+    id BIGSERIAL PRIMARY KEY,
+    conta_bancaria_id BIGINT NOT NULL REFERENCES contas_bancarias(id),
+    tipo VARCHAR(30) NOT NULL,
+    valor DECIMAL(12,2) NOT NULL,
+    data_transacao TIMESTAMP NOT NULL,
+    status_conciliado VARCHAR(30) NOT NULL,
+    origem_tipo VARCHAR(50),
+    origem_id BIGINT,
+    descricao TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE fluxo_caixa_projetado (
+    id BIGSERIAL PRIMARY KEY,
+    data_referencia DATE NOT NULL,
+    saldo_inicial DECIMAL(12,2) NOT NULL,
+    total_receber DECIMAL(12,2) NOT NULL,
+    total_pagar DECIMAL(12,2) NOT NULL,
+    saldo_projetado DECIMAL(12,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE margens_lucro_reais (
+    id BIGSERIAL PRIMARY KEY,
+    bateria_id BIGINT NOT NULL REFERENCES baterias(id),
+    periodo_inicio DATE NOT NULL,
+    periodo_fim DATE NOT NULL,
+    valor_venda DECIMAL(12,2) NOT NULL,
+    custo_aquisicao DECIMAL(12,2) NOT NULL,
+    frete DECIMAL(12,2) DEFAULT 0,
+    imposto DECIMAL(12,2) DEFAULT 0,
+    comissao DECIMAL(12,2) DEFAULT 0,
+    margem_calculada DECIMAL(12,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE conciliacoes_pendentes (
+    id BIGSERIAL PRIMARY KEY,
+    transacao_financeira_id BIGINT NOT NULL REFERENCES transacoes_financeiras(id),
+    motivo TEXT NOT NULL,
+    payload_bancario JSONB,
+    status VARCHAR(30) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE fechamentos_contabeis (
+    id BIGSERIAL PRIMARY KEY,
+    competencia VARCHAR(7) NOT NULL UNIQUE,
+    status VARCHAR(30) NOT NULL,
+    fechado_em TIMESTAMP,
+    fechado_por BIGINT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    table_name VARCHAR(100) NOT NULL,
+    record_id BIGINT NOT NULL,
+    old_values JSONB,
+    new_values JSONB,
+    ip INET,
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+## Directory Structure
+
+```text
+app/
+├── Models/
+│   ├── ContaBancaria.php
+│   ├── TransacaoFinanceira.php
+│   ├── FluxoCaixaProjetado.php
+│   ├── MargemLucroReal.php
+│   ├── ConciliacaoPendente.php
+│   ├── FechamentoContabil.php
+│   └── AuditLog.php
+├── Livewire/
+│   ├── FinanceDashboard.php
+│   ├── CashFlowPanel.php
+│   └── MarginAnalysisGrid.php
+├── Jobs/
+│   ├── SyncBankTransactionsJob.php
+│   └── RebuildReturnChargeJob.php
+├── Services/
+│   ├── BankApiClient.php
+│   ├── FinanceMatcherProcessor.php
+│   └── ClosingPeriodGuard.php
+└── Traits/
+    └── Auditable.php
+
+database/migrations/tenant/
+├── 2026_xx_xx_000001_create_contas_bancarias_table.php
+├── 2026_xx_xx_000002_create_transacoes_financeiras_table.php
+├── 2026_xx_xx_000003_create_fluxo_caixa_projetado_table.php
+├── 2026_xx_xx_000004_create_margens_lucro_reais_table.php
+├── 2026_xx_xx_000005_create_conciliacoes_pendentes_table.php
+├── 2026_xx_xx_000006_create_fechamentos_contabeis_table.php
+└── 2026_xx_xx_000007_create_audit_logs_table.php
+```
+
+## Design Notes
+
+- Este módulo NÃO deve usar `filial_id`, `branch_id`, `Global Scope`, `HasFilial` ou `MultiTenantScope`.
+- Integrações bancárias devem ser assíncronas e resilientes a falhas de token ou API.
+- Cálculos analíticos pesados podem usar visão materializada, tabela agregada ou rebuild assíncrono, mas sempre dentro do banco do tenant.

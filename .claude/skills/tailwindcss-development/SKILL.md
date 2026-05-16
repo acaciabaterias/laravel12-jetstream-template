@@ -1,6 +1,6 @@
 ---
 name: tailwindcss-development
-description: "Styles applications using Tailwind CSS v3 utilities. Activates when adding styles, restyling components, working with gradients, spacing, layout, flex, grid, responsive design, dark mode, colors, typography, or borders; or when the user mentions CSS, styling, classes, Tailwind, restyle, hero section, cards, buttons, or any visual/UI changes."
+description: "Styles applications using Tailwind CSS v4 utilities. Activates when adding styles, restyling components, working with gradients, spacing, layout, flex, grid, responsive design, dark mode, colors, typography, or borders; or when the user mentions CSS, styling, classes, Tailwind, restyle, hero section, cards, buttons, or any visual/UI changes."
 license: MIT
 metadata:
   author: laravel
@@ -11,6 +11,7 @@ metadata:
 ## When to Apply
 
 Activate this skill when:
+
 - Adding styles to components or pages
 - Working with responsive design
 - Implementing dark mode
@@ -19,7 +20,7 @@ Activate this skill when:
 
 ## Documentation
 
-Use `search-docs` for detailed Tailwind CSS v3 patterns and documentation.
+Use `search-docs` for detailed Tailwind CSS v4 patterns and documentation.
 
 ## Basic Usage
 
@@ -27,18 +28,11 @@ Use `search-docs` for detailed Tailwind CSS v3 patterns and documentation.
 - Offer to extract repeated patterns into components that match the project's conventions (e.g., Blade, JSX, Vue).
 - Consider class placement, order, priority, and defaults. Remove redundant classes, add classes to parent or child elements carefully to reduce repetition, and group elements logically.
 
-## Tailwind CSS v3 Specifics
+## Tailwind CSS v4 specifics
 
-- Always use Tailwind CSS v3 and verify you're using only classes it supports.
-- Configuration is done in the `tailwind.config.js` file.
-- Import using `@tailwind` directives:
-
-<!-- v3 Import Syntax -->
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-```
+- This application uses Tailwind CSS v4 with Vite (`@tailwindcss/vite`). Primary entry is `resources/css/app.css` with `@import 'tailwindcss'`, `@theme`, `@source`, and `@plugin` as used there.
+- A `tailwind.config.js` file may coexist for extended theme wiring or legacy content paths—follow existing Blade and `@layer`/`@apply` patterns before introducing new globals.
+- Use `search-docs` to validate utilities against v4; avoid assuming v3-only `@tailwind base/components/utilities` snippets unless the codebase already relies on them for the surface you edit.
 
 ## Spacing
 
@@ -98,3 +92,4 @@ If existing pages and components support dark mode, new pages and components mus
 - Forgetting to add dark mode variants when the project uses dark mode
 - Not checking existing project conventions before adding new utilities
 - Overusing inline styles when Tailwind classes would suffice
+- Copying Tailwind v3 configuration or `@tailwind` import examples without checking this app's v4 setup

@@ -8,15 +8,17 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Foundational Context
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.4
+- php - 8.3.30
 - laravel/fortify (FORTIFY) - v1
 - laravel/framework (LARAVEL) - v12
+- laravel/jetstream (JETSTREAM) - v5
 - laravel/prompts (PROMPTS) - v0
 - laravel/sanctum (SANCTUM) - v4
-- livewire/livewire (LIVEWIRE) - v3
+- livewire/livewire (LIVEWIRE) - v4
+- filament/actions, filament/forms, filament/infolists, filament/notifications, filament/tables (FILAMENT packages) - v5
 - laravel/pint (PINT) - v1
 - laravel/sail (SAIL) - v1
-- tailwindcss (TAILWINDCSS) - v3
+- tailwindcss (TAILWINDCSS) - v4
 
 
 ## Conventions
@@ -66,7 +68,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - You must use this tool to search for Laravel-ecosystem documentation before falling back to other approaches.
 - Search the documentation before making code changes to ensure we are taking the correct approach.
 - Use multiple, broad, simple, topic based queries to start. For example: `['rate limiting', 'routing rate limiting', 'routing']`.
-- Do not add package names to queries - package information is already shared. For example, use `test resource table`, not `filament 4 test resource table`.
+- Do not add package names to queries - package information is already shared. For example, use `test resource table`, not `filament test resource table`.
 
 ### Available Search Syntax
 - You can and should pass multiple queries at once. The most relevant results will be returned first.
@@ -199,7 +201,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
     @endforeach
     ```
 
-- Prefer lifecycle hooks like `mount()`, `updatedFoo()`) for initialization and reactive side effects:
+- Prefer lifecycle hooks like `mount()`, `updatedFoo()` for initialization and reactive side effects:
 
 <code-snippet name="Lifecycle hook examples" lang="php">
     public function mount(User $user) { $this->user = $user; }
@@ -225,14 +227,14 @@ protected function isAccessible(User $user, ?string $path = null): bool
     </code-snippet>
 
 
-=== livewire/v3 rules ===
+=== livewire/v4 rules ===
 
-## Livewire 3
+## Livewire 4
 
-### Key Changes From Livewire 2
-- These things changed in Livewire 2, but may not have been updated in this application. Verify this application's setup to ensure you conform with application conventions.
-    - Use `wire:model.live` for real-time updates, `wire:model` is now deferred by default.
-    - Components now use the `App\Livewire` namespace (not `App\Http\Livewire`).
+### Conventions (modern Livewire stack)
+- This application targets Livewire 4. Patterns below reflect the modern stack (Livewire 3+); verify with documentation when unsure.
+    - Use `wire:model.live` for real-time updates; `wire:model` is deferred by default.
+    - Components use the `App\Livewire` namespace (not `App\Http\Livewire`).
     - Use `$this->dispatch()` to dispatch events (not `emit` or `dispatchBrowserEvent`).
     - Use the `components.layouts.app` view as the typical layout path (not `layouts.app`).
 
@@ -294,11 +296,13 @@ document.addEventListener('livewire:init', function () {
 - If existing pages and components support dark mode, new pages and components must support dark mode in a similar way, typically using `dark:`.
 
 
-=== tailwindcss/v3 rules ===
+=== tailwindcss/v4 rules ===
 
-## Tailwind 3
+## Tailwind 4
 
-- Always use Tailwind CSS v3 - verify you're using only classes supported by this version.
+- This project uses Tailwind CSS v4 with Vite (`@tailwindcss/vite`). The main entry is `resources/css/app.css` using `@import 'tailwindcss'`, `@theme`, `@source`, and `@plugin` as needed.
+- There may still be a `tailwind.config.js` for content paths or theme extension; prefer matching existing patterns in this repo before adding new configuration surfaces.
+- Confirm utilities against Tailwind v4 documentation before relying on snippets written for older major versions.
 
 
 === tests rules ===
@@ -308,3 +312,8 @@ document.addEventListener('livewire:init', function () {
 - Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
 - Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test` with a specific filename or filter.
 </laravel-boost-guidelines>
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
