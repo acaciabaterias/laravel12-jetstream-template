@@ -1,10 +1,11 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v1.9.0 - pronto para lançamento assistido com executive reporting consolidado)
+## Status Atual (v2.0.0-beta - módulo 020 concluído)
 
-✅ 19 módulos implementados (`001` a `019`)
+✅ 20 módulos implementados (`001` a `020`)
+✅ módulo `020` concluído com jornadas adaptativas, experimentos governados e rollback auditável
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `433` testes passando, `1 skipped` e `2315` assertions
+✅ suíte principal estabilizada com `455` testes passando, `1 skipped` e `2424` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
@@ -60,14 +61,16 @@
 - [x] Identidade visual centralizada, tema versionado e publicação auditável por tenant
 - [x] Rollback visual governado com restauração segura do shell administrativo
 
-## Executive reporting concluído e próximo módulo sugerido
+## Executive reporting e automação avançada concluídos
 
 - [x] Módulo `019` - Executive Reporting Hub
 - [x] Dashboard executivo super admin com filtros reutilizáveis e drill-down operacional
 - [x] Relatórios avançados com exportação Excel e PDF auditável
 - [x] Histórico central e reexecução governada de relatórios executivos
-- [ ] Módulo `020` - Advanced Revenue Recovery Automation
-- [ ] Automação avançada de cobrança e recuperação de receita
+- [x] Módulo `020` - Advanced Revenue Recovery Automation
+- [x] Jornadas adaptativas com fallback, cooldown, supressão e dispatch idempotente
+- [x] Publicação governada de políticas com experimento, holdout e trilha auditável
+- [x] Inspeção central e rollback auditável para a última política saudável
 
 ## Fase 1: Estabilização e Produção (v1.4.0)
 
@@ -82,7 +85,7 @@
  - [x] White label avançado com temas customizáveis
 - [x] Dashboard analítico para Super Admin
 - [x] Relatórios avançados com exportação Excel e PDF
-- [ ] Automação avançada de cobrança e recuperação de receita
+- [x] Automação avançada de cobrança e recuperação de receita
 
 ## Fase 3: Internacionalização (v2.0.0)
 

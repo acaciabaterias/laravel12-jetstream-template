@@ -208,6 +208,12 @@ Valide fluxos manuais minimos:
 - dashboard central de recovery em `/admin/recovery`
 - operação manual de recovery em `/admin/recovery/operacoes`
 - inspeção de recovery em `/admin/recovery/inspection`
+- dashboard central de automação avançada em `/admin/recovery/automation`
+- inspeção de automação em `/admin/recovery/automation/inspection?policy_status=active`
+- publicação controlada de política com variante e holdout no painel de automação
+- avaliação de jornada com fallback e supressão sem duplicar dispatch do mesmo caso
+- rollback governado de política degradada com conferência do `restored_policy_version_id`
+- conferência de publicação dos eventos `POLITICA_AUTOMACAO_RECUPERACAO_PUBLICADA` e `ROLLBACK_AUTOMACAO_RECUPERACAO_EXECUTADO` no backbone `010`
 - dashboard central de analytics comercial em `/admin/analytics`
 - inspeção analítica em `/admin/analytics/inspection`
 - rebuild controlado do snapshot via `php artisan analytics:rebuild-platform-commercial-snapshot --days=30`
@@ -360,6 +366,27 @@ Se o deploy introduzir regressão na leitura operacional central:
   - `casos_recuperacao_receita.status` alinhado ao último estado comercial esperado
   - `acoes_recuperacao_receita` sem duplicidade indevida por estágio/canal
   - `compromissos_pagamento.status` e `suspends_until` coerentes com o último acordo válido
+
+### Rollback operacional do módulo 020
+
+Se o deploy introduzir automação degradada, variante incorreta ou jornada duplicada:
+
+- restaurar o dump do banco central anterior ao deploy quando a inconsistência afetar múltiplas políticas ou a trilha auditável
+- revisar `recovery_automation_policy_versions`, `recovery_automation_journeys`, `recovery_automation_dispatches`, `recovery_automation_experiments` e `recovery_automation_violations`
+- verificar se a política ativa pode ser revertida pelo painel `/admin/recovery/automation` sem restore completo
+- executar rollback explícito informando motivo operacional claro e baseline restaurado
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/AdvancedRecoveryAutomationJourneyTest.php`
+  - `php artisan test --compact tests/Feature/AdvancedRecoveryAutomationPublicationTest.php`
+  - `php artisan test --compact tests/Feature/AdvancedRecoveryAutomationInspectionTest.php`
+  - `php artisan test --compact tests/Feature/AdvancedRecoveryAutomationRollbackTest.php`
+  - `php artisan test --compact tests/Feature/AdvancedRecoveryAutomationGovernanceTest.php`
+- confirmar auditoria mínima:
+  - `evento_outboxes.event_type in ('POLITICA_AUTOMACAO_RECUPERACAO_PUBLICADA', 'ROLLBACK_AUTOMACAO_RECUPERACAO_EXECUTADO')`
+  - `recovery_automation_policy_versions.status` consistente com a política ativa, superseded ou rolled_back
+  - `recovery_automation_journeys.metadata.rollback_context.restored_policy_version_id` apontando para a política saudável restaurada
+  - `recovery_automation_experiments.status` consistente com a política publicada e o holdout configurado
+  - `recovery_automation_violations.resolution_status` refletindo `rolled_back` quando a reversão encerrou a violação crítica
 
 Com K6, quando aplicavel:
 

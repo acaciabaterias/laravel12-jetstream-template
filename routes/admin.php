@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdvancedRecoveryAutomationInspectionController;
 use App\Http\Controllers\Admin\AdvancedWhiteLabelInspectionController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\BackboneMonitoringInspectionController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\PlatformPaymentsInspectionController;
 use App\Http\Controllers\Admin\PlatformRevenueRecoveryInspectionController;
 use App\Http\Controllers\Admin\ProductionObservabilityInspectionController;
 use App\Http\Middleware\PlatformAdminMiddleware;
+use App\Livewire\Admin\AdvancedRecoveryAutomationManager;
 use App\Livewire\Admin\AdvancedWhiteLabelDashboard;
 use App\Livewire\Admin\BackboneMonitoringDashboard;
 use App\Livewire\Admin\CriticalLoadOptimizationDashboard;
@@ -54,6 +56,8 @@ Route::name('admin.')->group(function () {
         Route::get('/payments/inspection', PlatformPaymentsInspectionController::class)->name('payments.inspection');
         Route::get('/recovery', PlatformRevenueRecoveryDashboard::class)->name('recovery.index');
         Route::get('/recovery/operacoes', PlatformRevenueRecoveryManager::class)->name('recovery.operations');
+        Route::get('/recovery/automation', AdvancedRecoveryAutomationManager::class)->name('recovery.automation');
+        Route::get('/recovery/automation/inspection', AdvancedRecoveryAutomationInspectionController::class)->name('recovery.automation.inspection');
         Route::get('/recovery/inspection', PlatformRevenueRecoveryInspectionController::class)->name('recovery.inspection');
         Route::get('/analytics', PlatformCommercialAnalyticsDashboard::class)->name('analytics.index');
         Route::get('/analytics/inspection', PlatformCommercialAnalyticsInspectionController::class)->name('analytics.inspection');

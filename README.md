@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-421%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-455%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -38,6 +38,7 @@ Os modulos core cobrem:
 - recuperacao de receita e dunning central
 - analytics comercial central
 - hub executivo central com exportação auditável
+- automacao avancada de recuperacao com experimento e rollback governado
 
 ## Arquitetura
 
@@ -164,6 +165,15 @@ O modulo `019` fecha a camada executiva de consumo da informacao:
 - exportacao Excel/PDF auditavel a partir do mesmo recorte analitico
 - historico central de geracoes e reexecucoes com `scope_summary`, operador e snapshot associado
 - eventos materiais publicados no backbone `010` para geracao, reexecucao e falha
+
+## Advanced Revenue Recovery Automation
+
+O modulo `020` fecha a camada adaptativa de cobranca central:
+
+- jornadas automaticas com fallback por canal, cooldown e supressao reutilizando os casos do modulo `013`
+- politicas versionadas com publicacao governada, experimento controlado e holdout persistente por jornada
+- rollback auditavel para a ultima politica saudavel com marcacao explicita das jornadas afetadas
+- dashboard `/admin/recovery/automation` e inspecao `/admin/recovery/automation/inspection`
 
 ## Stack
 
@@ -314,6 +324,15 @@ php artisan test --compact tests/Feature/ProductionObservabilityDashboardTest.ph
 php artisan test --compact tests/Feature/ProductionObservabilitySnapshotTest.php
 php artisan test --compact tests/Feature/ProductionObservabilityLoadBaselineTest.php
 php artisan test --compact tests/Feature/ProductionObservabilityIncidentInspectionTest.php
+```
+
+Para o recorte de automacao avancada do modulo `020`, os testes chave incluem:
+
+```bash
+php artisan test --compact tests/Feature/AdvancedRecoveryAutomationJourneyTest.php
+php artisan test --compact tests/Feature/AdvancedRecoveryAutomationPublicationTest.php
+php artisan test --compact tests/Feature/AdvancedRecoveryAutomationInspectionTest.php
+php artisan test --compact tests/Feature/AdvancedRecoveryAutomationGovernanceTest.php
 ```
 
 ### Documentação da API (OpenAPI/Swagger)

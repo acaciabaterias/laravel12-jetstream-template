@@ -51,6 +51,11 @@ use App\Models\PlanoComercial;
 use App\Models\PoliticaInadimplencia;
 use App\Models\PoliticaRecuperacaoReceita;
 use App\Models\RecorteCoorteComercial;
+use App\Models\RecoveryAutomationDispatch;
+use App\Models\RecoveryAutomationExperiment;
+use App\Models\RecoveryAutomationJourney;
+use App\Models\RecoveryAutomationPolicyVersion;
+use App\Models\RecoveryAutomationViolation;
 use App\Models\ReservaEstoque;
 use App\Models\RetornoPagamentoSaaS;
 use App\Models\RunbookExecutionEvidence;
@@ -64,6 +69,7 @@ use App\Models\TuningChangeRecord;
 use App\Models\User;
 use App\Models\UsuarioPlataforma;
 use App\Models\Vale;
+use App\Policies\AdvancedRevenueRecoveryAutomationPolicy;
 use App\Policies\AdvancedWhiteLabelPolicy;
 use App\Policies\BackboneMonitoringPolicy;
 use App\Policies\BoletoOrquestradoPolicy;
@@ -149,6 +155,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(AcaoRecuperacaoReceita::class, PlatformRevenueRecoveryPolicy::class);
         Gate::policy(CompromissoPagamento::class, PlatformRevenueRecoveryPolicy::class);
         Gate::policy(IndicadorRecuperacaoReceita::class, PlatformRevenueRecoveryPolicy::class);
+        Gate::policy(RecoveryAutomationPolicyVersion::class, AdvancedRevenueRecoveryAutomationPolicy::class);
+        Gate::policy(RecoveryAutomationJourney::class, AdvancedRevenueRecoveryAutomationPolicy::class);
+        Gate::policy(RecoveryAutomationDispatch::class, AdvancedRevenueRecoveryAutomationPolicy::class);
+        Gate::policy(RecoveryAutomationExperiment::class, AdvancedRevenueRecoveryAutomationPolicy::class);
+        Gate::policy(RecoveryAutomationViolation::class, AdvancedRevenueRecoveryAutomationPolicy::class);
         Gate::policy(SnapshotAnalyticsComercial::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(RecorteCoorteComercial::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(MetricaPerformanceCanal::class, PlatformCommercialAnalyticsPolicy::class);
@@ -225,6 +236,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-platform-revenue-recovery', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'billing']);
+        });
+
+        Gate::define('manage-advanced-revenue-recovery-automation', function ($user) {
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'billing']);
