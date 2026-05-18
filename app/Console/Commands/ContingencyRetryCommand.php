@@ -3,8 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\FilaContingencia;
-use App\Services\Gateways\FiscalGateway;
+use App\Models\Filial;
 use App\Services\Gateways\BankGateway;
+use App\Services\Gateways\FiscalGateway;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -12,28 +13,31 @@ use Illuminate\Support\Facades\Log;
 class ContingencyRetryCommand extends Command
 {
     protected $signature = 'orquestrador:retry';
+
     protected $description = 'Processa a fila de contingência fiscal e bancária com backoff exponencial';
 
     public function handle(FiscalGateway $fiscalGateway, BankGateway $bankGateway): void
     {
-        $pendentes = FilaContingencia::where('status', 'pendente')
+        $pendentes = FilaContingencia::query()->where('status', 'pendente')
             ->where('proxima_tentativa', '<=', now())
             ->get();
 
         if ($pendentes->isEmpty()) {
-            $this->info("Nenhum item pendente na fila de contingência.");
+            $this->info('Nenhum item pendente na fila de contingência.');
+
             return;
         }
 
         foreach ($pendentes as $item) {
-            $this->info("Processando tentativa #{$item->tentativas} para item ID: {$item->id} ({$item->tipo})");
+            $this->info("Processando tentativa #{$item->tentativas} para item ID: {$item->id} ({$item->tipo_integracao})");
+            $filial = new Filial;
 
-            $resultado = $item->tipo === 'fiscal'
-                ? $fiscalGateway->emitir($item->filial, $item->payload)
-                : $bankGateway->emitirBoleto($item->filial, $item->payload, $item->payload['uuid'] ?? uniqid());
+            $resultado = $item->tipo_integracao === 'fiscal'
+                ? $fiscalGateway->emitir($filial, $item->payload)
+                : $bankGateway->emitirBoleto($filial, $item->payload, $item->idempotency_key ?? uniqid());
 
-            if ($resultado['status'] === 'success') {
-                $item->update(['status' => 'concluido', 'processado_em' => now()]);
+            if (($resultado['status'] ?? null) === 'success') {
+                $item->update(['status' => 'concluido']);
                 $this->info("Item {$item->id} processado com sucesso.");
             } else {
                 $this->tratarFalha($item);
@@ -44,14 +48,16 @@ class ContingencyRetryCommand extends Command
     protected function tratarFalha(FilaContingencia $item): void
     {
         $tentativas = $item->tentativas + 1;
-        
+
         // Se exceder 10 tentativas -> Alerta Crítico
         if ($tentativas >= 10) {
             $this->alertarSuporte($item);
             $item->update([
                 'status' => 'falha_critica',
                 'tentativas' => $tentativas,
+                'ultimo_erro' => 'Falha critica apos multiplas tentativas.',
             ]);
+
             return;
         }
 
@@ -70,19 +76,19 @@ class ContingencyRetryCommand extends Command
     protected function alertarSuporte(FilaContingencia $item): void
     {
         $numeroSuporte = config('services.suporte.whatsapp');
-        $urlMS = config('services.ms_whatsapp.url') . '/api/v1/notificacao/enviar';
+        $urlMS = config('services.ms_whatsapp.url').'/api/v1/notificacao/enviar';
 
-        $mensagem = "⚠️ *ALERTA CRÍTICO ERP* ⚠️\n\nFalha persistente na emissão {$item->tipo} para a Filial {$item->filial_id}.\n\nItem na fila há mais de 24h ou excedeu 10 tentativas.\nFavor verificar logs do Microserviço.";
+        $mensagem = "⚠️ *ALERTA CRÍTICO ERP* ⚠️\n\nFalha persistente na integração {$item->tipo_integracao}.\n\nItem na fila há mais de 24h ou excedeu 10 tentativas.\nFavor verificar logs do microserviço.";
 
         try {
             Http::post($urlMS, [
                 'to' => $numeroSuporte,
                 'message' => $mensagem,
-                'evento' => 'ERRO_ORQUESTRADOR_CRITICO'
+                'evento' => 'ERRO_ORQUESTRADOR_CRITICO',
             ]);
             Log::error("Alerta crítico de contingência enviado para suporte: {$numeroSuporte}");
         } catch (\Exception $e) {
-            Log::emergency("FALHA AO ENVIAR ALERTA DE SUPORTE: " . $e->getMessage());
+            Log::emergency('FALHA AO ENVIAR ALERTA DE SUPORTE: '.$e->getMessage());
         }
     }
 }

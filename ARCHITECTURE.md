@@ -47,6 +47,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `017`: governança central de benchmark, gargalos, tuning e rollback de performance nas integrações críticas
 - `018`: governança central de branding, tema versionado, publicação validada e rollback auditável de white label por tenant
 - `019`: hub executivo central com snapshots reutilizáveis, exportações Excel/PDF auditáveis e reexecução governada de relatórios
+- `020`: automação avançada de recuperação de receita com jornadas adaptativas, experimentos governados e rollback auditável
 
 ## Integrações Externas
 
@@ -151,6 +152,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - reexecuções criam nova trilha auditável sem perder vínculo com a exportação original
 - eventos materiais (`RELATORIO_EXECUTIVO_GERADO`, `RELATORIO_EXECUTIVO_REEXECUTADO`, `RELATORIO_EXECUTIVO_FALHOU`) são publicados no backbone `010`
 - o painel central opera via Livewire em `/admin/reports` e a inspeção JSON reutilizável fica em `/admin/reports/inspection`
+
+## Advanced Revenue Recovery Automation
+
+- o banco central mantém `recovery_automation_policy_versions`, `recovery_automation_journeys`, `recovery_automation_dispatches`, `recovery_automation_experiments` e `recovery_automation_violations`
+- o módulo `020` reutiliza casos e ações do módulo `013` sem duplicar a fonte operacional da cobrança
+- jornadas adaptativas respeitam fallback por canal, cooldown, supressão e idempotência antes de qualquer novo dispatch
+- políticas versionadas só são promovidas após validação explícita e podem ativar experimento ou holdout auditável por jornada
+- violações críticas habilitam rollback governado para a última política saudável, marcando jornadas afetadas e preservando `rollback_context`
+- eventos materiais (`POLITICA_AUTOMACAO_RECUPERACAO_PUBLICADA`, `ROLLBACK_AUTOMACAO_RECUPERACAO_EXECUTADO`) são publicados no backbone `010`
+- o painel central opera via Livewire em `/admin/recovery/automation` e a inspeção JSON reutilizável fica em `/admin/recovery/automation/inspection`
 
 ## Padrões Técnicos
 

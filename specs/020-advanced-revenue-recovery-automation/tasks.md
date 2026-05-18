@@ -25,8 +25,8 @@
 
 **Purpose**: Prepare advanced revenue recovery automation namespace and planning references
 
-- [ ] T001 Create advanced recovery automation service namespace scaffolding in `app/Services/Billing/` and related central test baselines in `tests/`
-- [ ] T002 [P] Register feature documentation references and plan pointer consistency in `AGENTS.md`, `ROADMAP.md` and `specs/020-advanced-revenue-recovery-automation/`
+- [x] T001 Create advanced recovery automation service namespace scaffolding in `app/Services/Billing/` and related central test baselines in `tests/`
+- [x] T002 [P] Register feature documentation references and plan pointer consistency in `AGENTS.md`, `ROADMAP.md` and `specs/020-advanced-revenue-recovery-automation/`
 
 ---
 
@@ -36,12 +36,12 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete
 
-- [ ] T003 Create central migrations for `recovery_automation_policy_versions`, `recovery_automation_journeys`, `recovery_automation_dispatches`, `recovery_automation_experiments` and `recovery_automation_violations` in `database/migrations/central/`
-- [ ] T004 [P] Create Eloquent models for policy versions, journeys, dispatches, experiments and violations in `app/Models/`
-- [ ] T005 [P] Create shared enums/value objects for automation policy status, journey status, dispatch status, experiment status and violation severity in `app/Support/Billing/`
-- [ ] T006 Create authorization policy/gate baseline for advanced recovery automation operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
-- [ ] T007 Create configuration entries for guardrails, fallback order, cooldown windows and rollback defaults in `config/`
-- [ ] T008 Create foundational event publication hooks for automation policy, dispatch and rollback transitions in `app/Services/Billing/`
+- [x] T003 Create central migrations for `recovery_automation_policy_versions`, `recovery_automation_journeys`, `recovery_automation_dispatches`, `recovery_automation_experiments` and `recovery_automation_violations` in `database/migrations/central/`
+- [x] T004 [P] Create Eloquent models for policy versions, journeys, dispatches, experiments and violations in `app/Models/`
+- [x] T005 [P] Create shared enums/value objects for automation policy status, journey status, dispatch status, experiment status and violation severity in `app/Support/Billing/`
+- [x] T006 Create authorization policy/gate baseline for advanced recovery automation operations in `app/Policies/` and `app/Providers/AppServiceProvider.php`
+- [x] T007 Create configuration entries for guardrails, fallback order, cooldown windows and rollback defaults in `config/`
+- [x] T008 Create foundational event publication hooks for automation policy, dispatch and rollback transitions in `app/Services/Billing/`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -55,17 +55,17 @@
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T009 [P] [US1] Create feature test for adaptive journey scheduling with valid next action selection in `tests/Feature/AdvancedRecoveryAutomationJourneyTest.php`
-- [ ] T010 [P] [US1] Create feature test for channel fallback and suppression-aware dispatch behavior in `tests/Feature/AdvancedRecoveryAutomationFallbackTest.php`
-- [ ] T011 [P] [US1] Create unit test for dispatch deduplication and cooldown rules in `tests/Unit/AdvancedRecoveryAutomationDispatchRulesTest.php`
+- [x] T009 [P] [US1] Create feature test for adaptive journey scheduling with valid next action selection in `tests/Feature/AdvancedRecoveryAutomationJourneyTest.php`
+- [x] T010 [P] [US1] Create feature test for channel fallback and suppression-aware dispatch behavior in `tests/Feature/AdvancedRecoveryAutomationFallbackTest.php`
+- [x] T011 [P] [US1] Create unit test for dispatch deduplication and cooldown rules in `tests/Unit/AdvancedRecoveryAutomationDispatchRulesTest.php`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Implement advanced automation policy resolution service in `app/Services/Billing/`
-- [ ] T013 [P] [US1] Implement adaptive journey orchestration service in `app/Services/Billing/`
-- [ ] T014 [US1] Implement dispatch scheduler/executor with fallback and revalidation in `app/Services/Billing/` and `app/Jobs/`
-- [ ] T015 [US1] Persist journey and dispatch history linked to recovery cases and actions from module `013`
-- [ ] T016 [US1] Expose reusable automation evaluation queries for dashboard and inspection layers
+- [x] T012 [P] [US1] Implement advanced automation policy resolution service in `app/Services/Billing/`
+- [x] T013 [P] [US1] Implement adaptive journey orchestration service in `app/Services/Billing/`
+- [x] T014 [US1] Implement dispatch scheduler/executor with fallback and revalidation in `app/Services/Billing/` and `app/Jobs/`
+- [x] T015 [US1] Persist journey and dispatch history linked to recovery cases and actions from module `013`
+- [x] T016 [US1] Expose reusable automation evaluation queries for dashboard and inspection layers
 
 **Checkpoint**: User Story 1 should advance automated journeys independently
 
@@ -79,17 +79,17 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T017 [P] [US2] Create feature test for controlled automation policy publication in `tests/Feature/AdvancedRecoveryAutomationPublicationTest.php`
-- [ ] T018 [P] [US2] Create feature test for experiment or holdout allocation persistence in `tests/Feature/AdvancedRecoveryAutomationExperimentTest.php`
-- [ ] T019 [P] [US2] Create unit test for publication guardrails and allocation rules in `tests/Unit/AdvancedRecoveryAutomationPolicyRulesTest.php`
+- [x] T017 [P] [US2] Create feature test for controlled automation policy publication in `tests/Feature/AdvancedRecoveryAutomationPublicationTest.php`
+- [x] T018 [P] [US2] Create feature test for experiment or holdout allocation persistence in `tests/Feature/AdvancedRecoveryAutomationExperimentTest.php`
+- [x] T019 [P] [US2] Create unit test for publication guardrails and allocation rules in `tests/Unit/AdvancedRecoveryAutomationPolicyRulesTest.php`
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Implement automation policy publication/versioning service in `app/Services/Billing/`
-- [ ] T021 [P] [US2] Implement experiment and holdout assignment service in `app/Services/Billing/`
-- [ ] T022 [US2] Implement manager workflow for draft, approval and scoped publication in `app/Livewire/Admin/`
-- [ ] T023 [US2] Implement requests/validation for policy publication, variant definition and holdout configuration in `app/Http/Requests/`
-- [ ] T024 [US2] Publish advanced recovery automation publication events through backbone `010`
+- [x] T020 [P] [US2] Implement automation policy publication/versioning service in `app/Services/Billing/`
+- [x] T021 [P] [US2] Implement experiment and holdout assignment service in `app/Services/Billing/`
+- [x] T022 [US2] Implement manager workflow for draft, approval and scoped publication in `app/Livewire/Admin/`
+- [x] T023 [US2] Implement requests/validation for policy publication, variant definition and holdout configuration in `app/Http/Requests/`
+- [x] T024 [US2] Publish advanced recovery automation publication events through backbone `010`
 
 **Checkpoint**: User Story 2 should support governed strategy rollout independently
 
@@ -103,17 +103,17 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T025 [P] [US3] Create feature test for automation performance and violation inspection in `tests/Feature/AdvancedRecoveryAutomationInspectionTest.php`
-- [ ] T026 [P] [US3] Create feature test for governed rollback and affected journey marking in `tests/Feature/AdvancedRecoveryAutomationRollbackTest.php`
-- [ ] T027 [P] [US3] Create unit test for violation classification and rollback eligibility in `tests/Unit/AdvancedRecoveryAutomationRollbackRulesTest.php`
+- [x] T025 [P] [US3] Create feature test for automation performance and violation inspection in `tests/Feature/AdvancedRecoveryAutomationInspectionTest.php`
+- [x] T026 [P] [US3] Create feature test for governed rollback and affected journey marking in `tests/Feature/AdvancedRecoveryAutomationRollbackTest.php`
+- [x] T027 [P] [US3] Create unit test for violation classification and rollback eligibility in `tests/Unit/AdvancedRecoveryAutomationRollbackRulesTest.php`
 
 ### Implementation for User Story 3
 
-- [ ] T028 [P] [US3] Implement automation performance and violation summary service in `app/Services/Billing/`
-- [ ] T029 [P] [US3] Implement automation rollback service with journey impact recording in `app/Services/Billing/`
-- [ ] T030 [US3] Implement super admin Livewire dashboard and inspection endpoint for automation governance in `app/Livewire/Admin/` and `app/Http/Controllers/`
-- [ ] T031 [US3] Implement rollback controls, violation drill-down and summary views in `resources/views/livewire/admin/`
-- [ ] T032 [US3] Expose central automation history, violation evidence and rollback context for governance support
+- [x] T028 [P] [US3] Implement automation performance and violation summary service in `app/Services/Billing/`
+- [x] T029 [P] [US3] Implement automation rollback service with journey impact recording in `app/Services/Billing/`
+- [x] T030 [US3] Implement super admin Livewire dashboard and inspection endpoint for automation governance in `app/Livewire/Admin/` and `app/Http/Controllers/`
+- [x] T031 [US3] Implement rollback controls, violation drill-down and summary views in `resources/views/livewire/admin/`
+- [x] T032 [US3] Expose central automation history, violation evidence and rollback context for governance support
 
 **Checkpoint**: User Story 3 should make automation governance auditable independently
 
@@ -123,11 +123,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T033 [P] Document automation publication, violation response and rollback procedures in `GO_LIVE_RUNBOOK.md` and related docs
-- [ ] T034 Update architecture and product documentation for the advanced recovery automation layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
-- [ ] T035 [P] Add targeted coverage for automation event publication, experiment persistence and rollback audit trail in `tests/Feature/` and `tests/Unit/`
-- [ ] T036 Perform code cleanup and Laravel Pint on changed files
-- [ ] T037 Run `quickstart.md` validation and record evidence in feature artifacts
+- [x] T033 [P] Document automation publication, violation response and rollback procedures in `GO_LIVE_RUNBOOK.md` and related docs
+- [x] T034 Update architecture and product documentation for the advanced recovery automation layer in `ARCHITECTURE.md`, `README.md` and roadmap artifacts when implementation starts
+- [x] T035 [P] Add targeted coverage for automation event publication, experiment persistence and rollback audit trail in `tests/Feature/` and `tests/Unit/`
+- [x] T036 Perform code cleanup and Laravel Pint on changed files
+- [x] T037 Run `quickstart.md` validation and record evidence in feature artifacts
 
 ---
 

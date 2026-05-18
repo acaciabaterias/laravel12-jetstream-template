@@ -38,3 +38,20 @@ Validar localmente a automação avançada de recuperação sobre a base já con
 - experimento ou holdout auditável por caso tratado
 - violação material e rollback expostos em painel e inspeção
 - runbook operacional cobrindo publicação, violação e reversão
+
+## Evidência de validação registrada
+
+- suíte focal do módulo `020` executada com:
+  - `tests/Feature/AdvancedRecoveryAutomationFoundationTest.php`
+  - `tests/Feature/AdvancedRecoveryAutomationJourneyTest.php`
+  - `tests/Feature/AdvancedRecoveryAutomationPublicationTest.php`
+  - `tests/Feature/AdvancedRecoveryAutomationExperimentTest.php`
+  - `tests/Feature/AdvancedRecoveryAutomationInspectionTest.php`
+  - `tests/Feature/AdvancedRecoveryAutomationRollbackTest.php`
+  - `tests/Feature/AdvancedRecoveryAutomationGovernanceTest.php`
+  - `tests/Unit/AdvancedRecoveryAutomationPolicyRulesTest.php`
+  - `tests/Unit/AdvancedRecoveryAutomationRollbackRulesTest.php`
+- resultado consolidado do recorte final do módulo: `15` testes passando, `81` assertions
+- suíte completa em PostgreSQL validada antes do fechamento operacional do módulo
+- resultado global pós-fechamento: `455` testes passando, `1 skipped`, `2424` assertions
+- `vendor/bin/pint --dirty --format agent` e `git diff --check` executados sem pendências

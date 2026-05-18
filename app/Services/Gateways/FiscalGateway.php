@@ -6,13 +6,14 @@ use App\Models\FilaContingencia;
 use App\Models\Filial;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class FiscalGateway
 {
     public function emitir(Filial $filial, array $payload): array
     {
-        $url = config('services.ms_fiscal.url') . '/api/v1/emissao';
-        $apiKey = $filial->ms_fiscal_api_key;
+        $url = config('services.ms_fiscal.url').'/api/v1/emissao';
+        $apiKey = config('services.ms_fiscal.api_key');
 
         try {
             $response = Http::withHeaders([
@@ -42,16 +43,17 @@ class FiscalGateway
         Log::warning("Entrando em contingência {$tipo} para filial {$filial->id}. Motivo: {$motivo}");
 
         FilaContingencia::create([
-            'filial_id' => $filial->id,
-            'tipo' => $tipo,
+            'tipo_integracao' => $tipo,
             'payload' => $payload,
             'status' => 'pendente',
             'proxima_tentativa' => now()->addMinutes(1),
+            'idempotency_key' => (string) Str::uuid(),
+            'ultimo_erro' => $motivo,
         ]);
 
         return [
             'status' => 'contingencia',
-            'mensagem' => 'Comunicação externa falhou. Nota enviada para fila de contingência.'
+            'mensagem' => 'Comunicação externa falhou. Nota enviada para fila de contingência.',
         ];
     }
 }
