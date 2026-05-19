@@ -90,6 +90,13 @@ if (! function_exists('format_money_br')) {
     }
 }
 
+if (! function_exists('format_money_amount')) {
+    function format_money_amount(float|int $value, string $currencySymbol = 'R$', int $precision = 2): string
+    {
+        return trim($currencySymbol.' '.number_format((float) $value, $precision, ',', '.'));
+    }
+}
+
 if (! function_exists('calculate_percentage')) {
     function calculate_percentage(float|int $part, float|int $total, int $precision = 2): float
     {

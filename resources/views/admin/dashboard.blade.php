@@ -43,7 +43,7 @@
 
             <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 p-6 shadow-sm">
                 <p class="text-sm font-medium text-slate-300">Faturamento Mensal</p>
-                <p class="mt-4 text-2xl font-semibold tracking-tight text-white">R$ 24,7 mil</p>
+                <p class="mt-4 text-2xl font-semibold tracking-tight text-white">{{ $stats['monthly_billing'] }}</p>
                 <p class="mt-2 text-sm text-slate-400">Receita recorrente estimada com base na carteira ativa.</p>
             </div>
         </div>
@@ -104,7 +104,7 @@
 
                 <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <p class="text-sm font-semibold text-slate-900">MRR projetado</p>
-                    <p class="mt-3 font-display text-3xl font-bold text-slate-950">R$ 31,2 mil</p>
+                    <p class="mt-3 font-display text-3xl font-bold text-slate-950">{{ $stats['projected_mrr'] }}</p>
                     <p class="mt-1 text-sm text-slate-500">Com upgrade estimado de 12% na carteira ativa.</p>
                 </div>
 

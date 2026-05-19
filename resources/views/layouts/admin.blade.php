@@ -72,6 +72,12 @@
                             </svg>
                             {{ __('Platform internationalization') }}
                         </a>
+                        <a href="{{ route('admin.currencies.index') }}" class="group flex items-center rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.currencies.*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                            <svg class="mr-3 h-5 w-5 flex-shrink-0 text-slate-400 group-hover:text-slate-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 .895-4 2s1.79 2 4 2 4 .895 4 2-1.79 2-4 2m0-10V4m0 14v2m8-8a8 8 0 11-16 0 8 8 0 0116 0z" />
+                            </svg>
+                            Platform currencies
+                        </a>
                     </nav>
                 </div>
                 <div class="flex flex-shrink-0 bg-slate-800 p-4">
@@ -101,6 +107,9 @@
                         <h1 class="font-display text-lg font-semibold text-gray-800">{{ __('Management Platform') }}</h1>
                         <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                             {{ app()->getLocale() }}
+                        </span>
+                        <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                            {{ $platformCurrencyCode ?? config('platform_currencies.default_currency', 'BRL') }}
                         </span>
                     </div>
                     <div class="ml-4 flex items-center md:ml-6">
