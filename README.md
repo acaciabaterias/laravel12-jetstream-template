@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-481%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-497%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -196,6 +196,15 @@ O modulo `022` fecha a camada monetaria central da plataforma:
 - inspecao central de cambio e rollback auditavel da ultima publicacao saudavel
 - dashboard `/admin/currencies` e inspecao `/admin/currencies/inspection`
 
+## Fiscal CFOP Export/Import
+
+O modulo `023` fecha a camada central de governanca fiscal para exportacao e importacao:
+
+- consulta de enquadramento por cenario com fallback governado quando a regra ativa estiver ausente ou invalida
+- publicacao versionada de catalogo CFOP e mappings fiscais com snapshot de cobertura obrigatoria
+- inspecao central de issues por severidade, historico de publicacoes e rollback auditavel da ultima publicacao elegivel
+- dashboard `/admin/fiscal-rules` e inspecao `/admin/fiscal-rules/inspection`
+
 ## Stack
 
 - PHP `^8.3`
@@ -372,6 +381,15 @@ php artisan test --compact tests/Feature/PlatformCurrencyPreferenceTest.php
 php artisan test --compact tests/Feature/PlatformCurrencyPublicationTest.php
 php artisan test --compact tests/Feature/PlatformCurrencyInspectionTest.php
 php artisan test --compact tests/Feature/PlatformCurrencyRollbackTest.php
+```
+
+Para o recorte fiscal governado do modulo `023`, os testes chave incluem:
+
+```bash
+php artisan test --compact tests/Feature/PlatformFiscalScenarioLookupTest.php
+php artisan test --compact tests/Feature/PlatformFiscalPublicationTest.php
+php artisan test --compact tests/Feature/PlatformFiscalInspectionTest.php
+php artisan test --compact tests/Feature/PlatformFiscalRollbackTest.php
 ```
 
 ### Documentação da API (OpenAPI/Swagger)

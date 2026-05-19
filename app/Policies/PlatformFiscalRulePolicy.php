@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Policies;
+
+use App\Models\UsuarioPlataforma;
+
+class PlatformFiscalRulePolicy
+{
+    public function viewAny(UsuarioPlataforma $user): bool
+    {
+        return $user->ativo && $user->hasRole(['super_admin', 'support', 'billing']);
+    }
+
+    public function view(UsuarioPlataforma $user): bool
+    {
+        return $this->viewAny($user);
+    }
+
+    public function create(UsuarioPlataforma $user): bool
+    {
+        return $user->ativo && $user->hasRole(['super_admin', 'billing']);
+    }
+
+    public function update(UsuarioPlataforma $user): bool
+    {
+        return $this->create($user);
+    }
+
+    public function delete(UsuarioPlataforma $user): bool
+    {
+        return $user->ativo && $user->isSuperAdmin();
+    }
+}

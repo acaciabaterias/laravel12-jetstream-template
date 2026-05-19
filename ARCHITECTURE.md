@@ -50,6 +50,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `020`: automação avançada de recuperação de receita com jornadas adaptativas, experimentos governados e rollback auditável
 - `021`: internacionalização central da plataforma com preferência por operador, publicação governada, cobertura inspecionável e rollback auditável
 - `022`: múltiplas moedas centrais com preferência por operador, tabela de câmbio governada, inspeção reutilizável e rollback auditável
+- `023`: governança fiscal central para CFOPs de exportação/importação com lookup por cenário, publicação auditável, inspeção e rollback
 
 ## Integrações Externas
 

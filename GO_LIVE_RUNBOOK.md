@@ -438,7 +438,26 @@ Se o deploy introduzir taxa inconsistente, moeda inválida ou projeção monetá
   - `platform_currency_publication_records.status` consistente com a publicação ativa, superseded ou rolled_back
   - `platform_currency_publication_records.metadata.rollback.restored_publication_id` preenchido quando houver reversão
   - `platform_currency_issue_reports.resolution_status` refletindo `rolled_back` nas inconsistências encerradas pela reversão
-  - `usuarios_plataforma.preferred_currency` preservado para operadores sem sobrescrita indevida
+- `usuarios_plataforma.preferred_currency` preservado para operadores sem sobrescrita indevida
+
+### Rollback operacional do módulo 023
+
+Se o deploy introduzir enquadramento fiscal inconsistente, CFOP inválido ou cobertura obrigatória degradada:
+
+- restaurar o dump do banco central anterior ao deploy quando a inconsistência afetar múltiplas publicações ou a trilha auditável
+- revisar `fiscal_cfop_catalog_entries`, `fiscal_operation_scenarios`, `fiscal_rule_publication_records`, `fiscal_rule_mappings` e `fiscal_rule_issue_reports`
+- validar se a publicação ativa pode ser revertida pelo painel `/admin/fiscal-rules` antes de considerar restore completo
+- executar rollback explícito informando motivo operacional claro e baseline restaurado
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/PlatformFiscalScenarioLookupTest.php`
+  - `php artisan test --compact tests/Feature/PlatformFiscalPublicationTest.php`
+  - `php artisan test --compact tests/Feature/PlatformFiscalInspectionTest.php`
+  - `php artisan test --compact tests/Feature/PlatformFiscalRollbackTest.php`
+- confirmar auditoria mínima:
+  - `evento_outboxes.event_type in ('CATALOGO_FISCAL_PUBLICADO', 'CATALOGO_FISCAL_DEGRADADO_REGISTRADO', 'ROLLBACK_CATALOGO_FISCAL_EXECUTADO')`
+  - `fiscal_rule_publication_records.status` consistente com a publicação ativa, draft, superseded ou rolled_back
+  - `fiscal_rule_publication_records.metadata.rollback.restored_publication_id` preenchido quando houver reversão
+  - `fiscal_rule_issue_reports.resolution_status` refletindo `rolled_back` nas inconsistências encerradas pela reversão
 
 Com K6, quando aplicavel:
 
