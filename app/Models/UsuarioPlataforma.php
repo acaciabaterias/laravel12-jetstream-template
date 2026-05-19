@@ -22,6 +22,7 @@ class UsuarioPlataforma extends Authenticatable
         'papel',
         'ativo',
         'preferred_locale',
+        'preferred_currency',
     ];
 
     protected $hidden = [

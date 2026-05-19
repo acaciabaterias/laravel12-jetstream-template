@@ -220,6 +220,12 @@ Valide fluxos manuais minimos:
 - publicação controlada de bundle com `pt_BR`, `en` e `es`, fallback ativo e conferência das lacunas abertas
 - rollback governado de publicação degradada com conferência do `restored_publication_id`
 - conferência de publicação dos eventos `LOCALIZACAO_PLATAFORMA_PUBLICADA` e `ROLLBACK_LOCALIZACAO_PLATAFORMA_EXECUTADO` no backbone `010`
+- dashboard central de moedas em `/admin/currencies`
+- inspeção monetária em `/admin/currencies/inspection?currency=USD&severity=warning`
+- alteração controlada de preferência monetária do operador com recarga do dashboard central
+- publicação controlada de bundle com `BRL`, `USD` e `EUR`, moeda base ativa e conferência das issue reports abertas
+- rollback governado de tabela degradada com conferência do `restored_publication_id`
+- conferência de publicação dos eventos `MOEDAS_PLATAFORMA_PUBLICADAS` e `ROLLBACK_MOEDAS_PLATAFORMA_EXECUTADO` no backbone `010`
 - dashboard central de analytics comercial em `/admin/analytics`
 - inspeção analítica em `/admin/analytics/inspection`
 - rebuild controlado do snapshot via `php artisan analytics:rebuild-platform-commercial-snapshot --days=30`
@@ -413,6 +419,26 @@ Se o deploy introduzir locale incorreto, fallback inválido ou publicação degr
   - `platform_locale_publication_records.metadata.rollback.restored_publication_id` preenchido quando houver reversão
   - `platform_locale_missing_key_reports.resolution_status` refletindo `rolled_back` nas lacunas encerradas pela reversão
   - `usuarios_plataforma.preferred_locale` preservado para operadores sem sobrescrita indevida
+
+### Rollback operacional do módulo 022
+
+Se o deploy introduzir taxa inconsistente, moeda inválida ou projeção monetária degradada:
+
+- restaurar o dump do banco central anterior ao deploy quando a inconsistência afetar múltiplas publicações ou a trilha auditável
+- revisar `usuarios_plataforma.preferred_currency`, `platform_currency_catalog_entries`, `platform_currency_publication_records`, `platform_currency_rate_entries` e `platform_currency_issue_reports`
+- verificar se a publicação ativa pode ser revertida pelo painel `/admin/currencies` sem restore completo
+- executar rollback explícito informando motivo operacional claro e moeda restaurada
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/PlatformCurrencyPreferenceTest.php`
+  - `php artisan test --compact tests/Feature/PlatformCurrencyPublicationTest.php`
+  - `php artisan test --compact tests/Feature/PlatformCurrencyInspectionTest.php`
+  - `php artisan test --compact tests/Feature/PlatformCurrencyRollbackTest.php`
+- confirmar auditoria mínima:
+  - `evento_outboxes.event_type in ('MOEDAS_PLATAFORMA_PUBLICADAS', 'ROLLBACK_MOEDAS_PLATAFORMA_EXECUTADO')`
+  - `platform_currency_publication_records.status` consistente com a publicação ativa, superseded ou rolled_back
+  - `platform_currency_publication_records.metadata.rollback.restored_publication_id` preenchido quando houver reversão
+  - `platform_currency_issue_reports.resolution_status` refletindo `rolled_back` nas inconsistências encerradas pela reversão
+  - `usuarios_plataforma.preferred_currency` preservado para operadores sem sobrescrita indevida
 
 Com K6, quando aplicavel:
 

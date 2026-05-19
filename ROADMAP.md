@@ -1,11 +1,11 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v2.1.0-beta - módulo 021 concluído)
+## Status Atual (v2.2.0-beta - módulo 022 concluído)
 
-✅ 21 módulos implementados (`001` a `021`)
-✅ módulo `021` concluído com internacionalização governada, fallback central e rollback auditável
+✅ 22 módulos implementados (`001` a `022`)
+✅ módulo `022` concluído com múltiplas moedas governadas, tabela ativa de câmbio e rollback auditável
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `466` testes passando, `1 skipped` e `2466` assertions
+✅ suíte principal estabilizada com `481` testes passando, `1 skipped` e `2526` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
@@ -75,6 +75,10 @@
 - [x] Preferência de idioma por operador com resolução segura por request administrativo
 - [x] Publicação governada de locales suportados com cobertura mínima e fallback ativo
 - [x] Inspeção central de lacunas e rollback auditável da última publicação saudável
+- [x] Módulo `022` - Multi-Currency Support
+- [x] Preferência monetária por operador com projeção consistente a partir do valor base
+- [x] Publicação governada de moedas e taxas com snapshot de cobertura e issue reports
+- [x] Inspeção central e rollback auditável da última tabela monetária saudável
 
 ## Fase 1: Estabilização e Produção (v1.4.0)
 
@@ -94,8 +98,9 @@
 ## Fase 3: Internacionalização (v2.0.0)
 
 - [x] Suporte a múltiplos idiomas (`pt-BR`, `en`, `es`)
+- [x] Módulo `022` - Multi-Currency Support
 - [ ] Regras fiscais e CFOPs para exportação e importação
-- [ ] Suporte a múltiplas moedas
+- [x] Suporte a múltiplas moedas
 
 ## Fase 4: IA e Automação (v3.0.0)
 

@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-466%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-481%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -186,6 +186,16 @@ O modulo `021` fecha a camada de internacionalizacao central da plataforma:
 - inspecao central de lacunas por severidade e rollback auditavel da ultima publicacao saudavel
 - dashboard `/admin/localization` e inspecao `/admin/localization/inspection`
 
+## Multi-Currency Support
+
+O modulo `022` fecha a camada monetaria central da plataforma:
+
+- preferencia de moeda persistida por operador em `BRL`, `USD` e `EUR`
+- projecao de valores centrais a partir da moeda base sem sobrescrever o historico original
+- publicacao governada de moedas suportadas, taxa ativa e issue reports de cobertura
+- inspecao central de cambio e rollback auditavel da ultima publicacao saudavel
+- dashboard `/admin/currencies` e inspecao `/admin/currencies/inspection`
+
 ## Stack
 
 - PHP `^8.3`
@@ -353,6 +363,15 @@ php artisan test --compact tests/Feature/PlatformLocalizationPreferenceTest.php
 php artisan test --compact tests/Feature/PlatformLocalizationPublicationTest.php
 php artisan test --compact tests/Feature/PlatformLocalizationInspectionTest.php
 php artisan test --compact tests/Feature/PlatformLocalizationRollbackTest.php
+```
+
+Para o recorte de multiplas moedas da plataforma do modulo `022`, os testes chave incluem:
+
+```bash
+php artisan test --compact tests/Feature/PlatformCurrencyPreferenceTest.php
+php artisan test --compact tests/Feature/PlatformCurrencyPublicationTest.php
+php artisan test --compact tests/Feature/PlatformCurrencyInspectionTest.php
+php artisan test --compact tests/Feature/PlatformCurrencyRollbackTest.php
 ```
 
 ### Documentação da API (OpenAPI/Swagger)

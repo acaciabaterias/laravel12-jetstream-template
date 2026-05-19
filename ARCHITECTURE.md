@@ -49,6 +49,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `019`: hub executivo central com snapshots reutilizáveis, exportações Excel/PDF auditáveis e reexecução governada de relatórios
 - `020`: automação avançada de recuperação de receita com jornadas adaptativas, experimentos governados e rollback auditável
 - `021`: internacionalização central da plataforma com preferência por operador, publicação governada, cobertura inspecionável e rollback auditável
+- `022`: múltiplas moedas centrais com preferência por operador, tabela de câmbio governada, inspeção reutilizável e rollback auditável
 
 ## Integrações Externas
 
@@ -173,6 +174,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - rollback restaura a última publicação elegível e marca a publicação degradada com trilha auditável de reversão
 - eventos materiais (`LOCALIZACAO_PLATAFORMA_PUBLICADA`, `ROLLBACK_LOCALIZACAO_PLATAFORMA_EXECUTADO`) são publicados no backbone `010`
 - o painel central opera via Livewire em `/admin/localization` e a inspeção JSON reutilizável fica em `/admin/localization/inspection`
+
+## Multi-Currency Support
+
+- o banco central mantém `platform_currency_catalog_entries`, `platform_currency_publication_records`, `platform_currency_rate_entries` e `platform_currency_issue_reports`, além da preferência `usuarios_plataforma.preferred_currency`
+- o módulo `022` resolve moeda de exibição por request administrativo sem alterar o valor base histórico já persistido nos módulos centrais
+- publicações de moeda promovem catálogo suportado, moeda base, moeda padrão e snapshot de taxas de câmbio em pacote versionado
+- inconsistências de cobertura ou taxa permanecem inspecionáveis por moeda e severidade, sem apagar a última publicação saudável
+- rollback reativa a última tabela elegível e marca a publicação degradada com trilha auditável de reversão
+- eventos materiais (`MOEDAS_PLATAFORMA_PUBLICADAS`, `ROLLBACK_MOEDAS_PLATAFORMA_EXECUTADO`) são publicados no backbone `010`
+- o painel central opera via Livewire em `/admin/currencies` e a inspeção JSON reutilizável fica em `/admin/currencies/inspection`
 
 ## Padrões Técnicos
 
