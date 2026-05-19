@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>BateriaExpert Admin</title>
+    <title>{{ __('Administrative login') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,8 +73,8 @@
 
                     <div class="mt-6 xl:mt-0">
                         <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--brand-primary)]">Plataforma central</p>
-                        <h2 class="mt-3 font-display text-4xl font-bold tracking-tight text-slate-950">Login administrativo</h2>
-                        <p class="mt-3 text-sm leading-6 text-slate-500">Entre com sua conta de administrador da plataforma para acessar o painel central.</p>
+                        <h2 class="mt-3 font-display text-4xl font-bold tracking-tight text-slate-950">{{ __('Administrative login') }}</h2>
+                        <p class="mt-3 text-sm leading-6 text-slate-500">{{ __('Enter with your platform administrator account to access the central panel.') }}</p>
                     </div>
 
                     @if ($errors->any())
@@ -100,7 +100,7 @@
 
                         <label for="remember" class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                             <input id="remember" name="remember" type="checkbox" value="1" class="rounded border-slate-300 text-[var(--brand-primary)] focus:ring-[var(--brand-primary)]">
-                            <span class="text-sm text-slate-600">Manter conectado</span>
+                            <span class="text-sm text-slate-600">{{ __('Keep me signed in') }}</span>
                         </label>
 
                         <button type="submit" class="inline-flex w-full items-center justify-center rounded-2xl bg-[var(--brand-primary)] px-5 py-3 text-sm font-semibold text-white shadow-brand transition hover:-translate-y-0.5 hover:opacity-95">
@@ -111,7 +111,7 @@
                     <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600">
                         <p class="font-semibold text-slate-900">Vai entrar na operação da loja?</p>
                         <a href="{{ route('login') }}" class="mt-2 inline-flex items-center font-semibold text-[var(--brand-primary)] transition hover:opacity-80">
-                            Ir para o login do ERP
+                            {{ __('Go to ERP login') }}
                         </a>
                     </div>
 

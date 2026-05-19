@@ -9,6 +9,7 @@ use App\Http\Middleware\MaintenanceModeMiddleware;
 use App\Http\Middleware\PrometheusMetrics;
 use App\Http\Middleware\RateLimitByRoleMiddleware;
 use App\Http\Middleware\RateLimitByTenant;
+use App\Http\Middleware\ResolvePlatformLocale;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 use App\Http\Middleware\TenantConnectionMiddleware;
 use App\Http\Middleware\VerifyHmacSignature;
@@ -59,6 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             TenantConnectionMiddleware::class,
+            ResolvePlatformLocale::class,
             PrometheusMetrics::class,
         ]);
 

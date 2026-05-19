@@ -48,6 +48,8 @@ use App\Models\PedidoVenda;
 use App\Models\PerformanceBottleneckRecord;
 use App\Models\PerformanceRollbackEvidence;
 use App\Models\PlanoComercial;
+use App\Models\PlatformLocaleMissingKeyReport;
+use App\Models\PlatformLocalePublicationRecord;
 use App\Models\PoliticaInadimplencia;
 use App\Models\PoliticaRecuperacaoReceita;
 use App\Models\RecorteCoorteComercial;
@@ -88,6 +90,7 @@ use App\Policies\OrdemServicoPolicy;
 use App\Policies\PedidoVendaPolicy;
 use App\Policies\PlatformBillingPolicy;
 use App\Policies\PlatformCommercialAnalyticsPolicy;
+use App\Policies\PlatformLocalizationPolicy;
 use App\Policies\PlatformPaymentsPolicy;
 use App\Policies\PlatformRevenueRecoveryPolicy;
 use App\Policies\ProductionObservabilityPolicy;
@@ -160,6 +163,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(RecoveryAutomationDispatch::class, AdvancedRevenueRecoveryAutomationPolicy::class);
         Gate::policy(RecoveryAutomationExperiment::class, AdvancedRevenueRecoveryAutomationPolicy::class);
         Gate::policy(RecoveryAutomationViolation::class, AdvancedRevenueRecoveryAutomationPolicy::class);
+        Gate::policy(PlatformLocalePublicationRecord::class, PlatformLocalizationPolicy::class);
+        Gate::policy(PlatformLocaleMissingKeyReport::class, PlatformLocalizationPolicy::class);
         Gate::policy(SnapshotAnalyticsComercial::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(RecorteCoorteComercial::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(MetricaPerformanceCanal::class, PlatformCommercialAnalyticsPolicy::class);
@@ -215,6 +220,30 @@ class AppServiceProvider extends ServiceProvider
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->hasRole(['super_admin', 'support', 'billing']);
+        });
+
+        Gate::define('view-platform-localization', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'support', 'billing']);
+        });
+
+        Gate::define('use-platform-localization', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'support', 'billing']);
+        });
+
+        Gate::define('manage-platform-localization', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'support']);
+        });
+
+        Gate::define('rollback-platform-localization', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->isSuperAdmin();
         });
 
         Gate::define('manage-tenants', function ($user) {

@@ -1,11 +1,11 @@
 # Roadmap do ERP BateriaExpert
 
-## Status Atual (v2.0.0-beta - módulo 020 concluído)
+## Status Atual (v2.1.0-beta - módulo 021 concluído)
 
-✅ 20 módulos implementados (`001` a `020`)
-✅ módulo `020` concluído com jornadas adaptativas, experimentos governados e rollback auditável
+✅ 21 módulos implementados (`001` a `021`)
+✅ módulo `021` concluído com internacionalização governada, fallback central e rollback auditável
 ✅ 5 microserviços scaffoldados (`MS-001` a `MS-005`)
-✅ suíte principal estabilizada com `455` testes passando, `1 skipped` e `2424` assertions
+✅ suíte principal estabilizada com `466` testes passando, `1 skipped` e `2466` assertions
 ✅ Containerização completa (`Dockerfile`, `docker-compose.yml`)
 ✅ Documentação consolidada: OpenAPI, Postman, `ARCHITECTURE`, guias operacionais e governança
 ✅ RBAC completo (`15+` policies, gates)
@@ -71,6 +71,10 @@
 - [x] Jornadas adaptativas com fallback, cooldown, supressão e dispatch idempotente
 - [x] Publicação governada de políticas com experimento, holdout e trilha auditável
 - [x] Inspeção central e rollback auditável para a última política saudável
+- [x] Módulo `021` - Platform Internationalization
+- [x] Preferência de idioma por operador com resolução segura por request administrativo
+- [x] Publicação governada de locales suportados com cobertura mínima e fallback ativo
+- [x] Inspeção central de lacunas e rollback auditável da última publicação saudável
 
 ## Fase 1: Estabilização e Produção (v1.4.0)
 
@@ -89,7 +93,7 @@
 
 ## Fase 3: Internacionalização (v2.0.0)
 
-- [ ] Suporte a múltiplos idiomas (`pt-BR`, `en`, `es`)
+- [x] Suporte a múltiplos idiomas (`pt-BR`, `en`, `es`)
 - [ ] Regras fiscais e CFOPs para exportação e importação
 - [ ] Suporte a múltiplas moedas
 

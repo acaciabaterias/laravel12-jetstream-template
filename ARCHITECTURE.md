@@ -48,6 +48,7 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - `018`: governança central de branding, tema versionado, publicação validada e rollback auditável de white label por tenant
 - `019`: hub executivo central com snapshots reutilizáveis, exportações Excel/PDF auditáveis e reexecução governada de relatórios
 - `020`: automação avançada de recuperação de receita com jornadas adaptativas, experimentos governados e rollback auditável
+- `021`: internacionalização central da plataforma com preferência por operador, publicação governada, cobertura inspecionável e rollback auditável
 
 ## Integrações Externas
 
@@ -162,6 +163,16 @@ O ERP BateriaExpert segue uma arquitetura Laravel monolítica para o core do ERP
 - violações críticas habilitam rollback governado para a última política saudável, marcando jornadas afetadas e preservando `rollback_context`
 - eventos materiais (`POLITICA_AUTOMACAO_RECUPERACAO_PUBLICADA`, `ROLLBACK_AUTOMACAO_RECUPERACAO_EXECUTADO`) são publicados no backbone `010`
 - o painel central opera via Livewire em `/admin/recovery/automation` e a inspeção JSON reutilizável fica em `/admin/recovery/automation/inspection`
+
+## Platform Internationalization
+
+- o banco central mantém `platform_locale_publication_records` e `platform_locale_missing_key_reports`, além da preferência `usuarios_plataforma.preferred_locale`
+- o módulo `021` resolve locale por request administrativo usando preferência persistida do operador, sessão ativa e fallback governado
+- publicações de locale só são promovidas quando `default_locale`, `fallback_locale` e cobertura mínima das chaves críticas são consistentes
+- lacunas de tradução permanecem inspecionáveis por severidade e locale, sem quebrar a publicação saudável anterior
+- rollback restaura a última publicação elegível e marca a publicação degradada com trilha auditável de reversão
+- eventos materiais (`LOCALIZACAO_PLATAFORMA_PUBLICADA`, `ROLLBACK_LOCALIZACAO_PLATAFORMA_EXECUTADO`) são publicados no backbone `010`
+- o painel central opera via Livewire em `/admin/localization` e a inspeção JSON reutilizável fica em `/admin/localization/inspection`
 
 ## Padrões Técnicos
 

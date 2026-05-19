@@ -214,6 +214,12 @@ Valide fluxos manuais minimos:
 - avaliação de jornada com fallback e supressão sem duplicar dispatch do mesmo caso
 - rollback governado de política degradada com conferência do `restored_policy_version_id`
 - conferência de publicação dos eventos `POLITICA_AUTOMACAO_RECUPERACAO_PUBLICADA` e `ROLLBACK_AUTOMACAO_RECUPERACAO_EXECUTADO` no backbone `010`
+- dashboard central de internacionalização em `/admin/localization`
+- inspeção de internacionalização em `/admin/localization/inspection?locale=en&severity=high`
+- alteração controlada de preferência de idioma do operador com recarga do shell administrativo
+- publicação controlada de bundle com `pt_BR`, `en` e `es`, fallback ativo e conferência das lacunas abertas
+- rollback governado de publicação degradada com conferência do `restored_publication_id`
+- conferência de publicação dos eventos `LOCALIZACAO_PLATAFORMA_PUBLICADA` e `ROLLBACK_LOCALIZACAO_PLATAFORMA_EXECUTADO` no backbone `010`
 - dashboard central de analytics comercial em `/admin/analytics`
 - inspeção analítica em `/admin/analytics/inspection`
 - rebuild controlado do snapshot via `php artisan analytics:rebuild-platform-commercial-snapshot --days=30`
@@ -387,6 +393,26 @@ Se o deploy introduzir automação degradada, variante incorreta ou jornada dupl
   - `recovery_automation_journeys.metadata.rollback_context.restored_policy_version_id` apontando para a política saudável restaurada
   - `recovery_automation_experiments.status` consistente com a política publicada e o holdout configurado
   - `recovery_automation_violations.resolution_status` refletindo `rolled_back` quando a reversão encerrou a violação crítica
+
+### Rollback operacional do módulo 021
+
+Se o deploy introduzir locale incorreto, fallback inválido ou publicação degradada:
+
+- restaurar o dump do banco central anterior ao deploy quando a inconsistência afetar múltiplas publicações ou a trilha auditável
+- revisar `usuarios_plataforma.preferred_locale`, `platform_locale_publication_records` e `platform_locale_missing_key_reports`
+- verificar se a publicação ativa pode ser revertida pelo painel `/admin/localization` sem restore completo
+- executar rollback explícito informando motivo operacional claro e locale restaurado
+- rerodar validação mínima:
+  - `php artisan test --compact tests/Feature/PlatformLocalizationPreferenceTest.php`
+  - `php artisan test --compact tests/Feature/PlatformLocalizationPublicationTest.php`
+  - `php artisan test --compact tests/Feature/PlatformLocalizationInspectionTest.php`
+  - `php artisan test --compact tests/Feature/PlatformLocalizationRollbackTest.php`
+- confirmar auditoria mínima:
+  - `evento_outboxes.event_type in ('LOCALIZACAO_PLATAFORMA_PUBLICADA', 'ROLLBACK_LOCALIZACAO_PLATAFORMA_EXECUTADO')`
+  - `platform_locale_publication_records.status` consistente com a publicação ativa, superseded ou rolled_back
+  - `platform_locale_publication_records.metadata.rollback.restored_publication_id` preenchido quando houver reversão
+  - `platform_locale_missing_key_reports.resolution_status` refletindo `rolled_back` nas lacunas encerradas pela reversão
+  - `usuarios_plataforma.preferred_locale` preservado para operadores sem sobrescrita indevida
 
 Com K6, quando aplicavel:
 
