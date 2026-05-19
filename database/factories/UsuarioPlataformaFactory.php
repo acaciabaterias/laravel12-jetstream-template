@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\UsuarioPlataforma;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\UsuarioPlataforma>
+ * @extends Factory<UsuarioPlataforma>
  */
 class UsuarioPlataformaFactory extends Factory
 {

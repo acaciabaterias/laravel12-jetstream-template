@@ -56,7 +56,7 @@ class FrontendBrandingFilesTest extends TestCase
         $this->assertStringContainsString('Vendas do Dia', $dashboard);
         $this->assertStringContainsString('Tenants recentes', $adminDashboard);
         $this->assertStringContainsString('Escolha sua entrada', $welcome);
-        $this->assertStringContainsString('Ir para o login do ERP', $adminLogin);
+        $this->assertStringContainsString("__('Go to ERP login')", $adminLogin);
         $this->assertStringContainsString('Painel do Tenant', $navigation);
         $this->assertStringContainsString('Próximas ações recomendadas', $tenantWelcome);
         $this->assertStringContainsString('family=Inter', $css);

@@ -2,15 +2,15 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--brand-primary)]">Controle Central</p>
-                <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900">Dashboard da Plataforma</h2>
-                <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Monitore faturamento mensal, base de tenants e saúde das assinaturas em um painel executivo.</p>
+                <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--brand-primary)]">{{ __('Central Control') }}</p>
+                <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900">{{ __('Platform Dashboard') }}</h2>
+                <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-500">{{ __('Monitor monthly billing, tenant base and subscription health in an executive panel.') }}</p>
             </div>
             <a
                 href="{{ route('admin.filiais.index') }}"
                 class="inline-flex items-center rounded-2xl bg-[var(--brand-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-brand transition hover:opacity-95"
             >
-                Gerenciar Tenants
+                {{ __('Manage Tenants') }}
             </a>
         </div>
     </x-slot>

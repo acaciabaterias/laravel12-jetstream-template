@@ -1,6 +1,6 @@
 # BateriaExpert ERP
 
-[![Tests Passing](https://img.shields.io/badge/tests-455%20passed-brightgreen)](#testes)
+[![Tests Passing](https://img.shields.io/badge/tests-466%20passed-brightgreen)](#testes)
 [![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](#testes)
 [![PHP Version](https://img.shields.io/badge/php-8.3-777bb4)](#stack)
 [![Laravel Version](https://img.shields.io/badge/laravel-12-ff2d20)](#stack)
@@ -39,6 +39,7 @@ Os modulos core cobrem:
 - analytics comercial central
 - hub executivo central com exportação auditável
 - automacao avancada de recuperacao com experimento e rollback governado
+- internacionalizacao central com fallback governado e rollback auditavel
 
 ## Arquitetura
 
@@ -174,6 +175,16 @@ O modulo `020` fecha a camada adaptativa de cobranca central:
 - politicas versionadas com publicacao governada, experimento controlado e holdout persistente por jornada
 - rollback auditavel para a ultima politica saudavel com marcacao explicita das jornadas afetadas
 - dashboard `/admin/recovery/automation` e inspecao `/admin/recovery/automation/inspection`
+
+## Platform Internationalization
+
+O modulo `021` fecha a camada de internacionalizacao central da plataforma:
+
+- preferencia de idioma persistida por operador em `pt_BR`, `en` e `es`
+- resolucao segura por request administrativo com fallback ativo e protecao contra locale invalido
+- publicacao governada de bundles de locale com cobertura minima para chaves criticas
+- inspecao central de lacunas por severidade e rollback auditavel da ultima publicacao saudavel
+- dashboard `/admin/localization` e inspecao `/admin/localization/inspection`
 
 ## Stack
 
@@ -333,6 +344,15 @@ php artisan test --compact tests/Feature/AdvancedRecoveryAutomationJourneyTest.p
 php artisan test --compact tests/Feature/AdvancedRecoveryAutomationPublicationTest.php
 php artisan test --compact tests/Feature/AdvancedRecoveryAutomationInspectionTest.php
 php artisan test --compact tests/Feature/AdvancedRecoveryAutomationGovernanceTest.php
+```
+
+Para o recorte de internacionalizacao da plataforma do modulo `021`, os testes chave incluem:
+
+```bash
+php artisan test --compact tests/Feature/PlatformLocalizationPreferenceTest.php
+php artisan test --compact tests/Feature/PlatformLocalizationPublicationTest.php
+php artisan test --compact tests/Feature/PlatformLocalizationInspectionTest.php
+php artisan test --compact tests/Feature/PlatformLocalizationRollbackTest.php
 ```
 
 ### Documentação da API (OpenAPI/Swagger)
