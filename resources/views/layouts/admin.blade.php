@@ -78,6 +78,12 @@
                             </svg>
                             Platform currencies
                         </a>
+                        <a href="{{ route('admin.fiscal-rules.index') }}" class="group flex items-center rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.fiscal-rules.*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                            <svg class="mr-3 h-5 w-5 flex-shrink-0 text-slate-400 group-hover:text-slate-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414A1 1 0 0118 8.414V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Fiscal CFOP rules
+                        </a>
                     </nav>
                 </div>
                 <div class="flex flex-shrink-0 bg-slate-800 p-4">

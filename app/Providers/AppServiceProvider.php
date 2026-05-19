@@ -29,6 +29,11 @@ use App\Models\ExecutiveReportExecutionLog;
 use App\Models\ExecutiveReportExport;
 use App\Models\FaturaSaaS;
 use App\Models\FilaContingencia;
+use App\Models\FiscalCfopCatalogEntry;
+use App\Models\FiscalOperationScenario;
+use App\Models\FiscalRuleIssueReport;
+use App\Models\FiscalRuleMapping;
+use App\Models\FiscalRulePublicationRecord;
 use App\Models\GatewayCobrancaSaaS;
 use App\Models\IndicadorRecuperacaoReceita;
 use App\Models\InsightRiscoComercial;
@@ -95,6 +100,7 @@ use App\Policies\PedidoVendaPolicy;
 use App\Policies\PlatformBillingPolicy;
 use App\Policies\PlatformCommercialAnalyticsPolicy;
 use App\Policies\PlatformCurrencyPolicy;
+use App\Policies\PlatformFiscalRulePolicy;
 use App\Policies\PlatformLocalizationPolicy;
 use App\Policies\PlatformPaymentsPolicy;
 use App\Policies\PlatformRevenueRecoveryPolicy;
@@ -174,6 +180,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(PlatformCurrencyPublicationRecord::class, PlatformCurrencyPolicy::class);
         Gate::policy(PlatformCurrencyRateEntry::class, PlatformCurrencyPolicy::class);
         Gate::policy(PlatformCurrencyIssueReport::class, PlatformCurrencyPolicy::class);
+        Gate::policy(FiscalCfopCatalogEntry::class, PlatformFiscalRulePolicy::class);
+        Gate::policy(FiscalOperationScenario::class, PlatformFiscalRulePolicy::class);
+        Gate::policy(FiscalRulePublicationRecord::class, PlatformFiscalRulePolicy::class);
+        Gate::policy(FiscalRuleMapping::class, PlatformFiscalRulePolicy::class);
+        Gate::policy(FiscalRuleIssueReport::class, PlatformFiscalRulePolicy::class);
         Gate::policy(SnapshotAnalyticsComercial::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(RecorteCoorteComercial::class, PlatformCommercialAnalyticsPolicy::class);
         Gate::policy(MetricaPerformanceCanal::class, PlatformCommercialAnalyticsPolicy::class);
@@ -274,6 +285,30 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('rollback-platform-currencies', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->isSuperAdmin();
+        });
+
+        Gate::define('view-platform-fiscal-rules', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'support', 'billing']);
+        });
+
+        Gate::define('use-platform-fiscal-rules', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'support', 'billing']);
+        });
+
+        Gate::define('manage-platform-fiscal-rules', function ($user) {
+            return $user instanceof UsuarioPlataforma
+                && $user->ativo
+                && $user->hasRole(['super_admin', 'billing']);
+        });
+
+        Gate::define('rollback-platform-fiscal-rules', function ($user) {
             return $user instanceof UsuarioPlataforma
                 && $user->ativo
                 && $user->isSuperAdmin();
