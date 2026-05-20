@@ -134,7 +134,7 @@ class DeploymentReadinessTest extends TestCase
         $this->assertStringContainsString('FROM php:8.3-fpm-bookworm', $phpFpmDockerfile);
         $this->assertStringContainsString('CMD ["php-fpm", "-F"]', $phpFpmDockerfile);
         $this->assertStringContainsString('FROM nginx:1.27-alpine', $nginxDockerfile);
-        $this->assertStringContainsString('fastcgi_pass erp_core_php_fpm:9000;', $nginxConfig);
+        $this->assertStringContainsString('fastcgi_pass tasks.bateriaexpert_erp_core_php_fpm:9000;', $nginxConfig);
         $this->assertStringContainsString('listen = 0.0.0.0:9000', $phpFpmConfig);
     }
 
