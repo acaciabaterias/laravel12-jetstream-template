@@ -10,15 +10,33 @@ import {
 const tenantProbeSuccess = new Rate('tenant_probe_success');
 const tenantProbeHits = new Counter('tenant_probe_hits_total');
 
+function envInteger(name, fallback) {
+    const parsed = Number.parseInt(__ENV[name] || '', 10);
+
+    return Number.isNaN(parsed) || parsed < 0 ? fallback : parsed;
+}
+
+function envDuration(name, fallback) {
+    const value = (__ENV[name] || '').trim();
+
+    return value === '' ? fallback : value;
+}
+
+const rampUpTarget = envInteger('LOAD_RAMP_UP_TARGET', 10);
+const peakTarget = envInteger('LOAD_PEAK_TARGET', 40);
+const rampUpDuration = envDuration('LOAD_RAMP_UP_DURATION', '30s');
+const peakDuration = envDuration('LOAD_PEAK_DURATION', '2m');
+const rampDownDuration = envDuration('LOAD_RAMP_DOWN_DURATION', '30s');
+
 export const options = {
     scenarios: {
         multi_tenant_dashboard: {
             executor: 'ramping-vus',
             startVUs: 1,
             stages: [
-                { duration: '30s', target: 10 },
-                { duration: '2m', target: 40 },
-                { duration: '30s', target: 0 },
+                { duration: rampUpDuration, target: rampUpTarget },
+                { duration: peakDuration, target: peakTarget },
+                { duration: rampDownDuration, target: 0 },
             ],
             gracefulRampDown: '10s',
         },

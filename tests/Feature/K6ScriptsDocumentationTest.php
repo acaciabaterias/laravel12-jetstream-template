@@ -42,6 +42,11 @@ class K6ScriptsDocumentationTest extends TestCase
         $this->assertStringContainsString('TENANT_PREFIX', $readme);
         $this->assertStringContainsString('TENANT_BASE_DOMAIN', $readme);
         $this->assertStringContainsString('TENANT_COUNT', $readme);
+        $this->assertStringContainsString('LOAD_RAMP_UP_TARGET', $readme);
+        $this->assertStringContainsString('LOAD_PEAK_TARGET', $readme);
+        $this->assertStringContainsString('LOAD_RAMP_UP_DURATION', $readme);
+        $this->assertStringContainsString('LOAD_PEAK_DURATION', $readme);
+        $this->assertStringContainsString('LOAD_RAMP_DOWN_DURATION', $readme);
         $this->assertStringContainsString('k6 run tests/k6/smoke-test.js', $readme);
     }
 }

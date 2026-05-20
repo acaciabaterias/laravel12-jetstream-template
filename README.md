@@ -456,6 +456,21 @@ BASE_URL=http://127.0.0.1:8000 \
 k6 run tests/k6/load-test-multi-tenant-dashboard.js
 ```
 
+Para localizar o ponto de degradacao em ambiente local, voce pode reduzir a carga usando `LOAD_RAMP_UP_TARGET`, `LOAD_PEAK_TARGET`, `LOAD_RAMP_UP_DURATION`, `LOAD_PEAK_DURATION` e `LOAD_RAMP_DOWN_DURATION`:
+
+```bash
+TENANT_PREFIX=loadtest \
+TENANT_BASE_DOMAIN=erp.local \
+TENANT_COUNT=100 \
+LOAD_RAMP_UP_TARGET=5 \
+LOAD_PEAK_TARGET=10 \
+LOAD_RAMP_UP_DURATION=20s \
+LOAD_PEAK_DURATION=60s \
+LOAD_RAMP_DOWN_DURATION=20s \
+BASE_URL=http://127.0.0.1:8000 \
+k6 run tests/k6/load-test-multi-tenant-dashboard.js
+```
+
 Para preparar massa central de tenants de carga:
 
 ```bash
