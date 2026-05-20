@@ -436,6 +436,32 @@ Executar o teste de concorrencia com `100` usuarios:
 k6 run tests/k6/load-test-concurrent-users.js
 ```
 
+Executar o teste de carga multi-tenant variando o `Host` entre muitos clientes:
+
+```bash
+TENANT_HOSTS=loadtest-001.erp.local,loadtest-002.erp.local,loadtest-003.erp.local \
+BASE_URL=http://127.0.0.1:8000 \
+k6 run tests/k6/load-test-multi-tenant-dashboard.js
+```
+
+Esse cenario usa o endpoint leve `/load/tenant-probe` em ambiente `local/testing` para medir resolucao tenant, bootstrap web e troca de conexao por subdominio sem ruido de autenticacao ou dashboard administrativo.
+
+Se preferir gerar a lista de hosts dinamicamente, o script tambem aceita `TENANT_PREFIX`, `TENANT_BASE_DOMAIN` e `TENANT_COUNT`:
+
+```bash
+TENANT_PREFIX=loadtest \
+TENANT_BASE_DOMAIN=erp.local \
+TENANT_COUNT=100 \
+BASE_URL=http://127.0.0.1:8000 \
+k6 run tests/k6/load-test-multi-tenant-dashboard.js
+```
+
+Para preparar massa central de tenants de carga:
+
+```bash
+php artisan db:seed --class=LoadTestTenantSeeder --no-interaction
+```
+
 Se a aplicacao estiver servindo frontend e backend separadamente, garanta que `php artisan serve` e `npm run dev` ou `composer run dev` estejam ativos antes de rodar os cenarios.
 
 ### Rate Limiting Multi-tenant

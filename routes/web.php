@@ -6,6 +6,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+if (app()->environment(['local', 'testing'])) {
+    Route::get('/load/tenant-probe', function () {
+        $cliente = request()->attributes->get('cliente');
+
+        return response()->json([
+            'tenant_host' => config('database.connections.tenant.host'),
+            'cliente_id' => $cliente?->id,
+            'subdominio' => $cliente?->subdominio,
+        ]);
+    })->name('load.tenant-probe');
+}
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

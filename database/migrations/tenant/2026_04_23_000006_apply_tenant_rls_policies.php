@@ -7,6 +7,8 @@ return new class extends Migration
 {
     protected $connection = 'tenant';
 
+    public $withinTransaction = false;
+
     public function up(): void
     {
         DB::connection($this->connection)->unprepared(

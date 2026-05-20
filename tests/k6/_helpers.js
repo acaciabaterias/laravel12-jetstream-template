@@ -17,6 +17,56 @@ export function getCredentials() {
     };
 }
 
+export function getTenantBaseDomain() {
+    return (__ENV.TENANT_BASE_DOMAIN || 'erp.local').replace(/^\.+|\.+$/g, '');
+}
+
+export function getTenantHosts() {
+    const configuredHosts = (__ENV.TENANT_HOSTS || '')
+        .split(',')
+        .map((value) => value.trim())
+        .filter((value) => value !== '');
+
+    if (configuredHosts.length > 0) {
+        return configuredHosts;
+    }
+
+    const tenantPrefix = (__ENV.TENANT_PREFIX || 'loadtest').trim();
+    const tenantCount = Number.parseInt(__ENV.TENANT_COUNT || '100', 10);
+    const safeTenantCount = Number.isNaN(tenantCount) || tenantCount < 1 ? 100 : tenantCount;
+    const tenantBaseDomain = getTenantBaseDomain();
+
+    return Array.from({ length: safeTenantCount }, (_, index) => {
+        const ordinal = String(index + 1).padStart(3, '0');
+
+        return `${tenantPrefix}-${ordinal}.${tenantBaseDomain}`;
+    });
+}
+
+export function pickTenantHost(iteration = 0, vuId = 1) {
+    const tenantHosts = getTenantHosts();
+
+    if (tenantHosts.length === 0) {
+        fail('Nenhum tenant host disponivel para o teste de carga multi-tenant.');
+    }
+
+    return tenantHosts[(Math.max(vuId, 1) - 1 + iteration) % tenantHosts.length];
+}
+
+function headersForTenant(tenantHost = null, overrides = {}) {
+    const headers = {
+        ...defaultHeaders,
+        ...overrides,
+    };
+
+    if (tenantHost) {
+        headers.Host = tenantHost;
+        headers['X-Forwarded-Host'] = tenantHost;
+    }
+
+    return headers;
+}
+
 export function getCsrfTokenFromHtml(html) {
     const match = html.match(/name="_token"\s+value="([^"]+)"/);
 
@@ -62,9 +112,9 @@ export function extractSelectValues(html, modelName) {
     return Array.from(selectMatch[1].matchAll(/<option value="(\d+)"/g)).map((match) => Number(match[1]));
 }
 
-export function login(baseUrl, credentials = getCredentials()) {
+export function login(baseUrl, credentials = getCredentials(), tenantHost = null) {
     const loginPage = http.get(`${baseUrl}/login`, {
-        headers: defaultHeaders,
+        headers: headersForTenant(tenantHost),
         redirects: 0,
         tags: { name: 'login_page' },
     });
@@ -88,7 +138,7 @@ export function login(baseUrl, credentials = getCredentials()) {
         },
         {
             headers: {
-                ...defaultHeaders,
+                ...headersForTenant(tenantHost),
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Referer': `${baseUrl}/login`,
             },
@@ -108,8 +158,12 @@ export function login(baseUrl, credentials = getCredentials()) {
 }
 
 export function fetchDashboard(baseUrl) {
+    return fetchTenantDashboard(baseUrl, null);
+}
+
+export function fetchTenantDashboard(baseUrl, tenantHost = null) {
     const response = http.get(`${baseUrl}/dashboard`, {
-        headers: defaultHeaders,
+        headers: headersForTenant(tenantHost),
         redirects: 0,
         tags: { name: 'dashboard_page' },
     });
@@ -122,6 +176,10 @@ export function fetchDashboard(baseUrl) {
 }
 
 export function livewireCall(baseUrl, csrfToken, component, updates, calls, tagName) {
+    return livewireTenantCall(baseUrl, csrfToken, component, updates, calls, tagName, null);
+}
+
+export function livewireTenantCall(baseUrl, csrfToken, component, updates, calls, tagName, tenantHost = null) {
     const response = http.post(
         `${baseUrl}/livewire/update`,
         JSON.stringify({
@@ -136,11 +194,11 @@ export function livewireCall(baseUrl, csrfToken, component, updates, calls, tagN
         }),
         {
             headers: {
+                ...headersForTenant(tenantHost),
                 'Content-Type': 'application/json',
                 'X-Livewire': '1',
                 'Accept': 'application/json, text/plain, */*',
                 'Referer': `${baseUrl}/dashboard`,
-                'User-Agent': defaultHeaders['User-Agent'],
             },
             tags: { name: tagName },
         },
