@@ -1,6 +1,8 @@
 services:
   erp_core_app:
     image: ${ERP_CORE_NGINX_IMAGE:-bateriaexpert/erp-nginx:latest}
+    environment:
+      APP_URL: ${APP_URL:-https://erp.automatize.uk}
     ports:
       - target: 80
         published: 8000
@@ -30,7 +32,9 @@ services:
       - ./.env.example
       - ./.env
     environment:
-      APP_URL: ${APP_URL:-http://localhost:8000}
+      APP_KEY: ${APP_KEY:-}
+      APP_URL: ${APP_URL:-https://erp.automatize.uk}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://erp.automatize.uk,https://admin-erp.automatize.uk}
       DB_CONNECTION: central
       DB_CENTRAL_DRIVER: pgsql
       DB_CENTRAL_HOST: ${DB_CENTRAL_HOST:-erp_core_db}
@@ -45,11 +49,14 @@ services:
       SESSION_DRIVER: database
       QUEUE_CONNECTION: redis
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-false}
+      SESSION_ENCRYPT: ${SESSION_ENCRYPT:-true}
+      SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-true}
       MS_FISCAL_URL: http://ms_001_fiscal_api:8001
       MS_BANCARIO_URL: http://ms_002_banking_api:8002
       MS_WHATSAPP_URL: http://ms_003_notification_api:8003
       MS_OPENFINANCE_URL: http://ms_004_openfinance_api:8004
       MS_GEOCODING_URL: http://ms_005_geocoding_api:8005
+      SUPER_ADMIN_PASSWORD: ${SUPER_ADMIN_PASSWORD:-change-me-before-deploy}
     volumes:
       - erp_core_storage:/var/www/html/storage
     healthcheck:
@@ -62,7 +69,9 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - network_swarm_public
+      network_swarm_public:
+        aliases:
+          - erp-php-fpm
     configs:
       - source: erp_core_php_fpm_pool_v2
         target: /usr/local/etc/php-fpm.d/zz-www.conf
@@ -73,7 +82,9 @@ services:
       - ./.env.example
       - ./.env
     environment:
-      APP_URL: ${APP_URL:-http://localhost:8000}
+      APP_KEY: ${APP_KEY:-}
+      APP_URL: ${APP_URL:-https://erp.automatize.uk}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://erp.automatize.uk,https://admin-erp.automatize.uk}
       DB_CONNECTION: central
       DB_CENTRAL_DRIVER: pgsql
       DB_CENTRAL_HOST: ${DB_CENTRAL_HOST:-erp_core_db}
@@ -86,8 +97,11 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
       CACHE_STORE: redis
       SESSION_DRIVER: database
+      SESSION_ENCRYPT: ${SESSION_ENCRYPT:-true}
+      SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-true}
       QUEUE_CONNECTION: redis
       RUN_MIGRATIONS: "false"
+      SUPER_ADMIN_PASSWORD: ${SUPER_ADMIN_PASSWORD:-change-me-before-deploy}
     command: ["php", "artisan", "queue:work", "--queue=audit,default", "--verbose", "--tries=3", "--timeout=120"]
     volumes:
       - erp_core_storage:/var/www/html/storage
@@ -104,7 +118,9 @@ services:
       - ./.env.example
       - ./.env
     environment:
-      APP_URL: ${APP_URL:-http://localhost:8000}
+      APP_KEY: ${APP_KEY:-}
+      APP_URL: ${APP_URL:-https://erp.automatize.uk}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://erp.automatize.uk,https://admin-erp.automatize.uk}
       DB_CONNECTION: central
       DB_CENTRAL_DRIVER: pgsql
       DB_CENTRAL_HOST: ${DB_CENTRAL_HOST:-erp_core_db}
@@ -117,8 +133,11 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
       CACHE_STORE: redis
       SESSION_DRIVER: database
+      SESSION_ENCRYPT: ${SESSION_ENCRYPT:-true}
+      SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-true}
       QUEUE_CONNECTION: redis
       RUN_MIGRATIONS: "false"
+      SUPER_ADMIN_PASSWORD: ${SUPER_ADMIN_PASSWORD:-change-me-before-deploy}
     command: ["sh", "-c", "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
     volumes:
       - erp_core_storage:/var/www/html/storage
