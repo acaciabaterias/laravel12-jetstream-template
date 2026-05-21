@@ -22,7 +22,7 @@ services:
     networks:
       - network_swarm_public
     configs:
-      - source: erp_core_nginx_default_v2
+      - source: erp_core_nginx_default_v3
         target: /etc/nginx/conf.d/default.conf
 
   erp_core_php_fpm:
@@ -73,7 +73,7 @@ services:
         aliases:
           - erp-php-fpm
     configs:
-      - source: erp_core_php_fpm_pool_v2
+      - source: erp_core_php_fpm_pool_v3
         target: /usr/local/etc/php-fpm.d/zz-www.conf
 
   erp_core_queue:
@@ -300,9 +300,9 @@ volumes:
   ms_003_n8n_data:
 
 configs:
-  erp_core_nginx_default_v2:
+  erp_core_nginx_default_v3:
     file: ./docker/nginx/default.swarm.conf
-  erp_core_php_fpm_pool_v2:
+  erp_core_php_fpm_pool_v3:
     file: ./docker/php/www.swarm.conf
 
 networks:

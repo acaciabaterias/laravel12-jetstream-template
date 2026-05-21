@@ -115,8 +115,8 @@ class DeploymentReadinessTest extends TestCase
         $this->assertIsString($compose);
         $this->assertStringContainsString('network_swarm_public', $compose);
         $this->assertStringContainsString('configs:', $compose);
-        $this->assertStringContainsString('erp_core_nginx_default_v2', $compose);
-        $this->assertStringContainsString('erp_core_php_fpm_pool_v2', $compose);
+        $this->assertStringContainsString('erp_core_nginx_default_v3', $compose);
+        $this->assertStringContainsString('erp_core_php_fpm_pool_v3', $compose);
     }
 
     public function test_swarm_runtime_images_and_configs_are_present(): void
