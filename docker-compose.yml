@@ -105,6 +105,8 @@ services:
     command: ["php", "artisan", "queue:work", "--queue=audit,default", "--verbose", "--tries=3", "--timeout=120"]
     volumes:
       - erp_core_storage:/var/www/html/storage
+    healthcheck:
+      disable: true
     deploy:
       replicas: 1
       restart_policy:
@@ -141,6 +143,8 @@ services:
     command: ["sh", "-c", "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
     volumes:
       - erp_core_storage:/var/www/html/storage
+    healthcheck:
+      disable: true
     deploy:
       replicas: 1
       restart_policy:
