@@ -34,7 +34,8 @@ services:
       DB_TENANT_USERNAME: postgres
       DB_TENANT_PASSWORD: JE9VM6NuiwHGFIl
       CACHE_STORE: array
-      SESSION_DRIVER: array
+      SESSION_DRIVER: file
+      SESSION_SECURE_COOKIE: false
       QUEUE_CONNECTION: sync
       REDIS_HOST: 127.0.0.1
       REDIS_PORT: 6379

@@ -49,4 +49,22 @@ class K6ScriptsDocumentationTest extends TestCase
         $this->assertStringContainsString('LOAD_RAMP_DOWN_DURATION', $readme);
         $this->assertStringContainsString('k6 run tests/k6/smoke-test.js', $readme);
     }
+
+    public function test_loadtest_compose_disables_secure_cookies_for_local_http_benchmarking(): void
+    {
+        $compose = file_get_contents($this->projectPath('docker-compose.loadtest.yml'));
+        $phpFpmPool = file_get_contents($this->projectPath('docker/php/www.loadtest.conf'));
+        $nginxConfig = file_get_contents($this->projectPath('docker/nginx/default.loadtest.conf'));
+
+        $this->assertIsString($compose);
+        $this->assertIsString($phpFpmPool);
+        $this->assertIsString($nginxConfig);
+        $this->assertStringContainsString('APP_URL: http://127.0.0.1:8082', $compose);
+        $this->assertStringContainsString('SESSION_DRIVER: file', $compose);
+        $this->assertStringContainsString('SESSION_SECURE_COOKIE: false', $compose);
+        $this->assertStringContainsString('pm.max_children = 50', $phpFpmPool);
+        $this->assertStringContainsString('pm.start_servers = 10', $phpFpmPool);
+        $this->assertStringContainsString('fastcgi_pass php-fpm:9000;', $nginxConfig);
+        $this->assertStringContainsString('fastcgi_read_timeout 300;', $nginxConfig);
+    }
 }
