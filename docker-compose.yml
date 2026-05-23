@@ -29,8 +29,9 @@ services:
     image: ${ERP_CORE_PHP_FPM_IMAGE:-bateriaexpert/erp-php-fpm:latest}
     command: ["php-fpm", "-F"]
     env_file:
-      - ./.env.example
-      - ./.env
+      - path: ./.env.example
+      - path: ./.env
+        required: false
     environment:
       APP_KEY: ${APP_KEY:-}
       APP_URL: ${APP_URL:-https://erp.automatize.uk}
@@ -79,8 +80,9 @@ services:
   erp_core_queue:
     image: ${ERP_CORE_PHP_FPM_IMAGE:-bateriaexpert/erp-php-fpm:latest}
     env_file:
-      - ./.env.example
-      - ./.env
+      - path: ./.env.example
+      - path: ./.env
+        required: false
     environment:
       APP_KEY: ${APP_KEY:-}
       APP_URL: ${APP_URL:-https://erp.automatize.uk}
@@ -117,8 +119,9 @@ services:
   erp_core_scheduler:
     image: ${ERP_CORE_PHP_FPM_IMAGE:-bateriaexpert/erp-php-fpm:latest}
     env_file:
-      - ./.env.example
-      - ./.env
+      - path: ./.env.example
+      - path: ./.env
+        required: false
     environment:
       APP_KEY: ${APP_KEY:-}
       APP_URL: ${APP_URL:-https://erp.automatize.uk}
@@ -155,8 +158,9 @@ services:
   ms_001_fiscal_api:
     image: bateriaexpert/ms-001-fiscal-acbr:latest
     env_file:
-      - ./microservicos/ms-001-fiscal-acbr/.env.example
-      - ./microservicos/ms-001-fiscal-acbr/.env
+      - path: ./microservicos/ms-001-fiscal-acbr/.env.example
+      - path: ./microservicos/ms-001-fiscal-acbr/.env
+        required: false
     ports:
       - target: 8001
         published: 8001
@@ -182,8 +186,9 @@ services:
   ms_002_banking_api:
     image: bateriaexpert/ms-002-bancario:latest
     env_file:
-      - ./microservicos/ms-002-bancario/.env.example
-      - ./microservicos/ms-002-bancario/.env
+      - path: ./microservicos/ms-002-bancario/.env.example
+      - path: ./microservicos/ms-002-bancario/.env
+        required: false
     ports:
       - target: 8002
         published: 8002
@@ -199,8 +204,9 @@ services:
   ms_003_notification_api:
     image: bateriaexpert/ms-003-whatsapp-n8n:latest
     env_file:
-      - ./microservicos/ms-003-whatsapp-n8n/.env.example
-      - ./microservicos/ms-003-whatsapp-n8n/.env
+      - path: ./microservicos/ms-003-whatsapp-n8n/.env.example
+      - path: ./microservicos/ms-003-whatsapp-n8n/.env
+        required: false
     ports:
       - target: 8003
         published: 8003
@@ -268,8 +274,9 @@ services:
   ms_004_openfinance_api:
     image: bateriaexpert/ms-004-openfinance:latest
     env_file:
-      - ./microservicos/ms-004-openfinance/.env.example
-      - ./microservicos/ms-004-openfinance/.env
+      - path: ./microservicos/ms-004-openfinance/.env.example
+      - path: ./microservicos/ms-004-openfinance/.env
+        required: false
     ports:
       - target: 8004
         published: 8004
@@ -285,8 +292,9 @@ services:
   ms_005_geocoding_api:
     image: bateriaexpert/ms-005-geocoding:latest
     env_file:
-      - ./microservicos/ms-005-geocoding/.env.example
-      - ./microservicos/ms-005-geocoding/.env
+      - path: ./microservicos/ms-005-geocoding/.env.example
+      - path: ./microservicos/ms-005-geocoding/.env
+        required: false
     ports:
       - target: 8005
         published: 8005

@@ -93,10 +93,11 @@ class DeploymentReadinessTest extends TestCase
         $compose = file_get_contents($this->projectPath('docker-compose.yml'));
 
         $this->assertIsString($compose);
-        $this->assertStringContainsString('- ./.env.example', $compose);
-        $this->assertStringContainsString('- ./.env', $compose);
-        $this->assertStringContainsString('- ./microservicos/ms-001-fiscal-acbr/.env.example', $compose);
-        $this->assertStringContainsString('- ./microservicos/ms-005-geocoding/.env.example', $compose);
+        $this->assertStringContainsString('- path: ./.env.example', $compose);
+        $this->assertStringContainsString('- path: ./.env', $compose);
+        $this->assertStringContainsString('required: false', $compose);
+        $this->assertStringContainsString('- path: ./microservicos/ms-001-fiscal-acbr/.env.example', $compose);
+        $this->assertStringContainsString('- path: ./microservicos/ms-005-geocoding/.env.example', $compose);
     }
 
     public function test_docker_compose_preserves_built_runtime_artifacts_when_mounting_source(): void
