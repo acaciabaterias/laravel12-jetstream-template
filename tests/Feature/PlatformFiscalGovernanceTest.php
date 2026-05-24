@@ -32,8 +32,8 @@ class PlatformFiscalGovernanceTest extends TestCase
                 ['cfop_code' => '3101', 'description' => 'Import for resale', 'operation_direction' => 'import'],
             ],
             [
-                ['scenario_key' => 'direct_export', 'cfop_code' => '7101', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_ncm']],
-                ['scenario_key' => 'resale_import', 'cfop_code' => '3101', 'classification_code' => '85072010', 'operation_direction' => 'import', 'validation_flags' => ['requires_customs_record']],
+                ['scenario_key' => 'direct_export', 'cfop_code' => '7101', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_ncm'], 'tax_profile' => ['ncm_code' => '85072010', 'tax_regime' => 'regular', 'cst_code' => '041', 'operation_purpose' => 'direct_export', 'partner_type' => 'customer', 'tax_payload' => ['ipi_rate' => 0]]],
+                ['scenario_key' => 'resale_import', 'cfop_code' => '3101', 'classification_code' => '85072010', 'operation_direction' => 'import', 'validation_flags' => ['requires_customs_record'], 'tax_profile' => ['ncm_code' => '85072010', 'tax_regime' => 'regular', 'cst_code' => '040', 'operation_purpose' => 'resale', 'partner_type' => 'supplier', 'tax_payload' => ['ii_rate' => 14]]],
             ],
             $billing->id,
         );

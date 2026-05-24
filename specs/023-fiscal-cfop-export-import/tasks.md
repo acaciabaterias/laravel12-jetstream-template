@@ -127,3 +127,19 @@
 - [x] T034 [P] Add targeted coverage for fiscal event publication, scenario lookup and rollback audit trail in `tests/Feature/` and `tests/Unit/`
 - [x] T035 Perform code cleanup and Laravel Pint on changed files
 - [x] T036 Run `quickstart.md` validation and record evidence in feature artifacts
+
+---
+
+## Phase 7: Pending Material Fiscal Delivery
+
+**Purpose**: Close the gap between governance-only fiscal rules and operationally usable fiscal classification
+
+- [x] T037 [P] [US1] Add feature coverage for interstate fiscal scenario lookup with origin/destination and partner context in `tests/Feature/PlatformFiscalInterstateLookupTest.php`
+- [x] T038 [P] [US2] Add unit coverage for tax profile validation rules including NCM, CST/CSOSN and interstate exceptions in `tests/Unit/PlatformFiscalTaxProfileRulesTest.php`
+- [x] T039 [P] [US2] Add feature coverage for publication blocking when tax profile metadata is incomplete in `tests/Feature/PlatformFiscalTaxProfilePublicationTest.php`
+- [x] T040 [US1] Extend central fiscal schema and models for material tax profile data in `database/migrations/central/` and `app/Models/`
+- [x] T041 [US1] Implement tax profile resolution services for interstate and international scenarios in `app/Services/Fiscal/`
+- [x] T042 [US2] Strengthen publication guardrails for NCM/CST/CSOSN, regime compatibility and interstate tax context in `app/Services/Fiscal/` and `app/Http/Requests/Admin/`
+- [x] T043 [US1] Expose enriched fiscal resolution contract for module `009` consumers in `app/Services/Fiscal/` and `app/Http/Controllers/Admin/`
+- [x] T044 [US3] Extend inspection and rollback evidence to include tax profile gaps and tributary exceptions in `app/Services/Fiscal/`, `app/Livewire/Admin/` and `resources/views/livewire/admin/`
+- [x] T045 [US3] Update runbook and quickstart evidence for interstate taxation and material fiscal payload validation in `GO_LIVE_RUNBOOK.md` and `specs/023-fiscal-cfop-export-import/quickstart.md`

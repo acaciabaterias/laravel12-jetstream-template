@@ -9,6 +9,7 @@ use App\Models\FiscalOperationScenario;
 use App\Models\FiscalRuleIssueReport;
 use App\Models\FiscalRuleMapping;
 use App\Models\FiscalRulePublicationRecord;
+use App\Models\FiscalTaxProfile;
 use App\Models\UsuarioPlataforma;
 use App\Services\Fiscal\PlatformFiscalRuleEventPublisher;
 use App\Support\Fiscal\FiscalRuleIssueResolutionStatus;
@@ -39,6 +40,7 @@ class PlatformFiscalRuleFoundationTest extends TestCase
         $this->assertTrue(Schema::connection('central')->hasTable('fiscal_operation_scenarios'));
         $this->assertTrue(Schema::connection('central')->hasTable('fiscal_rule_publication_records'));
         $this->assertTrue(Schema::connection('central')->hasTable('fiscal_rule_mappings'));
+        $this->assertTrue(Schema::connection('central')->hasTable('fiscal_tax_profiles'));
         $this->assertTrue(Schema::connection('central')->hasTable('fiscal_rule_issue_reports'));
     }
 
@@ -60,6 +62,12 @@ class PlatformFiscalRuleFoundationTest extends TestCase
             'scenario_key' => $scenario->scenario_key,
             'cfop_code' => $cfop->cfop_code,
         ]);
+        $taxProfile = FiscalTaxProfile::factory()->create([
+            'fiscal_rule_mapping_id' => $mapping->id,
+            'fiscal_rule_publication_record_id' => $publication->id,
+            'scenario_key' => $scenario->scenario_key,
+            'cfop_code' => $cfop->cfop_code,
+        ]);
         $issueReport = FiscalRuleIssueReport::factory()->create([
             'fiscal_rule_publication_record_id' => $publication->id,
             'scenario_key' => $scenario->scenario_key,
@@ -70,6 +78,7 @@ class PlatformFiscalRuleFoundationTest extends TestCase
 
         $this->assertSame('central', $publication->getConnectionName());
         $this->assertSame($publication->id, $mapping->publication->id);
+        $this->assertSame($taxProfile->id, $mapping->taxProfile->id);
         $this->assertSame($publication->id, $issueReport->publication->id);
         $this->assertSame($operator->id, $publication->publisher->id);
         $this->assertSame(FiscalRulePublicationStatus::Active, $publication->status);

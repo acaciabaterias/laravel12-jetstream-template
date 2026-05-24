@@ -201,9 +201,10 @@ O modulo `022` fecha a camada monetaria central da plataforma:
 O modulo `023` fecha a camada central de governanca fiscal para exportacao e importacao:
 
 - consulta de enquadramento por cenario com fallback governado quando a regra ativa estiver ausente ou invalida
-- publicacao versionada de catalogo CFOP e mappings fiscais com snapshot de cobertura obrigatoria
-- inspecao central de issues por severidade, historico de publicacoes e rollback auditavel da ultima publicacao elegivel
-- dashboard `/admin/fiscal-rules` e inspecao `/admin/fiscal-rules/inspection`
+- publicacao versionada de catalogo CFOP, mappings fiscais e `tax_profile` material com snapshot de cobertura obrigatoria
+- resolucao fiscal enriquecida para contexto interestadual com contrato consumivel em `/admin/fiscal-rules/resolve`
+- inspecao central de issues por severidade, gaps tributarios materiais, historico de publicacoes e rollback auditavel da ultima publicacao elegivel
+- dashboard `/admin/fiscal-rules` e inspecoes `/admin/fiscal-rules/inspection` e `/admin/fiscal-rules/resolve`
 
 ## Stack
 
@@ -434,6 +435,47 @@ Executar o teste de concorrencia com `100` usuarios:
 
 ```bash
 k6 run tests/k6/load-test-concurrent-users.js
+```
+
+Executar o teste de carga multi-tenant variando o `Host` entre muitos clientes:
+
+```bash
+TENANT_HOSTS=loadtest-001.erp.local,loadtest-002.erp.local,loadtest-003.erp.local \
+BASE_URL=http://127.0.0.1:8000 \
+k6 run tests/k6/load-test-multi-tenant-dashboard.js
+```
+
+Esse cenario usa o endpoint leve `/load/tenant-probe` em ambiente `local/testing` para medir resolucao tenant, bootstrap web e troca de conexao por subdominio sem ruido de autenticacao ou dashboard administrativo.
+
+Se preferir gerar a lista de hosts dinamicamente, o script tambem aceita `TENANT_PREFIX`, `TENANT_BASE_DOMAIN` e `TENANT_COUNT`:
+
+```bash
+TENANT_PREFIX=loadtest \
+TENANT_BASE_DOMAIN=erp.local \
+TENANT_COUNT=100 \
+BASE_URL=http://127.0.0.1:8000 \
+k6 run tests/k6/load-test-multi-tenant-dashboard.js
+```
+
+Para localizar o ponto de degradacao em ambiente local, voce pode reduzir a carga usando `LOAD_RAMP_UP_TARGET`, `LOAD_PEAK_TARGET`, `LOAD_RAMP_UP_DURATION`, `LOAD_PEAK_DURATION` e `LOAD_RAMP_DOWN_DURATION`:
+
+```bash
+TENANT_PREFIX=loadtest \
+TENANT_BASE_DOMAIN=erp.local \
+TENANT_COUNT=100 \
+LOAD_RAMP_UP_TARGET=5 \
+LOAD_PEAK_TARGET=10 \
+LOAD_RAMP_UP_DURATION=20s \
+LOAD_PEAK_DURATION=60s \
+LOAD_RAMP_DOWN_DURATION=20s \
+BASE_URL=http://127.0.0.1:8000 \
+k6 run tests/k6/load-test-multi-tenant-dashboard.js
+```
+
+Para preparar massa central de tenants de carga:
+
+```bash
+php artisan db:seed --class=LoadTestTenantSeeder --no-interaction
 ```
 
 Se a aplicacao estiver servindo frontend e backend separadamente, garanta que `php artisan serve` e `npm run dev` ou `composer run dev` estejam ativos antes de rodar os cenarios.

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PlatformBillingInspectionController;
 use App\Http\Controllers\Admin\PlatformCommercialAnalyticsInspectionController;
 use App\Http\Controllers\Admin\PlatformCurrencyInspectionController;
 use App\Http\Controllers\Admin\PlatformFiscalRuleInspectionController;
+use App\Http\Controllers\Admin\PlatformFiscalRuleResolutionController;
 use App\Http\Controllers\Admin\PlatformLocalizationInspectionController;
 use App\Http\Controllers\Admin\PlatformPaymentsInspectionController;
 use App\Http\Controllers\Admin\PlatformRevenueRecoveryInspectionController;
@@ -64,6 +65,7 @@ Route::name('admin.')->group(function () {
         Route::get('/currencies/inspection', PlatformCurrencyInspectionController::class)->name('currencies.inspection');
         Route::get('/fiscal-rules', PlatformFiscalRuleManager::class)->name('fiscal-rules.index');
         Route::get('/fiscal-rules/inspection', PlatformFiscalRuleInspectionController::class)->name('fiscal-rules.inspection');
+        Route::get('/fiscal-rules/resolve', PlatformFiscalRuleResolutionController::class)->name('fiscal-rules.resolve');
         Route::get('/localization', PlatformLocalizationManager::class)->name('localization.index');
         Route::get('/localization/inspection', PlatformLocalizationInspectionController::class)->name('localization.inspection');
         Route::get('/recovery', PlatformRevenueRecoveryDashboard::class)->name('recovery.index');

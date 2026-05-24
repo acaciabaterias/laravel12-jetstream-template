@@ -118,14 +118,14 @@
             @if(auth()->user()->isSuperAdmin())
                 <div class="brand-card">
                     <h3 class="mb-4 font-display text-xl font-semibold text-slate-950">Contexto de Empresa</h3>
-                    <livewire:filial-selector />
+                    <livewire:filial-selector lazy />
                 </div>
             @endif
 
             @if(auth()->user()->hasRole(['dono', 'gestor', 'super_admin']))
                 <div class="brand-card">
                     <h3 class="mb-4 font-display text-xl font-semibold text-slate-950">Gerenciamento de Usuários</h3>
-                    <livewire:user-manager />
+                    <livewire:user-manager lazy />
                 </div>
             @else
                 <div class="brand-shell">
@@ -135,64 +135,64 @@
 
             @can('acesso-estoque')
                 <div class="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-                    <livewire:estoque-dashboard />
-                    <livewire:estoque-adjustment-form />
+                    <livewire:estoque-dashboard lazy />
+                    <livewire:estoque-adjustment-form lazy />
                 </div>
 
                 <div class="grid gap-6 xl:grid-cols-2">
-                    <livewire:xml-import-form />
-                    <livewire:conta-sucata-dashboard />
+                    <livewire:xml-import-form lazy />
+                    <livewire:conta-sucata-dashboard lazy />
                 </div>
             @endcan
 
             @can('acesso-vendas')
                 <div class="grid gap-6 xl:grid-cols-[1.35fr_0.95fr]">
-                    <livewire:vale-form />
+                    <livewire:vale-form lazy />
                     <div class="space-y-6">
-                        <livewire:vale-conversion-actions />
+                        <livewire:vale-conversion-actions lazy />
                         @can('acesso-tecnico')
-                            <livewire:ordem-servico-form />
+                            <livewire:ordem-servico-form lazy />
                         @endcan
                     </div>
                 </div>
 
-                <livewire:vale-list />
+                <livewire:vale-list lazy />
             @endcan
 
             @can('acesso-logistica')
                 <div class="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-                    <livewire:route-planner />
-                    <livewire:logistics-dashboard />
+                    <livewire:route-planner lazy />
+                    <livewire:logistics-dashboard lazy />
                 </div>
 
-                <livewire:delivery-route-screen />
+                <livewire:delivery-route-screen lazy />
             @endcan
 
             @can('acesso-tecnico')
                 <div class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-                    <livewire:garantia-board />
-                    <livewire:garantia-form />
+                    <livewire:garantia-board lazy />
+                    <livewire:garantia-form lazy />
                 </div>
 
-                <livewire:garantia-laudo-form />
+                <livewire:garantia-laudo-form lazy />
             @endcan
 
             @can('acesso-financeiro')
                 <div class="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-                    <livewire:finance-dashboard />
-                    <livewire:cash-flow-panel />
+                    <livewire:finance-dashboard lazy />
+                    <livewire:cash-flow-panel lazy />
                 </div>
 
-                <livewire:margin-analysis-grid />
+                <livewire:margin-analysis-grid lazy />
 
                 <div class="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-                    <livewire:fiscal-contingency-dashboard />
-                    <livewire:cnab-upload-panel />
+                    <livewire:fiscal-contingency-dashboard lazy />
+                    <livewire:cnab-upload-panel lazy />
                 </div>
             @endcan
 
             @can('view-integration-operations')
-                <livewire:integration-backbone-dashboard />
+                <livewire:integration-backbone-dashboard lazy />
             @endcan
         </div>
     </div>

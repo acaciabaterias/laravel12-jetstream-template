@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Models\FiscalRuleMapping;
+use App\Models\FiscalTaxProfile;
 use App\Services\Fiscal\PlatformFiscalResolutionRules;
 use Tests\TestCase;
 
@@ -19,6 +20,12 @@ class PlatformFiscalResolutionRulesTest extends TestCase
             'operation_direction' => 'export',
             'validation_flags' => ['requires_ncm' => true],
         ]);
+        $mapping->setRelation('taxProfile', new FiscalTaxProfile([
+            'ncm_code' => '85072010',
+            'tax_regime' => 'regular',
+            'cst_code' => '041',
+            'tax_payload' => ['ipi_rate' => 0],
+        ]));
 
         $this->assertTrue($rules->mappingMatchesScenario([
             'scenario_key' => 'direct_export',
@@ -47,5 +54,6 @@ class PlatformFiscalResolutionRulesTest extends TestCase
         $this->assertSame('7101', $fallback['cfop_code']);
         $this->assertSame('missing_active_publication', $fallback['issue']['code']);
         $this->assertContains('requires_manual_review', $fallback['validation_flags']);
+        $this->assertSame('regular', $fallback['tax_profile']['tax_regime']);
     }
 }

@@ -36,10 +36,10 @@ class PlatformFiscalPublicationTest extends TestCase
                 ['cfop_code' => '3551', 'description' => 'Import for industrialization', 'operation_direction' => 'import'],
             ])
             ->set('scenarioMappings', [
-                ['scenario_key' => 'direct_export', 'cfop_code' => '7101', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_ncm']],
-                ['scenario_key' => 'indirect_export', 'cfop_code' => '7501', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_export_commitment']],
-                ['scenario_key' => 'resale_import', 'cfop_code' => '3101', 'classification_code' => '85072010', 'operation_direction' => 'import', 'validation_flags' => ['requires_customs_record']],
-                ['scenario_key' => 'industrial_import', 'cfop_code' => '3551', 'classification_code' => '85072010', 'operation_direction' => 'import', 'validation_flags' => ['requires_ncm']],
+                ['scenario_key' => 'direct_export', 'cfop_code' => '7101', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_ncm'], 'tax_profile' => ['ncm_code' => '85072010', 'tax_regime' => 'regular', 'cst_code' => '041', 'operation_purpose' => 'direct_export', 'partner_type' => 'customer', 'tax_payload' => ['ipi_rate' => 0]]],
+                ['scenario_key' => 'indirect_export', 'cfop_code' => '7501', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_export_commitment'], 'tax_profile' => ['ncm_code' => '85072010', 'tax_regime' => 'regular', 'cst_code' => '041', 'operation_purpose' => 'indirect_export', 'partner_type' => 'trading_company', 'tax_payload' => ['ipi_rate' => 0]]],
+                ['scenario_key' => 'resale_import', 'cfop_code' => '3101', 'classification_code' => '85072010', 'operation_direction' => 'import', 'validation_flags' => ['requires_customs_record'], 'tax_profile' => ['ncm_code' => '85072010', 'tax_regime' => 'regular', 'cst_code' => '040', 'operation_purpose' => 'resale', 'partner_type' => 'supplier', 'tax_payload' => ['ii_rate' => 14]]],
+                ['scenario_key' => 'industrial_import', 'cfop_code' => '3551', 'classification_code' => '85072010', 'operation_direction' => 'import', 'validation_flags' => ['requires_ncm'], 'tax_profile' => ['ncm_code' => '85072010', 'tax_regime' => 'regular', 'cst_code' => '000', 'operation_purpose' => 'industrialization', 'partner_type' => 'supplier', 'tax_payload' => ['ii_rate' => 14, 'ipi_rate' => 5]]],
             ])
             ->call('publishRules')
             ->assertHasNoErrors();
@@ -51,6 +51,11 @@ class PlatformFiscalPublicationTest extends TestCase
         $this->assertDatabaseHas('fiscal_rule_mappings', [
             'scenario_key' => 'direct_export',
             'cfop_code' => '7101',
+        ], 'central');
+        $this->assertDatabaseHas('fiscal_tax_profiles', [
+            'scenario_key' => 'direct_export',
+            'cfop_code' => '7101',
+            'ncm_code' => '85072010',
         ], 'central');
         $this->assertDatabaseHas('evento_outboxes', [
             'event_type' => 'CATALOGO_FISCAL_PUBLICADO',

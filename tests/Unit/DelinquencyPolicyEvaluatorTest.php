@@ -11,23 +11,41 @@ use App\Support\Billing\DelinquencyAction;
 use App\Support\Billing\PlatformSubscriptionStatus;
 use App\Support\Billing\SaasInvoiceStatus;
 use Illuminate\Support\Carbon;
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class DelinquencyPolicyEvaluatorTest extends TestCase
 {
+    private function makeInvoice(string $status, Carbon $dueDate): FaturaSaaS
+    {
+        $fatura = new FaturaSaaS;
+        $fatura->setRawAttributes([
+            'status' => $status,
+            'vencimento' => $dueDate->toDateString(),
+        ], true);
+
+        return $fatura;
+    }
+
+    private function makePolicy(int $gracePeriodDays, int $blockAfterDays): PoliticaInadimplencia
+    {
+        $politica = new PoliticaInadimplencia;
+        $politica->setRawAttributes([
+            'grace_period_days' => $gracePeriodDays,
+            'block_after_days' => $blockAfterDays,
+            'reactivation_mode' => 'automatic',
+            'notification_profile' => '[]',
+        ], true);
+
+        return $politica;
+    }
+
     public function test_it_marks_a_pending_invoice_as_overdue_once_the_due_date_has_passed(): void
     {
-        $fatura = new FaturaSaaS([
-            'status' => SaasInvoiceStatus::Pending->value,
-            'vencimento' => Carbon::now()->subDay(),
-        ]);
+        $fatura = $this->makeInvoice(SaasInvoiceStatus::Pending->value, Carbon::now()->subDay());
 
-        $acao = new DelinquencyPolicyEvaluator()->decideAction(
+        $acao = (new DelinquencyPolicyEvaluator)->decideAction(
             faturaSaaS: $fatura,
-            politicaInadimplencia: new PoliticaInadimplencia([
-                'grace_period_days' => 3,
-                'block_after_days' => 7,
-            ]),
+            politicaInadimplencia: $this->makePolicy(3, 7),
             currentStatus: PlatformSubscriptionStatus::Active->value,
             referenceDate: Carbon::now(),
         );
@@ -37,17 +55,11 @@ class DelinquencyPolicyEvaluatorTest extends TestCase
 
     public function test_it_blocks_when_the_invoice_has_exceeded_the_block_threshold(): void
     {
-        $fatura = new FaturaSaaS([
-            'status' => SaasInvoiceStatus::Overdue->value,
-            'vencimento' => Carbon::now()->subDays(10),
-        ]);
+        $fatura = $this->makeInvoice(SaasInvoiceStatus::Overdue->value, Carbon::now()->subDays(10));
 
-        $acao = new DelinquencyPolicyEvaluator()->decideAction(
+        $acao = (new DelinquencyPolicyEvaluator)->decideAction(
             faturaSaaS: $fatura,
-            politicaInadimplencia: new PoliticaInadimplencia([
-                'grace_period_days' => 2,
-                'block_after_days' => 5,
-            ]),
+            politicaInadimplencia: $this->makePolicy(2, 5),
             currentStatus: PlatformSubscriptionStatus::GracePeriod->value,
             referenceDate: Carbon::now(),
         );
@@ -57,12 +69,9 @@ class DelinquencyPolicyEvaluatorTest extends TestCase
 
     public function test_it_reactivates_when_the_open_invoice_is_missing_and_subscription_is_blocked(): void
     {
-        $acao = new DelinquencyPolicyEvaluator()->decideAction(
+        $acao = (new DelinquencyPolicyEvaluator)->decideAction(
             faturaSaaS: null,
-            politicaInadimplencia: new PoliticaInadimplencia([
-                'grace_period_days' => 2,
-                'block_after_days' => 5,
-            ]),
+            politicaInadimplencia: $this->makePolicy(2, 5),
             currentStatus: PlatformSubscriptionStatus::Blocked->value,
             referenceDate: Carbon::now(),
         );
