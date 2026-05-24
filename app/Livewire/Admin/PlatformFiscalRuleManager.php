@@ -64,6 +64,18 @@ class PlatformFiscalRuleManager extends Component
             'classification_code' => '85072010',
             'operation_direction' => 'export',
             'validation_flags' => ['requires_ncm', 'requires_foreign_partner'],
+            'tax_profile' => [
+                'ncm_code' => '85072010',
+                'tax_regime' => 'regular',
+                'cst_code' => '041',
+                'csosn_code' => null,
+                'partner_type' => 'customer',
+                'operation_purpose' => 'direct_export',
+                'origin_state' => null,
+                'destination_state' => null,
+                'interstate_tax_rate' => null,
+                'tax_payload' => ['ipi_rate' => 0, 'pis_rate' => 0, 'cofins_rate' => 0],
+            ],
         ],
         [
             'scenario_key' => 'indirect_export',
@@ -71,6 +83,18 @@ class PlatformFiscalRuleManager extends Component
             'classification_code' => '85072010',
             'operation_direction' => 'export',
             'validation_flags' => ['requires_export_commitment'],
+            'tax_profile' => [
+                'ncm_code' => '85072010',
+                'tax_regime' => 'regular',
+                'cst_code' => '041',
+                'csosn_code' => null,
+                'partner_type' => 'trading_company',
+                'operation_purpose' => 'indirect_export',
+                'origin_state' => null,
+                'destination_state' => null,
+                'interstate_tax_rate' => null,
+                'tax_payload' => ['ipi_rate' => 0, 'pis_rate' => 0, 'cofins_rate' => 0],
+            ],
         ],
         [
             'scenario_key' => 'resale_import',
@@ -78,6 +102,18 @@ class PlatformFiscalRuleManager extends Component
             'classification_code' => '85072010',
             'operation_direction' => 'import',
             'validation_flags' => ['requires_customs_record'],
+            'tax_profile' => [
+                'ncm_code' => '85072010',
+                'tax_regime' => 'regular',
+                'cst_code' => '040',
+                'csosn_code' => null,
+                'partner_type' => 'supplier',
+                'operation_purpose' => 'resale',
+                'origin_state' => null,
+                'destination_state' => null,
+                'interstate_tax_rate' => null,
+                'tax_payload' => ['ii_rate' => 14, 'ipi_rate' => 0, 'pis_rate' => 0, 'cofins_rate' => 0],
+            ],
         ],
         [
             'scenario_key' => 'industrial_import',
@@ -85,6 +121,18 @@ class PlatformFiscalRuleManager extends Component
             'classification_code' => '85072010',
             'operation_direction' => 'import',
             'validation_flags' => ['requires_ncm'],
+            'tax_profile' => [
+                'ncm_code' => '85072010',
+                'tax_regime' => 'regular',
+                'cst_code' => '000',
+                'csosn_code' => null,
+                'partner_type' => 'supplier',
+                'operation_purpose' => 'industrialization',
+                'origin_state' => null,
+                'destination_state' => null,
+                'interstate_tax_rate' => null,
+                'tax_payload' => ['ii_rate' => 14, 'ipi_rate' => 5, 'pis_rate' => 1.65, 'cofins_rate' => 7.6],
+            ],
         ],
     ];
 
@@ -112,6 +160,7 @@ class PlatformFiscalRuleManager extends Component
                     'classification_code' => $scenarioMapping['classification_code'] ?? null,
                     'operation_direction' => $scenarioMapping['operation_direction'],
                     'validation_flags' => array_values($validationFlags),
+                    'tax_profile' => $scenarioMapping['tax_profile'] ?? [],
                 ];
             })
             ->values()

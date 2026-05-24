@@ -16,8 +16,8 @@ class PlatformFiscalPublicationRulesTest extends TestCase
                 ['cfop_code' => '7101', 'description' => 'Direct export', 'operation_direction' => 'export'],
             ],
             [
-                ['scenario_key' => 'direct_export', 'cfop_code' => '7101', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_ncm']],
-                ['scenario_key' => 'direct_export', 'cfop_code' => '9999', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_ncm']],
+                ['scenario_key' => 'direct_export', 'cfop_code' => '7101', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_ncm'], 'tax_profile' => ['ncm_code' => '85072010', 'tax_regime' => 'regular', 'cst_code' => '041', 'tax_payload' => ['ipi_rate' => 0]]],
+                ['scenario_key' => 'direct_export', 'cfop_code' => '9999', 'classification_code' => '85072010', 'operation_direction' => 'export', 'validation_flags' => ['requires_ncm'], 'tax_profile' => ['ncm_code' => '85072010', 'tax_regime' => 'regular', 'cst_code' => '041', 'tax_payload' => ['ipi_rate' => 0]]],
             ],
             [
                 'invalid_mappings' => [],
@@ -36,7 +36,7 @@ class PlatformFiscalPublicationRulesTest extends TestCase
                 ['cfop_code' => '3101', 'description' => 'Import for resale', 'operation_direction' => 'import'],
             ],
             [
-                ['scenario_key' => 'direct_export', 'cfop_code' => '3101', 'classification_code' => '85072010', 'operation_direction' => 'import', 'validation_flags' => ['requires_ncm']],
+                ['scenario_key' => 'direct_export', 'cfop_code' => '3101', 'classification_code' => '85072010', 'operation_direction' => 'import', 'validation_flags' => ['requires_ncm'], 'tax_profile' => ['ncm_code' => '85072010', 'tax_regime' => 'regular', 'cst_code' => '041', 'tax_payload' => ['ipi_rate' => 0]]],
             ],
             [
                 'invalid_mappings' => [

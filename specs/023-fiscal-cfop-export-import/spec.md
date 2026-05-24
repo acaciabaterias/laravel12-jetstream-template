@@ -2,7 +2,7 @@
 
 **Feature Branch**: `023-fiscal-cfop-export-import`  
 **Created**: 2026-05-18  
-**Status**: Draft  
+**Status**: In Progress  
 **Input**: User description: "Prossiga."
 
 ## Contexto
@@ -10,6 +10,8 @@
 O ERP já consolidou orquestração fiscal e bancária, backbone, billing central, relatórios executivos, internacionalização e múltiplas moedas. O roadmap ainda prevê regras fiscais e CFOPs para exportação e importação, e este módulo fecha a próxima camada crítica para operações interestaduais e internacionais com governança central, catálogo auditável e rollback seguro de regras fiscais.
 
 O objetivo do módulo `023` é introduzir uma camada central para catálogo de CFOPs, enquadramentos de exportação/importação, classificação fiscal por cenário e publicação governada de regras materiais. O escopo inicial cobre o plano central administrativo e a projeção operacional das regras fiscais que serão consumidas pela orquestração do módulo `009`, sem reescrever o fluxo transacional de emissão existente.
+
+O primeiro corte já implementado cobre a governança central mínima de catálogo, cenários, publicação, inspeção e rollback. Ainda falta a camada material de decisão fiscal para operações interestaduais e internacionais, com tributação derivada, NCM/CST/CSOSN, perfil tributário por operação e contrato operacional mais completo para o consumidor do módulo `009`.
 
 ## Constitution Mapping
 
@@ -88,6 +90,11 @@ Como super admin, quero inspecionar histórico de publicações fiscais, inconsi
 - **FR-FISC-009**: O sistema MUST publicar eventos materiais de catálogo fiscal no backbone `010` para publicação e rollback.
 - **FR-FISC-010**: O sistema MUST preservar o uso central como catálogo governado, sem duplicar estado fiscal definitivo em bancos tenant neste módulo.
 - **FR-FISC-011**: A spec MUST definir requisitos de backup, restore validation e rollback para publicações fiscais e evidências de inconsistência.
+- **FR-FISC-012**: O sistema MUST classificar operações interestaduais considerando origem, destino, finalidade da operação e tipo de parceiro, sem reduzir a decisão fiscal apenas à direção `import` ou `export`.
+- **FR-FISC-013**: O sistema MUST permitir publicar metadados fiscais materiais por regra, incluindo ao menos NCM de referência, CST/CSOSN aplicável, regime tributário compatível e payload de tributos derivados para consumo operacional.
+- **FR-FISC-014**: O sistema MUST validar coerência entre CFOP, cenário, perfil tributário e contexto interestadual antes de ativar uma publicação.
+- **FR-FISC-015**: O sistema MUST expor um contrato de resolução fiscal reutilizável para o módulo `009` contendo CFOP, classificação, flags, contexto tributário e evidência da publicação de origem.
+- **FR-FISC-016**: O sistema MUST registrar lacunas materiais quando uma regra depender de NCM, CST/CSOSN, alíquota interestadual ou exceção fiscal não publicada.
 
 ### Key Entities
 
@@ -96,6 +103,7 @@ Como super admin, quero inspecionar histórico de publicações fiscais, inconsi
 - **FiscalRulePublicationRecord**: representa a publicação governada do catálogo fiscal e das regras ativas.
 - **FiscalRuleMapping**: representa o vínculo entre cenário fiscal, CFOP, classificação e flags materiais da publicação.
 - **FiscalRuleIssueReport**: representa uma inconsistência material ou lacuna detectada na publicação fiscal.
+- **FiscalTaxProfile**: representa o contexto tributário material derivado de uma regra fiscal, incluindo regime, NCM/CST/CSOSN e payload de tributos usados pelo consumidor operacional.
 
 ## Success Criteria
 
@@ -106,6 +114,8 @@ Como super admin, quero inspecionar histórico de publicações fiscais, inconsi
 - **SC-FISC-003**: Inconsistências materiais de regras fiscais ficam inspecionáveis em até 1 minuto após a publicação.
 - **SC-FISC-004**: Um rollback validado restaura a última publicação saudável em até 3 interações no painel administrativo.
 - **SC-FISC-005**: Nenhuma consulta fiscal central responde com cenário obrigatório sem classificação explícita, fallback ou evidência de lacuna.
+- **SC-FISC-006**: Uma operação interestadual obrigatória deve ser resolvida com contexto tributário mínimo publicável em até uma consulta administrativa.
+- **SC-FISC-007**: O contrato consumido pelo módulo `009` deve permitir emissão assistida sem depender de planilha externa para NCM/CST/CSOSN ou exceção interestadual do cenário coberto.
 
 ## Dependencies
 

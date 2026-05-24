@@ -6,6 +6,10 @@ namespace App\Services\Fiscal;
 
 class PlatformFiscalPublicationRules
 {
+    public function __construct(
+        private readonly PlatformFiscalTaxProfileRules $platformFiscalTaxProfileRules,
+    ) {}
+
     /**
      * @param  array<int, array<string, mixed>>  $catalogEntries
      * @param  array<int, array<string, mixed>>  $scenarioMappings
@@ -51,6 +55,8 @@ class PlatformFiscalPublicationRules
             if (! in_array($scenarioMapping['operation_direction'] ?? null, $supportedDirections, true)) {
                 $messages[] = sprintf('O cenario %s possui direcao fiscal nao suportada.', $scenarioMapping['scenario_key'] ?? 'n/d');
             }
+
+            array_push($messages, ...$this->platformFiscalTaxProfileRules->validate($scenarioMapping));
         }
 
         foreach ((array) ($coverageSnapshot['invalid_mappings'] ?? []) as $invalidMapping) {

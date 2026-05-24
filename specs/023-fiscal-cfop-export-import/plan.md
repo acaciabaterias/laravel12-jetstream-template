@@ -116,6 +116,14 @@ tests/
   - testes de consulta, publicação, inconsistência e rollback
   - atualização de runbook e artefatos de produto
 
+## Phase 3: Delivery Delta After Initial Governance Cut
+
+- Expandir o domínio fiscal além da direção da operação, cobrindo contexto interestadual, origem/destino e finalidade operacional.
+- Acrescentar perfil tributário material publicável por regra fiscal, com suporte mínimo para NCM, CST/CSOSN, regime e payload de tributos derivados.
+- Revisar o contrato de resolução para o módulo `009`, garantindo que a resposta reutilizável entregue dados suficientes para consumo transacional assistido.
+- Fortalecer validações de publicação para bloquear combinações incoerentes entre CFOP, cenário, perfil tributário e exceções interestaduais.
+- Complementar a inspeção e o rollback com evidência de lacunas tributárias materiais, não apenas ausência de cenário ou mismatch de direção.
+
 ## Complexity Tracking
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |

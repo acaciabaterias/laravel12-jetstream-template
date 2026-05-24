@@ -55,6 +55,11 @@ class FiscalRulePublicationRecord extends Model
         return $this->hasMany(FiscalRuleIssueReport::class);
     }
 
+    public function taxProfiles(): HasMany
+    {
+        return $this->hasMany(FiscalTaxProfile::class, 'fiscal_rule_publication_record_id');
+    }
+
     public function publisher(): BelongsTo
     {
         return $this->belongsTo(UsuarioPlataforma::class, 'published_by');

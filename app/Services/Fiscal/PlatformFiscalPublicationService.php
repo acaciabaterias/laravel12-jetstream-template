@@ -77,12 +77,31 @@ class PlatformFiscalPublicationService
             }
 
             foreach ($scenarioMappings as $scenarioMapping) {
-                $publication->mappings()->create([
+                $mapping = $publication->mappings()->create([
                     'scenario_key' => $scenarioMapping['scenario_key'],
                     'cfop_code' => $scenarioMapping['cfop_code'],
                     'classification_code' => $scenarioMapping['classification_code'] ?? null,
                     'operation_direction' => $scenarioMapping['operation_direction'],
                     'validation_flags' => $scenarioMapping['validation_flags'] ?? [],
+                    'metadata' => [
+                        'source' => 'publication',
+                    ],
+                ]);
+
+                $mapping->taxProfile()->create([
+                    'fiscal_rule_publication_record_id' => $publication->id,
+                    'scenario_key' => $scenarioMapping['scenario_key'],
+                    'cfop_code' => $scenarioMapping['cfop_code'],
+                    'ncm_code' => $scenarioMapping['tax_profile']['ncm_code'] ?? null,
+                    'tax_regime' => $scenarioMapping['tax_profile']['tax_regime'] ?? 'regular',
+                    'cst_code' => $scenarioMapping['tax_profile']['cst_code'] ?? null,
+                    'csosn_code' => $scenarioMapping['tax_profile']['csosn_code'] ?? null,
+                    'partner_type' => $scenarioMapping['tax_profile']['partner_type'] ?? null,
+                    'operation_purpose' => $scenarioMapping['tax_profile']['operation_purpose'] ?? null,
+                    'origin_state' => $scenarioMapping['tax_profile']['origin_state'] ?? null,
+                    'destination_state' => $scenarioMapping['tax_profile']['destination_state'] ?? null,
+                    'interstate_tax_rate' => $scenarioMapping['tax_profile']['interstate_tax_rate'] ?? null,
+                    'tax_payload' => $scenarioMapping['tax_profile']['tax_payload'] ?? [],
                     'metadata' => [
                         'source' => 'publication',
                     ],

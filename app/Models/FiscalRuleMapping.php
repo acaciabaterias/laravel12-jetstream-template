@@ -8,6 +8,7 @@ use Database\Factories\FiscalRuleMappingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class FiscalRuleMapping extends Model
 {
@@ -37,5 +38,10 @@ class FiscalRuleMapping extends Model
     public function publication(): BelongsTo
     {
         return $this->belongsTo(FiscalRulePublicationRecord::class, 'fiscal_rule_publication_record_id');
+    }
+
+    public function taxProfile(): HasOne
+    {
+        return $this->hasOne(FiscalTaxProfile::class, 'fiscal_rule_mapping_id');
     }
 }

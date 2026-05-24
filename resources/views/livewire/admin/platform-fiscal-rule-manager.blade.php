@@ -97,17 +97,38 @@
 
         <div class="mt-6 space-y-4">
             @foreach ($scenarioMappings as $index => $scenarioMapping)
-                <div class="grid gap-3 md:grid-cols-5">
-                    <input wire:model.live="scenarioMappings.{{ $index }}.scenario_key" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Scenario key">
-                    <input wire:model.live="scenarioMappings.{{ $index }}.cfop_code" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="CFOP">
-                    <input wire:model.live="scenarioMappings.{{ $index }}.classification_code" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Classification">
-                    <select wire:model.live="scenarioMappings.{{ $index }}.operation_direction" class="rounded-lg border-slate-300 text-sm">
-                        @foreach ($supportedDirections as $supportedDirection)
-                            <option value="{{ $supportedDirection }}">{{ $supportedDirection }}</option>
-                        @endforeach
-                    </select>
+                <div class="space-y-3 rounded-xl border border-slate-200 p-4">
+                    <div class="grid gap-3 md:grid-cols-5">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.scenario_key" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Scenario key">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.cfop_code" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="CFOP">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.classification_code" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Classification">
+                        <select wire:model.live="scenarioMappings.{{ $index }}.operation_direction" class="rounded-lg border-slate-300 text-sm">
+                            @foreach ($supportedDirections as $supportedDirection)
+                                <option value="{{ $supportedDirection }}">{{ $supportedDirection }}</option>
+                            @endforeach
+                        </select>
+                        <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                            {{ implode(', ', (array) $scenarioMapping['validation_flags']) }}
+                        </div>
+                    </div>
+
+                    <div class="grid gap-3 md:grid-cols-4">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.tax_profile.ncm_code" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="NCM">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.tax_profile.tax_regime" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Tax regime">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.tax_profile.cst_code" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="CST">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.tax_profile.csosn_code" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="CSOSN">
+                    </div>
+
+                    <div class="grid gap-3 md:grid-cols-5">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.tax_profile.partner_type" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Partner type">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.tax_profile.operation_purpose" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Operation purpose">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.tax_profile.origin_state" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Origin state">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.tax_profile.destination_state" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Destination state">
+                        <input wire:model.live="scenarioMappings.{{ $index }}.tax_profile.interstate_tax_rate" type="text" class="rounded-lg border-slate-300 text-sm" placeholder="Interstate rate">
+                    </div>
+
                     <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
-                        {{ implode(', ', (array) $scenarioMapping['validation_flags']) }}
+                        Tax payload keys: {{ implode(', ', array_keys((array) ($scenarioMapping['tax_profile']['tax_payload'] ?? []))) ?: 'none' }}
                     </div>
                 </div>
             @endforeach

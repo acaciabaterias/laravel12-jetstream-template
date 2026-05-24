@@ -9,6 +9,7 @@ use App\Models\FiscalCfopCatalogEntry;
 use App\Models\FiscalOperationScenario;
 use App\Models\FiscalRuleMapping;
 use App\Models\FiscalRulePublicationRecord;
+use App\Models\FiscalTaxProfile;
 use App\Models\UsuarioPlataforma;
 use App\Support\Fiscal\FiscalRulePublicationStatus;
 use Tests\Concerns\InteractsWithPlatformFiscalRuleSetup;
@@ -42,7 +43,7 @@ class PlatformFiscalScenarioLookupTest extends TestCase
             'release_key' => 'fiscal-lookup-001',
             'published_at' => now(),
         ]);
-        FiscalRuleMapping::factory()->create([
+        $mapping = FiscalRuleMapping::factory()->create([
             'fiscal_rule_publication_record_id' => $publication->id,
             'scenario_key' => 'direct_export',
             'cfop_code' => '7101',
@@ -52,6 +53,13 @@ class PlatformFiscalScenarioLookupTest extends TestCase
                 'requires_ncm' => true,
                 'requires_foreign_partner' => true,
             ],
+        ]);
+        FiscalTaxProfile::factory()->create([
+            'fiscal_rule_mapping_id' => $mapping->id,
+            'fiscal_rule_publication_record_id' => $publication->id,
+            'scenario_key' => 'direct_export',
+            'cfop_code' => '7101',
+            'ncm_code' => '85072010',
         ]);
 
         $operator = UsuarioPlataforma::factory()->billing()->create();
@@ -75,6 +83,7 @@ class PlatformFiscalScenarioLookupTest extends TestCase
             ->assertOk()
             ->assertJsonPath('lookup.cfop_code', '7101')
             ->assertJsonPath('lookup.classification_code', '85072010')
-            ->assertJsonPath('lookup.resolution_type', 'active_mapping');
+            ->assertJsonPath('lookup.resolution_type', 'active_mapping')
+            ->assertJsonPath('lookup.tax_profile.ncm_code', '85072010');
     }
 }
