@@ -201,9 +201,10 @@ O modulo `022` fecha a camada monetaria central da plataforma:
 O modulo `023` fecha a camada central de governanca fiscal para exportacao e importacao:
 
 - consulta de enquadramento por cenario com fallback governado quando a regra ativa estiver ausente ou invalida
-- publicacao versionada de catalogo CFOP e mappings fiscais com snapshot de cobertura obrigatoria
-- inspecao central de issues por severidade, historico de publicacoes e rollback auditavel da ultima publicacao elegivel
-- dashboard `/admin/fiscal-rules` e inspecao `/admin/fiscal-rules/inspection`
+- publicacao versionada de catalogo CFOP, mappings fiscais e `tax_profile` material com snapshot de cobertura obrigatoria
+- resolucao fiscal enriquecida para contexto interestadual com contrato consumivel em `/admin/fiscal-rules/resolve`
+- inspecao central de issues por severidade, gaps tributarios materiais, historico de publicacoes e rollback auditavel da ultima publicacao elegivel
+- dashboard `/admin/fiscal-rules` e inspecoes `/admin/fiscal-rules/inspection` e `/admin/fiscal-rules/resolve`
 
 ## Stack
 

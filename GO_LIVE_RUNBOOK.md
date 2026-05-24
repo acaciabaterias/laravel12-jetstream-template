@@ -445,7 +445,9 @@ Se o deploy introduzir taxa inconsistente, moeda inválida ou projeção monetá
 Se o deploy introduzir enquadramento fiscal inconsistente, CFOP inválido ou cobertura obrigatória degradada:
 
 - restaurar o dump do banco central anterior ao deploy quando a inconsistência afetar múltiplas publicações ou a trilha auditável
-- revisar `fiscal_cfop_catalog_entries`, `fiscal_operation_scenarios`, `fiscal_rule_publication_records`, `fiscal_rule_mappings` e `fiscal_rule_issue_reports`
+- revisar `fiscal_cfop_catalog_entries`, `fiscal_operation_scenarios`, `fiscal_rule_publication_records`, `fiscal_rule_mappings`, `fiscal_tax_profiles` e `fiscal_rule_issue_reports`
+- validar no endpoint `/admin/fiscal-rules/resolve` se o contrato do cenário afetado ainda retorna `schema_version`, `resolution`, `tax_profile` e `tax_context` coerentes
+- confirmar na inspeção `/admin/fiscal-rules/inspection` se `summary.material_tax_issues` ou `summary.interstate_profiles` denunciaram a degradação esperada
 - validar se a publicação ativa pode ser revertida pelo painel `/admin/fiscal-rules` antes de considerar restore completo
 - executar rollback explícito informando motivo operacional claro e baseline restaurado
 - rerodar validação mínima:
@@ -453,11 +455,22 @@ Se o deploy introduzir enquadramento fiscal inconsistente, CFOP inválido ou cob
   - `php artisan test --compact tests/Feature/PlatformFiscalPublicationTest.php`
   - `php artisan test --compact tests/Feature/PlatformFiscalInspectionTest.php`
   - `php artisan test --compact tests/Feature/PlatformFiscalRollbackTest.php`
+  - `php artisan test --compact tests/Feature/PlatformFiscalInterstateLookupTest.php`
+  - `php artisan test --compact tests/Feature/PlatformFiscalTaxProfilePublicationTest.php`
+  - `php artisan test --compact tests/Unit/PlatformFiscalTaxProfileRulesTest.php`
 - confirmar auditoria mínima:
   - `evento_outboxes.event_type in ('CATALOGO_FISCAL_PUBLICADO', 'CATALOGO_FISCAL_DEGRADADO_REGISTRADO', 'ROLLBACK_CATALOGO_FISCAL_EXECUTADO')`
   - `fiscal_rule_publication_records.status` consistente com a publicação ativa, draft, superseded ou rolled_back
   - `fiscal_rule_publication_records.metadata.rollback.restored_publication_id` preenchido quando houver reversão
+  - `fiscal_rule_publication_records.metadata.rollback.material_tax_issue_count` refletindo o total de gaps materiais revertidos
   - `fiscal_rule_issue_reports.resolution_status` refletindo `rolled_back` nas inconsistências encerradas pela reversão
+  - `fiscal_rule_issue_reports.issue_type` contendo evidências como `tax_profile_gap`, `missing_interstate_rate`, `missing_cst` ou `missing_csosn` quando a degradação for tributária
+
+Quando a degradação afetar operação interestadual, validar explicitamente:
+
+- `origin_state` e `destination_state` preservados no `tax_profile` da publicação restaurada
+- `interstate_tax_rate` retornado pela resolução para cenários como `interstate_resale`
+- `partner_type` e `operation_purpose` compatíveis com o contrato consumido pelo módulo `009`
 
 Com K6, quando aplicavel:
 
