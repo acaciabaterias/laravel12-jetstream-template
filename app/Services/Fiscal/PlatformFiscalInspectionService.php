@@ -24,6 +24,7 @@ class PlatformFiscalInspectionService
         $issues = FiscalRuleIssueReport::query()
             ->when(filled($filters['scenario'] ?? null), fn ($query) => $query->where('scenario_key', $filters['scenario']))
             ->when(filled($filters['severity'] ?? null), fn ($query) => $query->where('severity', $filters['severity']))
+            ->when(filled($filters['issue_type'] ?? null), fn ($query) => $query->where('issue_type', $filters['issue_type']))
             ->latest('detected_at')
             ->limit((int) ($filters['limit'] ?? 10))
             ->get();
@@ -48,8 +49,19 @@ class PlatformFiscalInspectionService
                     ->where('resolution_status', 'open')
                     ->where('severity', 'critical')
                     ->count(),
+                'material_tax_issues' => FiscalRuleIssueReport::query()
+                    ->where('resolution_status', 'open')
+                    ->whereIn('issue_type', ['material_tax_profile_missing', 'tax_profile_gap', 'missing_interstate_rate', 'missing_cst', 'missing_csosn'])
+                    ->count(),
+                'interstate_profiles' => $lookupInspection['active_publication']?->taxProfiles()
+                    ->whereNotNull('origin_state')
+                    ->whereNotNull('destination_state')
+                    ->whereColumn('origin_state', '!=', 'destination_state')
+                    ->count() ?? 0,
+                'lookup_issue_code' => $lookupInspection['lookup']['issue']['code'] ?? null,
             ],
             'lookup' => $lookupInspection['lookup'],
+            'consumer_contract' => $lookupInspection['consumer_contract'],
             'scenarios' => $lookupInspection['scenarios'],
             'issues' => $issues,
             'publications' => $publications,

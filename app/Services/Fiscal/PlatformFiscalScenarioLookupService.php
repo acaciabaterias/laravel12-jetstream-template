@@ -33,6 +33,7 @@ class PlatformFiscalScenarioLookupService
         return [
             'summary' => $this->summary($activePublication),
             'lookup' => $selectedScenarioKey !== '' ? $this->resolve($selectedScenarioKey, $activePublication, $filters) : null,
+            'consumer_contract' => $selectedScenarioKey !== '' ? $this->consumerContract($selectedScenarioKey, $activePublication, $filters) : null,
             'scenarios' => $scenarios,
             'issues' => FiscalRuleIssueReport::query()
                 ->when(
@@ -100,6 +101,38 @@ class PlatformFiscalScenarioLookupService
         }
 
         return $this->platformFiscalResolutionRules->fallbackForScenario($scenario, $publication, $mapping, $context);
+    }
+
+    /**
+     * @param  array<string, mixed>  $context
+     * @return array<string, mixed>
+     */
+    public function consumerContract(string $scenarioKey, ?FiscalRulePublicationRecord $publication = null, array $context = []): array
+    {
+        $publication ??= $this->activePublication();
+        $lookup = $this->resolve($scenarioKey, $publication, $context);
+
+        return [
+            'schema_version' => 'platform-fiscal-rule.v2',
+            'module_consumer' => '009-fiscal-bank-orchestrator',
+            'scenario_key' => $lookup['scenario_key'],
+            'publication' => [
+                'id' => $lookup['source_publication_id'],
+                'release_key' => $publication?->release_key,
+            ],
+            'resolution' => [
+                'type' => $lookup['resolution_type'],
+                'cfop_code' => $lookup['cfop_code'],
+                'classification_code' => $lookup['classification_code'],
+                'validation_flags' => $lookup['validation_flags'],
+            ],
+            'tax_profile' => $lookup['tax_profile'] ?? null,
+            'tax_context' => $lookup['tax_context'] ?? [],
+            'governance' => [
+                'issue' => $lookup['issue'],
+                'fallback_applied' => $lookup['resolution_type'] !== 'active_mapping',
+            ],
+        ];
     }
 
     /**

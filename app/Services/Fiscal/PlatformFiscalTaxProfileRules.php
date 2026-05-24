@@ -154,6 +154,65 @@ class PlatformFiscalTaxProfileRules
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $scenarioMapping
+     * @return array<int, array<string, mixed>>
+     */
+    public function issuePayloads(array $scenarioMapping): array
+    {
+        $taxProfile = $scenarioMapping['tax_profile'] ?? null;
+        $scenarioKey = (string) ($scenarioMapping['scenario_key'] ?? 'n/d');
+        $issues = [];
+
+        if (! is_array($taxProfile)) {
+            return [[
+                'scenario_key' => $scenarioKey,
+                'issue_type' => 'material_tax_profile_missing',
+                'issue_payload' => ['reason' => 'tax_profile_not_array'],
+            ]];
+        }
+
+        $originState = $this->normalizeState($taxProfile['origin_state'] ?? null);
+        $destinationState = $this->normalizeState($taxProfile['destination_state'] ?? null);
+
+        if (! filled($taxProfile['ncm_code'] ?? null)) {
+            $issues[] = [
+                'scenario_key' => $scenarioKey,
+                'issue_type' => 'tax_profile_gap',
+                'issue_payload' => ['field' => 'ncm_code'],
+            ];
+        }
+
+        if (($taxProfile['tax_regime'] ?? null) === 'simple_national' && ! filled($taxProfile['csosn_code'] ?? null)) {
+            $issues[] = [
+                'scenario_key' => $scenarioKey,
+                'issue_type' => 'missing_csosn',
+                'issue_payload' => ['tax_regime' => 'simple_national'],
+            ];
+        }
+
+        if (($taxProfile['tax_regime'] ?? null) !== 'simple_national' && filled($taxProfile['tax_regime'] ?? null) && ! filled($taxProfile['cst_code'] ?? null)) {
+            $issues[] = [
+                'scenario_key' => $scenarioKey,
+                'issue_type' => 'missing_cst',
+                'issue_payload' => ['tax_regime' => $taxProfile['tax_regime'] ?? null],
+            ];
+        }
+
+        if ($originState !== null && $destinationState !== null && $originState !== $destinationState && ! filled($taxProfile['interstate_tax_rate'] ?? null)) {
+            $issues[] = [
+                'scenario_key' => $scenarioKey,
+                'issue_type' => 'missing_interstate_rate',
+                'issue_payload' => [
+                    'origin_state' => $originState,
+                    'destination_state' => $destinationState,
+                ],
+            ];
+        }
+
+        return $issues;
+    }
+
     private function normalizeState(mixed $state): ?string
     {
         if (! is_string($state) || trim($state) === '') {

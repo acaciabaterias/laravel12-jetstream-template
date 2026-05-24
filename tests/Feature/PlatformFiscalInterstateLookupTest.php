@@ -9,6 +9,7 @@ use App\Models\FiscalOperationScenario;
 use App\Models\FiscalRuleMapping;
 use App\Models\FiscalRulePublicationRecord;
 use App\Models\FiscalTaxProfile;
+use App\Models\UsuarioPlataforma;
 use App\Services\Fiscal\PlatformFiscalScenarioLookupService;
 use App\Support\Fiscal\FiscalRulePublicationStatus;
 use Tests\Concerns\InteractsWithPlatformFiscalRuleSetup;
@@ -74,5 +75,23 @@ class PlatformFiscalInterstateLookupTest extends TestCase
         $this->assertSame('6102', $lookup['cfop_code']);
         $this->assertTrue($lookup['tax_context']['is_interstate']);
         $this->assertSame('12.00', $lookup['tax_profile']['interstate_tax_rate']);
+
+        $resolutionResponse = $this
+            ->actingAs(UsuarioPlataforma::factory()->billing()->create(), 'platform')
+            ->getJson(route('admin.fiscal-rules.resolve', [
+                'scenario' => 'interstate_resale',
+                'origin_state' => 'SP',
+                'destination_state' => 'RJ',
+                'partner_type' => 'customer',
+                'operation_purpose' => 'resale',
+                'tax_regime' => 'regular',
+            ]));
+
+        $resolutionResponse
+            ->assertOk()
+            ->assertJsonPath('schema_version', 'platform-fiscal-rule.v2')
+            ->assertJsonPath('module_consumer', '009-fiscal-bank-orchestrator')
+            ->assertJsonPath('resolution.cfop_code', '6102')
+            ->assertJsonPath('tax_profile.interstate_tax_rate', '12.00');
     }
 }

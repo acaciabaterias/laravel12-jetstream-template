@@ -44,6 +44,20 @@ class PlatformFiscalRollbackService
         $connection = FiscalRulePublicationRecord::query()->getModel()->getConnection();
 
         return $connection->transaction(function () use ($publication, $restorablePublication, $reason, $operatorId): FiscalRulePublicationRecord {
+            $criticalIssueTypes = FiscalRuleIssueReport::query()
+                ->where('fiscal_rule_publication_record_id', $publication->id)
+                ->where('resolution_status', 'open')
+                ->where('severity', 'critical')
+                ->pluck('issue_type')
+                ->unique()
+                ->values()
+                ->all();
+            $materialTaxIssueCount = FiscalRuleIssueReport::query()
+                ->where('fiscal_rule_publication_record_id', $publication->id)
+                ->where('resolution_status', 'open')
+                ->whereIn('issue_type', ['material_tax_profile_missing', 'tax_profile_gap', 'missing_interstate_rate', 'missing_cst', 'missing_csosn'])
+                ->count();
+
             $publication->forceFill([
                 'status' => FiscalRulePublicationStatus::RolledBack->value,
                 'rolled_back_by' => $operatorId,
@@ -53,6 +67,8 @@ class PlatformFiscalRollbackService
                         'reason' => $reason,
                         'restored_publication_id' => $restorablePublication?->id,
                         'rolled_back_at' => now()->toIso8601String(),
+                        'critical_issue_types' => $criticalIssueTypes,
+                        'material_tax_issue_count' => $materialTaxIssueCount,
                     ],
                 ]),
             ])->save();
@@ -89,6 +105,8 @@ class PlatformFiscalRollbackService
                     'metadata' => [
                         'rolled_back_by' => $operatorId,
                         'reason' => $reason,
+                        'critical_issue_types' => $criticalIssueTypes,
+                        'material_tax_issue_count' => $materialTaxIssueCount,
                     ],
                 ],
                 config('platform_fiscal_rules.events.default_consumers', ['platform', 'fiscal', 'observability']),

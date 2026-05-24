@@ -35,6 +35,7 @@ class PlatformFiscalInspectionTest extends TestCase
             'fiscal_rule_publication_record_id' => $publication->id,
             'scenario_key' => 'direct_export',
             'severity' => FiscalRuleIssueSeverity::Critical->value,
+            'issue_type' => 'tax_profile_gap',
         ]);
 
         $response = $this
@@ -43,13 +44,16 @@ class PlatformFiscalInspectionTest extends TestCase
                 'scenario' => 'direct_export',
                 'severity' => 'critical',
                 'status' => 'active',
+                'issue_type' => 'tax_profile_gap',
             ]));
 
         $response
             ->assertOk()
             ->assertJsonPath('summary.active_publications', 1)
             ->assertJsonPath('summary.critical_issues', 1)
+            ->assertJsonPath('summary.material_tax_issues', 1)
             ->assertJsonPath('issues.0.scenario_key', 'direct_export')
+            ->assertJsonPath('issues.0.issue_type', 'tax_profile_gap')
             ->assertJsonPath('publications.0.release_key', 'fiscal-inspection-001');
     }
 }

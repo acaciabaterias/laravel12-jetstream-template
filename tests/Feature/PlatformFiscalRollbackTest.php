@@ -55,6 +55,8 @@ class PlatformFiscalRollbackTest extends TestCase
             ->call('rollbackPublication', $candidate->id)
             ->assertHasNoErrors();
 
+        $candidate->refresh();
+
         $this->assertDatabaseHas('fiscal_rule_publication_records', [
             'id' => $candidate->id,
             'status' => FiscalRulePublicationStatus::RolledBack->value,
@@ -73,5 +75,7 @@ class PlatformFiscalRollbackTest extends TestCase
             'event_type' => 'ROLLBACK_CATALOGO_FISCAL_EXECUTADO',
             'origin_context' => 'platform-fiscal-rules',
         ], 'central');
+        $this->assertSame(['direction_mismatch'], $candidate->metadata['rollback']['critical_issue_types']);
+        $this->assertSame(0, $candidate->metadata['rollback']['material_tax_issue_count']);
     }
 }

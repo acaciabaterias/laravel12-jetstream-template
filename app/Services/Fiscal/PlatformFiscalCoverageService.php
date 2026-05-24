@@ -6,6 +6,10 @@ namespace App\Services\Fiscal;
 
 class PlatformFiscalCoverageService
 {
+    public function __construct(
+        private readonly PlatformFiscalTaxProfileRules $platformFiscalTaxProfileRules,
+    ) {}
+
     /**
      * @param  array<int, array<string, mixed>>  $catalogEntries
      * @param  array<int, array<string, mixed>>  $scenarioMappings
@@ -117,6 +121,17 @@ class PlatformFiscalCoverageService
                         'catalog_direction' => $catalogEntry['operation_direction'] ?? null,
                         'mapping_direction' => $mapping['operation_direction'] ?? null,
                     ],
+                ];
+            }
+
+            foreach ($this->platformFiscalTaxProfileRules->issuePayloads($mapping) as $taxIssue) {
+                $reports[] = [
+                    'scenario_key' => $taxIssue['scenario_key'],
+                    'issue_type' => $taxIssue['issue_type'],
+                    'severity' => 'critical',
+                    'resolution_status' => 'open',
+                    'detected_at' => now(),
+                    'issue_payload' => $taxIssue['issue_payload'],
                 ];
             }
         }
